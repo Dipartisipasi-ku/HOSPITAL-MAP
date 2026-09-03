@@ -23,13 +23,23 @@
             perspective: 1200px; cursor: grab; z-index: 1;
         }
         
+        /* PERBAIKAN BUG ROTASI & HOTSPOT: Wadah kini memeluk gambar (Shrink-Wrap) */
         .map-wrapper { 
-            position: relative; width: 95vw; height: 95vh; display: flex; justify-content: center; align-items: center;
+            position: relative; 
+            display: inline-block; /* Kunci agar wadah presisi seukuran gambar di dalamnya */
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 10px; background: white;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
             transform-style: preserve-3d; transform-origin: center center;
         }
-        .map-wrapper img { display: none; width: 100%; height: 100%; object-fit: contain; border-radius: 10px; pointer-events: none;}
+        
+        .map-wrapper img { 
+            display: none; 
+            max-width: 95vw; /* Batasan ukuran diletakkan langsung di gambar */
+            max-height: 95vh; 
+            width: auto; 
+            height: auto; 
+            object-fit: contain; border-radius: 10px; pointer-events: none;
+        }
         
         .no-map-warning {
             position: absolute; text-align: center; color: #e84118; font-weight: bold; font-size: 28px;
@@ -37,7 +47,7 @@
             border: 3px dashed #e84118; z-index: 50; display: none;
         }
 
-        /* --- FITUR BARU: PANEL FLOATING DRAGGABLE --- */
+        /* Panel Floating Draggable */
         .floating-panel {
             position: absolute; top: 20px; left: 20px; width: 360px; max-height: 90vh;
             background: rgba(245, 246, 250, 0.95); backdrop-filter: blur(10px);
@@ -53,7 +63,7 @@
         .drag-handle:active { cursor: grabbing; }
         .panel-content { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-        /* HUD Kontrol (Juga Dibuat Floating & Draggable) */
+        /* HUD Kontrol Draggable */
         .map-controls-hud {
             position: absolute; bottom: 30px; left: 30px; width: 250px;
             background: rgba(47, 54, 64, 0.9); border-radius: 15px; overflow: hidden;
@@ -71,7 +81,6 @@
         .btn-map-control:hover { background: #dcdde1; color: #2f3640;}
         .btn-map-control.active { background: #e1b12c; color: #2f3640; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
 
-        /* Tombol Zoom (Kini digabung ke HUD) */
         .zoom-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px;}
         .btn-zoom { background: #00a8ff; color: white; border: none; width: 45px; height: 45px; border-radius: 8px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
         .btn-zoom:hover { background: #0097e6; transform: scale(1.05); }
@@ -173,7 +182,7 @@
         </div>
     </div>
 
-    <!-- WIDGET FLOATING 1: NAVIGASI (Bisa Digeser) -->
+    <!-- WIDGET FLOATING 1: NAVIGASI PENGUNJUNG (Draggable) -->
     <div class="floating-panel" id="drag-nav-panel">
         <div class="drag-handle" id="nav-drag-handle">
             <span>🏥 RS Atma Husada</span>
@@ -198,7 +207,7 @@
         </div>
     </div>
 
-    <!-- WIDGET FLOATING 2: HUD KONTROL PETA (Bisa Digeser) -->
+    <!-- WIDGET FLOATING 2: HUD KONTROL PETA (Draggable) -->
     <div class="map-controls-hud" id="drag-hud-panel">
         <div class="hud-handle" id="hud-drag-handle">🔀 Kontrol Peta</div>
         <div class="hud-content">
@@ -386,6 +395,7 @@
         let dataRute = {}; 
         let dataHotspots = []; 
         
+        // State Editing C-Panel
         let editAsalName = null;
         let editTujuanName = null;
         let editHotspotId = null;
@@ -394,6 +404,7 @@
         let lokasiTujuan = "";
         let ucapanAktif = null;
 
+        // Kontrol Peta
         let modePeta = 'FLAT'; 
         let rotasiPeta = 0;
         let currentZoom = 1;
@@ -598,6 +609,7 @@
         // C-PANEL: RENDER LIST VIEWS
         // ==========================================
         function renderAllAdminLists() {
+            // 1. Render Asal
             const listAsal = document.getElementById('list-asal');
             listAsal.innerHTML = '';
             dataLokasiAsal.forEach(nama => {
@@ -611,6 +623,7 @@
                     </div>`;
             });
 
+            // 2. Render Tujuan
             const listTujuan = document.getElementById('list-tujuan');
             listTujuan.innerHTML = '';
             for (let nama in dataRute) {
@@ -624,6 +637,7 @@
                     </div>`;
             }
 
+            // 3. Render Hotspot
             const listHotspot = document.getElementById('list-hotspot');
             const selectTarget = document.getElementById('hs-target');
             
@@ -639,6 +653,7 @@
                     </div>`;
             });
 
+            // Update Dropdown "Target Rute" di form Hotspot
             selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Info) --</option>';
             for (let nama in dataRute) { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; }
         }
@@ -797,15 +812,19 @@
             }
         }
 
+
         // ==========================================
         // C-PANEL LOGIC (LAINNYA)
         // ==========================================
-        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
+        window.syncDataAdmin = function() {
+            fetchAllDataSupabase();
+        }
 
         window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
         window.prosesLogin = function() {
             if (document.getElementById('login-pin').value === systemPIN) {
-                window.tutupModal('login-modal'); bukaCPanel();
+                window.tutupModal('login-modal');
+                bukaCPanel();
             } else { alert("PIN Salah!"); }
         }
         function bukaCPanel() {
@@ -814,7 +833,7 @@
             document.getElementById('val-vol').innerText = settingTTS.volume;
             document.getElementById('tts-rate').value = settingTTS.rate;
             document.getElementById('val-rate').innerText = settingTTS.rate;
-            renderAllAdminLists(); 
+            renderAllAdminLists(); // Render seluruh list
         }
         window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
 
@@ -862,36 +881,53 @@
             document.getElementById('panel-cpanel').classList.remove('open');
             drawOverlay.style.display = 'block';
             drawBox.style.display = 'none';
-            alert("INFORMASI: Klik dan tahan, lalu tarik kursor Anda pada area gambar peta untuk membuat kotak hotspot tujuan.");
+            alert("INFORMASI: Klik dan tahan, lalu tarik kursor Anda pada area gambar peta untuk mencetak kotak area (Hotspot).");
         };
+
+        window.previewHotspot = function() {
+            const top = document.getElementById('hs-top').value || 0;
+            const left = document.getElementById('hs-left').value || 0;
+            const width = document.getElementById('hs-width').value || 10;
+            const height = document.getElementById('hs-height').value || 10;
+
+            let previewDiv = document.getElementById('hotspot-preview');
+            if(!previewDiv) {
+                previewDiv = document.createElement('div');
+                previewDiv.id = 'hotspot-preview';
+                previewDiv.style.position = 'absolute';
+                previewDiv.style.background = 'rgba(232, 65, 24, 0.6)'; 
+                previewDiv.style.border = '3px solid #e84118';
+                previewDiv.style.zIndex = '999';
+                document.getElementById('interactive-map').appendChild(previewDiv);
+            }
+            previewDiv.style.top = `${top}%`; previewDiv.style.left = `${left}%`;
+            previewDiv.style.width = `${width}%`; previewDiv.style.height = `${height}%`;
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('draw-overlay');
             const box = document.getElementById('draw-box');
-
+            
             function getEventPos(e) {
                 if(e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 return { x: e.clientX, y: e.clientY };
             }
 
-            function startDraw(e) {
+            function sDraw(e) {
                 isDrawingArea = true;
                 const pos = getEventPos(e);
                 const rect = mapImg.getBoundingClientRect();
-                
                 drawStartX = ((pos.x - rect.left) / rect.width) * 100;
                 drawStartY = ((pos.y - rect.top) / rect.height) * 100;
                 drawStartX = Math.max(0, Math.min(100, drawStartX));
                 drawStartY = Math.max(0, Math.min(100, drawStartY));
 
-                box.style.left = drawStartX + '%';
-                box.style.top = drawStartY + '%';
-                box.style.width = '0%';
-                box.style.height = '0%';
+                box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%';
+                box.style.width = '0%'; box.style.height = '0%';
                 box.style.display = 'block';
             }
 
-            function moveDraw(e) {
+            function mDraw(e) {
                 if(!isDrawingArea) return;
                 e.preventDefault(); 
                 const pos = getEventPos(e);
@@ -899,7 +935,6 @@
                 
                 let currentX = ((pos.x - rect.left) / rect.width) * 100;
                 let currentY = ((pos.y - rect.top) / rect.height) * 100;
-                
                 currentX = Math.max(0, Math.min(100, currentX));
                 currentY = Math.max(0, Math.min(100, currentY));
 
@@ -908,13 +943,11 @@
                 let width = Math.abs(currentX - drawStartX);
                 let height = Math.abs(currentY - drawStartY);
 
-                box.style.left = left + '%';
-                box.style.top = top + '%';
-                box.style.width = width + '%';
-                box.style.height = height + '%';
+                box.style.left = left + '%'; box.style.top = top + '%';
+                box.style.width = width + '%'; box.style.height = height + '%';
             }
 
-            function endDraw(e) {
+            function eDraw(e) {
                 if(!isDrawingArea) return;
                 isDrawingArea = false;
                 overlay.style.display = 'none';
@@ -938,13 +971,12 @@
                 window.previewHotspot();
             }
 
-            overlay.addEventListener('mousedown', startDraw);
-            overlay.addEventListener('mousemove', moveDraw);
-            overlay.addEventListener('mouseup', endDraw);
-            
-            overlay.addEventListener('touchstart', startDraw, {passive: false});
-            overlay.addEventListener('touchmove', moveDraw, {passive: false});
-            overlay.addEventListener('touchend', endDraw);
+            overlay.addEventListener('mousedown', sDraw);
+            overlay.addEventListener('mousemove', mDraw);
+            overlay.addEventListener('mouseup', eDraw);
+            overlay.addEventListener('touchstart', sDraw, {passive: false});
+            overlay.addEventListener('touchmove', mDraw, {passive: false});
+            overlay.addEventListener('touchend', eDraw);
         });
 
         // ==========================================
@@ -1049,12 +1081,14 @@
             if(isRecording) stopRekam();
             else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
         }
+        
         window.toggleSurveyRekam = function() {
             if(!recognizer) return alert("Browser tidak mendukung mic.");
             activeInputTarget = 'Survey';
             if(isRecording) stopRekam();
             else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
         }
+
         function stopRekam() {
             if(recognizer) recognizer.stop(); isRecording = false;
             document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording'));
@@ -1086,7 +1120,10 @@
 
         window.kirimSurveySupabase = async function() {
             const teks = document.getElementById('ulasan-teks').value.trim();
-            if(teks) { await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]); }
+            if(teks) {
+                await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]);
+            }
+            
             window.tutupModal('survey-popup');
             document.getElementById('step-2').classList.remove('active');
             document.getElementById('step-1').classList.add('active');
