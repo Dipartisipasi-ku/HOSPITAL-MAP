@@ -90,6 +90,1256 @@
         }
         .map-wrapper img { display: none; max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; pointer-events: none;}
         
+        /* OVERLAY GARIS RUTE SVG */
+        .svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
+        .path-base { fill: none; stroke: #10b981; stroke-width: 0.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+        .path-animated { fill: none; stroke: #ef4444; stroke-width: 0.8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2, 2; transition: stroke-dashoffset linear; }
+
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px;}
+        #draw-box { position: absolute; border: 2px solid #d4af37; background: rgba(212, 175, 55, 0.3); display: none; pointer-events: none; }
+
+        /* HUD KONTROL TAMPILAN PETA */
+        .map-controls-hud { position: absolute; bottom: 20px; left: 20px; background: rgba(17, 17, 17, 0.95); padding: 15px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px; z-index: 900; backdrop-filter: blur(8px); border: 1px solid #d4af37;}
+        .map-controls-hud h4 { color: #bdc3c7; margin: 0; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
+        .control-row { display: flex; gap: 8px; justify-content: center;}
+        .btn-map-control { background: #333; color: #bdc3c7; border: 1px solid #555; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;}
+        .btn-map-control:hover { background: #555; color: #fff;}
+        .btn-map-control.active { background: #800000; color: #d4af37; border-color: #d4af37; box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);}
+
+        /* Hotspot & Badge Nomor Gedung */
+        .hotspot { position: absolute; background: rgba(128, 0, 0, 0.3); border: 2px dashed #d4af37; cursor: pointer; transition: all 0.3s ease; border-radius: 4px; z-index: 5; }
+        .hotspot:hover { background: rgba(212, 175, 55, 0.5); border-color: #800000; border-style: solid; transform: scale(1.02); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .hotspot-number { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #800000; color: #d4af37; font-weight: 900; font-size: 14px; width: 28px; height: 28px; 
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8); border: 2px solid #d4af37; pointer-events: none; z-index: 20;
+        }
+        .hotspot-tooltip { position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%); background: #111; color: #d4af37; border: 1px solid #d4af37; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 30;}
+        .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #d4af37 transparent transparent transparent; }
+        .hotspot:hover .hotspot-tooltip { opacity: 1; bottom: 120%; }
+
+        /* ------------------------------------------- */
+        /* UI SIDEBAR (PENCARIAN & TUJUAN) - SILVER    */
+        /* ------------------------------------------- */
+        .sidebar { background: #e0e0e0; padding: 25px; width: 400px; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.5); position: relative;}
+        
+        .header-title { color: #800000; font-size: 22px; text-align: center; border-bottom: 3px solid #d4af37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 900;}
+        .accordion-header { font-size: 18px; font-weight: bold; color: #d4af37; background: #800000; padding: 15px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid #800000;}
+        .accordion-header:hover { background: #600000; }
+        .accordion-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; transition: 0.3s ease-in-out; }
+        .accordion-content.collapsed { display: none; }
+        .search-box { width: 100%; padding: 15px; border: 2px solid #bdc3c7; background: #fff; color: #111; border-radius: 8px; font-size: 16px; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .search-box:focus { border-color: #800000; box-shadow: 0 0 10px rgba(128,0,0,0.3); }
+
+        .toggle-switch { position: relative; width: 44px; height: 24px; background-color: #bdc3c7; border-radius: 12px; transition: 0.3s; cursor: pointer; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);}
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .toggle-switch.active { background-color: #d4af37; }
+        .toggle-switch.active::after { transform: translateX(20px); }
+
+        .btn-tujuan-card { background: white; border: 1px solid #bdc3c7; border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; text-align: left; width: 100%; margin-bottom: 8px; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        .btn-tujuan-card:hover { border-color: #800000; box-shadow: 0 5px 15px rgba(128,0,0,0.2); transform: translateY(-2px); }
+        .nomor-circle { width: 45px; height: 45px; border-radius: 50%; background: #111; border: 2px solid #d4af37; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #d4af37; font-size: 18px; flex-shrink: 0; }
+        .tujuan-content { flex: 1; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+        .tujuan-title { font-size: 16px; font-weight: bold; color: #111; line-height: 1.2; }
+        .tujuan-number { font-size: 12px; font-weight: 800; color: #800000; text-transform: uppercase; }
+        .tujuan-subtitle { font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px; }
+        .dot-warna { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .badge-akses { font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: bold; border: 1px solid; white-space: nowrap; margin-left: auto; }
+        .badge-pengunjung { color: #fff; border-color: #800000; background: #800000; }
+        .badge-non { color: #111; border-color: #d4af37; background: #d4af37; }
+        
+        .btn-primary { background: #800000; color: #d4af37; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.2s;}
+        .btn-primary:hover { background: #a00000; color: white;}
+
+        .btn-hud-tanya { position: absolute; bottom: 30px; right: 30px; background: #d4af37; color: #111; border: 2px solid #800000; padding: 15px 25px; border-radius: 30px; font-weight: 900; font-size: 18px; cursor: pointer; z-index: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: transform 0.2s; display: flex; align-items: center; gap: 10px;}
+        .btn-hud-tanya:hover { transform: scale(1.05); }
+        
+        /* ------------------------------------------- */
+        /* C-PANEL ADMIN                               */
+        /* ------------------------------------------- */
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #111; color: #e0e0e0; box-shadow: -5px 0 20px rgba(0,0,0,0.8); z-index: 1001; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #d4af37;}
+        .admin-panel.open { right: 0; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37; padding-bottom: 10px; }
+        .btn-close-admin { background: none; border: none; color: #d4af37; font-size: 28px; cursor: pointer; }
+        .admin-section { background: #1a1a1a; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #333;}
+        .admin-section h3 { color: #d4af37; font-size: 16px; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px;}
+        .admin-section label { font-size: 14px; color: #bdc3c7; }
+        .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; font-family: inherit; margin-bottom: 5px;}
+        .admin-section input:focus, .admin-section select:focus { border-color: #d4af37; outline: none; }
+        
+        .flex-row { display: flex; gap: 10px; align-items: center; }
+        .flex-row > div { flex: 1; width: 100%;}
+        .btn-save-admin { background: #800000; color: #fff; border: 1px solid #800000; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1; transition: 0.2s;}
+        .btn-save-admin:hover { background: #a00000; border-color: #d4af37; color: #d4af37;}
+        .btn-delete-admin { background: #555; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1; transition: 0.2s;}
+        .btn-delete-admin:hover { background: #ff3f34; }
+        .btn-cancel-admin { background: #333; color: #bdc3c7; border: 1px solid #555; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; transition: 0.2s;}
+        .btn-cancel-admin:hover { background: #555; color: #fff; }
+
+        .data-list { max-height: 200px; overflow-y: auto; background: #111; border-radius: 5px; padding: 5px; margin-bottom: 10px; border: 1px solid #333;}
+        .data-list::-webkit-scrollbar { width: 6px; }
+        .data-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        .data-item { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 8px 12px; margin-bottom: 5px; border-radius: 5px; font-size: 14px; border-left: 4px solid #800000; transition: 0.2s;}
+        .data-item:hover { background: #333; border-color: #d4af37;}
+        .data-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e0e0e0;}
+        .data-item-actions { display: flex; gap: 5px; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+        .sync-loader { font-size: 12px; color: #d4af37; font-style: italic; display: none; }
+
+        /* OVERLAYS */
+        #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 17, 17, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(10px); }
+        #force-fs-overlay h2 { color: #d4af37; font-size: 32px; margin-bottom: 20px;}
+
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
+        .popup-content { background: #1a1a1a; border: 2px solid #d4af37; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); animation: slideDown 0.3s ease; color: #e0e0e0;}
+        .login-box { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
+        .login-box select, .login-box input { padding: 15px; border-radius: 8px; border: 1px solid #555; background: #111; color: #fff; font-size: 16px; }
+        .sign-image { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin: 15px 0; border: 3px solid #d4af37; }
+        .instruksi-teks { font-size: 22px; font-weight: bold; color: #d4af37; line-height: 1.4; }
+        
+        .chat-area { height: 250px; background: #111; border-radius: 10px; padding: 15px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #333; }
+        .chat-bubble { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 80%; line-height: 1.4; font-size: 15px; color: #fff;}
+        .chat-user { background: #555; margin-left: auto; border-bottom-right-radius: 2px; }
+        .chat-bot { background: #800000; border-bottom-left-radius: 2px; font-weight: bold;}
+        
+        .btn-mic { background: #d4af37; color: #111; border: none; padding: 15px; border-radius: 50%; cursor: pointer; width: 60px; height: 60px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); transition: 0.3s; }
+        .btn-mic.recording { background: #800000; color: #fff; animation: pulseMic 1s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(128, 0, 0, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(128, 0, 0, 0); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY MULAI KIOSK (LANDING PAGE) -->
+    <div id="start-overlay">
+        <div class="landing-bg"></div>
+        <div class="landing-content">
+            <h1 class="landing-title">🏥 RSJD Atma Husada</h1>
+            <h2 class="landing-subtitle">Sistem Denah Digital & Navigasi Interaktif</h2>
+            
+            <div id="loading-container">
+                <div class="loader"></div>
+                <p id="loading-text" style="font-size: 20px; margin-top: 25px; font-weight: bold; color: #d4af37;">Mengunduh Data Cloud...</p>
+            </div>
+
+            <button id="btn-start-app" onclick="mulaiAplikasi()">👆 Sentuh Layar Untuk Memulai</button>
+        </div>
+    </div>
+
+    <!-- HEADER TOPBAR BARU -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="rs-logo">🏥 RSJD Atma Husada</div>
+            
+            <!-- DROPDOWN LOKASI ASAL -->
+            <div class="loc-dropdown">
+                <button class="loc-btn" id="btn-current-location" onclick="toggleDropdownLoc()">📍 Lokasi Anda: Belum Disetel <span>▼</span></button>
+                <div class="loc-menu" id="dropdown-loc-menu">
+                    <!-- Dirender via JS Otomatis dari Tabel Tujuan -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="topbar-right">
+            <button class="topbar-btn" onclick="toggleFullscreen()">⛶ Layar Penuh</button>
+            <button class="topbar-btn" onclick="bukaModalLogin()">⚙️ C-Panel</button>
+        </div>
+    </div>
+
+    <!-- BODY APLIKASI -->
+    <div class="app-body">
+        
+        <div class="floating-instruction" id="floating-instruction">
+            ☝️ Silakan pilih "Lokasi Anda" di menu ini terlebih dahulu.
+        </div>
+
+        <!-- SIDEBAR ACCORDION PENCARIAN TUJUAN -->
+        <div class="sidebar" id="main-sidebar" style="display: none;">
+            
+            <div class="accordion-header" onclick="toggleTujuanAccordion()" id="header-tujuan">
+                <span style="display:flex; align-items:center; gap:10px;">🎯 LOKASI TUJUAN</span>
+                <div class="toggle-switch" id="tujuan-toggle-switch"></div>
+            </div>
+            
+            <div class="accordion-content collapsed" id="content-tujuan">
+                <div id="lokasi-anda-info" style="margin-bottom: 5px; font-weight: bold; color: #800000;">Dari: Belum Disetel</div>
+                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / tujuan..." onkeyup="filterTujuan()">
+
+                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; flex: 1;">
+                    <!-- Dirender via JS -->
+                </div>
+                
+                <button class="btn-primary" onclick="batalPilih()" style="background: #111; color:#d4af37; margin-top: 15px; border: 1px solid #d4af37;">Batal / Reset Lokasi Asal</button>
+            </div>
+        </div>
+
+        <!-- AREA PETA & HUD -->
+        <div class="map-view" id="map-container-view">
+
+            <div class="no-map-warning" id="no-map-warning">
+                ⚠️ PETA TIDAK TERSEDIA<br>
+                <span style="font-size:16px; color:#bdc3c7; font-weight:normal;">Silakan unggah gambar peta melalui C-Panel (Superadmin).</span>
+            </div>
+
+            <!-- HUD KONTROL TAMPILAN PETA -->
+            <div class="map-controls-hud">
+                <h4>Perbesar Peta</h4>
+                <div class="control-row">
+                    <button class="btn-map-control" onclick="zoomPeta(0.2)" title="Perbesar">➕ In</button>
+                    <button class="btn-map-control" onclick="zoomPeta(-0.2)" title="Perkecil">➖ Out</button>
+                </div>
+                
+                <h4>Mode Efek Tampilan</h4>
+                <div class="control-row">
+                    <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 2D Flat</button>
+                    <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D Waze</button>
+                </div>
+                
+                <h4>Rotasi Peta</h4>
+                <div class="control-row">
+                    <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
+                    <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
+                </div>
+                <button class="btn-map-control" style="background:#800000; color:#d4af37; border-color:#d4af37; margin-top:5px;" onclick="resetPosisiPeta()">🔄 Reset Tampilan Peta</button>
+            </div>
+
+            <!-- WRAPPER GAMBAR PETA & GARIS NAVIGASI SVG -->
+            <div class="map-wrapper" id="interactive-map">
+                <img id="main-map-image" src="" alt="Peta RS">
+                
+                <!-- LAYER GARIS NAVIGASI (ANIMASI) -->
+                <svg id="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" class="svg-overlay">
+                    <path id="greenPath" class="path-base" d=""></path>
+                    <path id="redPath" class="path-animated" d=""></path>
+                </svg>
+
+                <!-- LAYER HOTSPOT & DRAWING -->
+                <div id="draw-overlay"><div id="draw-box"></div></div>
+            </div>
+
+            <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODAL & PANEL ADMIN -->
+    <!-- ---------------------------------------------------- -->
+    <div class="popup-overlay" id="login-modal">
+        <div class="popup-content">
+            <h2 style="color: #d4af37; border-bottom: 1px solid #333; padding-bottom:10px;">Akses C-Panel</h2>
+            <div class="login-box">
+                <select id="login-role">
+                    <option value="superadmin">Superadmin</option>
+                    <option value="administrator">Administrator</option>
+                </select>
+                <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12">
+                <button class="btn-primary" onclick="prosesLogin()">LOGIN</button>
+                <button class="btn-primary" style="background: #333; color:#bdc3c7; margin-top:0;" onclick="tutupModal('login-modal')">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="panel-cpanel">
+        <div class="admin-header">
+            <h2>⚙️ Control Panel</h2>
+            <button class="btn-close-admin" onclick="tutupCPanel()">✖</button>
+        </div>
+        
+        <button class="btn-save-admin" style="background: #d4af37; color:#111; margin-bottom:10px;" onclick="syncDataAdmin()">🔄 Muat Ulang / Sync Data Cloud</button>
+
+        <!-- PENGINGAT KOMPRESI GAMBAR -->
+        <div class="admin-section" style="border: 2px solid #e1b12c; background: #332b00;">
+            <h3 style="color: #e1b12c;">⚠️ WAJIB: Kompresi Gambar Peta</h3>
+            <p style="font-size: 13px; color: #bdc3c7; line-height: 1.4;">Agar aplikasi tidak lag/lemot di perangkat Kiosk atau HP, <b>wajib kompres gambar peta Anda di bawah 100 KB</b> (Format: WebP / JPG kualitas sedang). Gunakan situs gratis seperti <a href="https://squoosh.app/" target="_blank" style="color:#00a8ff;">Squoosh.app</a> sebelum upload ke sini.</p>
+        </div>
+
+        <div class="sync-loader" id="sync-indicator">Memuat data dari database...</div>
+
+        <!-- Section Peta Utama -->
+        <div class="admin-section" style="border: 2px solid #800000;">
+            <h3 style="color: #d4af37;">🖼️ Upload Peta Utama (Map Image)</h3>
+            <p id="map-status" style="font-size: 13px; color: #bdc3c7; margin-bottom: 10px;"></p>
+            <div id="upload-map-container">
+                <input type="file" id="map-file" accept="image/*">
+                <button class="btn-save-admin" style="width: 100%;" onclick="uploadPeta()">⬆️ Upload Peta Baru</button>
+            </div>
+            <button id="btn-hapus-peta" class="btn-delete-admin" style="display:none; width: 100%;" onclick="hapusPeta()">🗑️ Hapus Peta Saat Ini</button>
+        </div>
+
+        <!-- Section CRUD Hotspot Peta -->
+        <div class="admin-section">
+            <h3 style="color: #d4af37;">🔲 Kotak Interaktif Bangunan (Hotspot)</h3>
+            <div class="data-list" id="list-hotspot"></div>
+            <hr style="border-color:#333; margin:10px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="color:#d4af37; font-weight:bold;" id="label-mode-hs">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormHotspot()">Bersihkan Form</button>
+            </div>
+            
+            <label>Pilih dari Data Referensi (Otomatis Isi Nomor):</label>
+            <select id="hs-referensi" onchange="autoFillHotspot()"></select>
+
+            <div class="flex-row">
+                <div style="flex:1;"><label>No.</label><input type="text" id="hs-nomor" placeholder="1"></div>
+                <div style="flex:3;"><label>Nama Bangunan / Label</label><input type="text" id="hs-nama" placeholder="Misal: IGD"></div>
+            </div>
+
+            <label>Arahkan ke Rute Tujuan (Pilih yang sesuai):</label>
+            <select id="hs-target"></select> 
+            
+            <button type="button" class="btn-save-admin" style="background: #d4af37; color: #111; width: 100%; margin-bottom: 5px;" onclick="mulaiGambarHotspot()">🖱️ Tarik & Gambar Area Langsung di Peta</button>
+            
+            <div class="flex-row" style="display: none;">
+                <div><input type="number" id="hs-top"></div>
+                <div><input type="number" id="hs-left"></div>
+                <div><input type="number" id="hs-width"></div>
+                <div><input type="number" id="hs-height"></div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button class="btn-save-admin" style="background: #333; color:#d4af37;" onclick="previewHotspot()">👁️ Cek Posisi</button>
+                <button class="btn-save-admin" id="btn-save-hs" onclick="simpanHotspotSupabase()">➕ Simpan Baru</button>
+            </div>
+            <button class="btn-delete-admin" style="width: 100%;" onclick="hapusHotspotSupabase()">🗑️ Hapus Hotspot Ini</button>
+        </div>
+
+        <!-- FORM TUJUAN & JALUR BARU -->
+        <div class="admin-section">
+            <h3 style="color:#d4af37;">🗺️ Direktori Tujuan & Jalur Navigasi</h3>
+            <div class="data-list" id="list-tujuan"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:10px;">
+                <label id="label-mode-tujuan" style="color:#d4af37; font-weight:bold;">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormTujuan()">Batal Edit</button>
+            </div>
+            
+            <input type="text" id="admin-nama-lokasi" placeholder="Nama Tujuan (Cth: GEDUNG POLIKLINIK)">
+            <select id="admin-akses">
+                <option value="PENGUNJUNG">Akses: PENGUNJUNG UMUM</option>
+                <option value="STAF MEDIS">Akses: STAF MEDIS</option>
+            </select>
+            
+            <div class="flex-row">
+                <input type="text" id="admin-nomor" placeholder="No. (11)">
+                <input type="text" id="admin-lantai" placeholder="Lantai 3">
+            </div>
+            <div class="flex-row">
+                <input type="color" id="admin-warna-dot" value="#85e0a3" style="padding:0; height: 35px; cursor: pointer;">
+                <input type="text" id="admin-nama-warna" placeholder="Warna (Hijau)">
+            </div>
+
+            <!-- FITUR BARU: GAMBAR JALUR SVG -->
+            <label style="margin-top: 10px; color:#e1b12c;">Titik Jalur Garis Navigasi (Mulai s/d Tujuan):</label>
+            <input type="text" id="admin-jalur-svg" placeholder="Jalur SVG (Kosongkan bila belum ada)">
+            <button type="button" class="btn-save-admin" style="background: #333; color: #d4af37; border: 1px solid #d4af37; width: 100%; margin-bottom: 5px; font-size: 13px;" onclick="mulaiGambarJalur()">🖱️ Gambar Jalur Otomatis di Peta (Klik-Klik)</button>
+            
+            <label style="margin-top: 5px;">Info Tambahan Kedatangan (Suara Akhir):</label>
+            <textarea id="admin-rute" placeholder="Misal: Silakan masuk melalui pintu kaca sebelah kiri..."></textarea>
+            
+            <input type="text" id="admin-tanda" placeholder="URL Gambar Patokan (Tiba)">
+            
+            <button class="btn-save-admin" id="btn-save-tujuan" onclick="simpanDataRuteSupabase()">➕ Tambah Rute Baru</button>
+        </div>
+
+        <div class="admin-section">
+            <h3 style="color:#d4af37;">🎛️ Pengaturan Suara (TTS)</h3>
+            <label>Volume (<span id="val-vol">1.0</span>)</label>
+            <input type="range" id="tts-volume" min="0.1" max="1" step="0.1" value="1.0" oninput="updateTTSUI()">
+            <label>Kecepatan (<span id="val-rate">0.9</span>)</label>
+            <input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="0.9" oninput="updateTTSUI()">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-save-admin" style="background: #d4af37; color: #111;" onclick="tesSuara()">Tes Suara</button>
+                <button class="btn-save-admin" onclick="simpanPengaturanSupabase()">💾 Simpan TTS</button>
+            </div>
+        </div>
+        
+        <div class="admin-section">
+            <h3 style="color:#d4af37;">🔐 Reset Akses PIN</h3>
+            <input type="password" id="pin-lama" placeholder="PIN Lama (12 Karakter)" maxlength="12">
+            <input type="password" id="pin-baru" placeholder="PIN Baru (12 Karakter)" maxlength="12">
+            <button class="btn-save-admin" style="background: #800000; color:#d4af37;" onclick="resetPINSupabase()">Simpan PIN Baru</button>
+        </div>
+    </div>
+
+    <!-- MODAL POPUPS PENGUNJUNG -->
+    <div class="popup-overlay" id="qa-modal">
+        <div class="popup-content" style="max-width: 500px;">
+            <h2 style="color: #d4af37; margin-bottom: 10px; border-bottom:1px solid #333; padding-bottom:10px;">💬 Tanya Jawab Cepat</h2>
+            <div class="chat-area" id="qa-chat">
+                <div class="chat-bubble chat-bot">Halo! Ada yang bisa saya bantu informasikan?</div>
+            </div>
+            <button class="btn-mic" id="btn-qa-rekam" onclick="toggleQARekam()">🎤</button>
+            <button class="btn-primary" style="background:#333; color:#bdc3c7; margin-top:20px;" onclick="tutupModal('qa-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="hotspot-info-popup">
+        <div class="popup-content" style="max-width: 450px;">
+            <h2 style="color: #d4af37; margin-bottom: 5px;">🏢 Informasi Area</h2>
+            <h3 id="hs-info-nama" style="font-size: 24px; color: #e0e0e0; margin-bottom: 20px;">Nama Bangunan</h3>
+            <div id="hs-info-action"></div>
+            <button class="btn-primary" style="background:#333; color:#bdc3c7; margin-top:15px;" onclick="tutupModal('hotspot-info-popup')">Tutup</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="nav-popup">
+        <div class="popup-content">
+            <h2 style="color: #d4af37; margin-bottom: 15px; border-bottom:1px solid #333; padding-bottom:10px;">Anda Telah Sampai</h2>
+            <div class="instruksi-teks" id="teks-instruksi"></div>
+            <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
+            <button class="btn-primary" style="background:#800000; color: #d4af37;" onclick="telahSampaiAkhir()">✅ SAYA SUDAH SAMPAI</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="survey-popup">
+        <div class="popup-content">
+            <h2 style="color: #d4af37; margin-bottom: 15px;">Terima Kasih! 🎉</h2>
+            <textarea id="ulasan-teks" style="width: 100%; height: 100px; padding: 15px; border-radius: 10px; border: 1px solid #555; background: #111; color: #fff; resize:none; margin-bottom:10px;" placeholder="Ketik ulasan Anda atau gunakan suara..."></textarea>
+            <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()">🎤</button>
+            <button class="btn-primary" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA BERBASIS MODULE -->
+    <script type="module">
+        import supabase from './supabase_config.js';
+
+        let systemPIN = '123456789012';
+        let settingTTS = { volume: 1.0, rate: 0.9 };
+        
+        let dataRute = {}; 
+        let dataHotspots = []; 
+        let dataNomorBangunan = []; 
+        let appStarted = false;
+        
+        let editAsalName = null;
+        let editTujuanName = null;
+        let editHotspotId = null;
+
+        let lokasiAsal = "";
+        let lokasiTujuan = "";
+        let ucapanAktif = null;
+        let timerInstruksiNavigasi = [];
+
+        let modePeta = 'FLAT'; 
+        let rotasiPeta = 0;
+        let currentZoom = 1;
+        let panX = 0, panY = 0;
+        let isPanning = false;
+        let startPanX = 0, startPanY = 0;
+
+        window.aturModePeta = function(mode) {
+            modePeta = mode;
+            document.getElementById('btn-flat').classList.toggle('active', mode === 'FLAT');
+            document.getElementById('btn-waze').classList.toggle('active', mode === '3D');
+            terapkanTransformasiPeta();
+        }
+        window.putarPeta = function(derajat) { rotasiPeta += derajat; terapkanTransformasiPeta(); }
+        window.zoomPeta = function(factor) {
+            currentZoom += factor;
+            if(currentZoom < 0.5) currentZoom = 0.5; 
+            if(currentZoom > 5) currentZoom = 5;     
+            terapkanTransformasiPeta();
+        }
+        window.resetPosisiPeta = function() {
+            modePeta = 'FLAT'; rotasiPeta = 0; currentZoom = 1; panX = 0; panY = 0;
+            document.getElementById('btn-flat').classList.add('active');
+            document.getElementById('btn-waze').classList.remove('active');
+            
+            // Bersihkan SVG Rute saat reset peta
+            document.getElementById('greenPath').setAttribute('d', '');
+            document.getElementById('redPath').setAttribute('d', '');
+            window.speechSynthesis.cancel();
+            timerInstruksiNavigasi.forEach(clearTimeout);
+
+            terapkanTransformasiPeta();
+        }
+
+        function terapkanTransformasiPeta() {
+            const wadahPeta = document.getElementById('interactive-map');
+            if (modePeta === '3D') {
+                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(55deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom * 1.3})`;
+                wadahPeta.style.boxShadow = `0 30px 60px rgba(0,0,0,0.8)`;
+            } else {
+                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(0deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom})`;
+                wadahPeta.style.boxShadow = `0 15px 40px rgba(0,0,0,0.6)`;
+            }
+        }
+
+        const mapView = document.getElementById('map-container-view');
+        const mapWrapper = document.getElementById('interactive-map');
+
+        function startPan(e) {
+            if(isDrawingArea || isDraggingPreview || isResizingPreview || isDrawingRoute) return; 
+            isPanning = true;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startPanX = clientX - panX;
+            startPanY = clientY - panY;
+            mapView.style.cursor = 'grabbing';
+            mapWrapper.style.transition = 'none'; 
+        }
+        function doPan(e) {
+            if(!isPanning) return;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            panX = clientX - startPanX;
+            panY = clientY - startPanY;
+            terapkanTransformasiPeta();
+        }
+        function endPan() {
+            isPanning = false;
+            mapView.style.cursor = 'grab';
+            mapWrapper.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease';
+        }
+        mapView.addEventListener('mousedown', startPan);
+        mapView.addEventListener('mousemove', doPan);
+        window.addEventListener('mouseup', endPan);
+        mapView.addEventListener('touchstart', startPan, {passive: true});
+        mapView.addEventListener('touchmove', doPan, {passive: true});
+        window.addEventListener('touchend', endPan);
+
+        // ==========================================
+        // FETCH DATA CLOUD & PARALEL REQUEST
+        // ==========================================
+        window.fetchAllDataSupabase = async function() {
+            try {
+                document.getElementById('loading-container').style.display = 'block';
+                document.getElementById('btn-start-app').style.display = 'none';
+
+                const [ resSet, resMap, resRef, resTujuan, resHotspots ] = await Promise.all([
+                    supabase.from('app_settings').select('*').eq('id', 1).maybeSingle(),
+                    supabase.from('map_image').select('*').eq('id', 1).maybeSingle(),
+                    supabase.from('nomor_bangunan').select('*').order('nomor', { ascending: true }),
+                    supabase.from('lokasi_tujuan').select('*').order('nama_lokasi', { ascending: true }),
+                    supabase.from('map_hotspots').select('*').order('created_at', { ascending: true })
+                ]);
+                const queryError = [resSet, resMap, resRef, resTujuan, resHotspots].find(result => result.error)?.error;
+                if (queryError) throw new Error(`Supabase: ${queryError.message}`);
+                if (resSet.data) {
+                    systemPIN = resSet.data.pin;
+                    settingTTS.volume = parseFloat(resSet.data.tts_volume);
+                    settingTTS.rate = parseFloat(resSet.data.tts_rate);
+                }
+
+                const imgEl = document.getElementById('main-map-image');
+                const warnEl = document.getElementById('no-map-warning');
+                const statusTxt = document.getElementById('map-status');
+                
+                if (resMap.data && resMap.data.image_url) {
+                    imgEl.src = resMap.data.image_url;
+                    imgEl.style.display = 'block'; warnEl.style.display = 'none'; 
+                    document.getElementById('upload-map-container').style.display = 'none'; 
+                    document.getElementById('btn-hapus-peta').style.display = 'block';
+                    statusTxt.innerText = "Peta cloud aktif digunakan.";
+                } else {
+                    imgEl.style.display = 'none'; warnEl.style.display = 'block'; 
+                    document.getElementById('upload-map-container').style.display = 'block'; 
+                    document.getElementById('btn-hapus-peta').style.display = 'none';
+                    statusTxt.innerText = "Belum ada peta. Silakan upload gambar peta Anda.";
+                }
+
+                if (resRef.data) dataNomorBangunan = resRef.data;
+                if (resTujuan.data) {
+                    dataRute = {};
+                    resTujuan.data.forEach(t => { 
+                        dataRute[t.nama_lokasi] = { 
+                            akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda,
+                            nomor: t.nomor_gedung, lantai: t.info_lantai, warnaDot: t.warna_dot, namaWarna: t.nama_warna,
+                            jalur_svg: t.jalur_svg // Menarik data jalur SVG dari Supabase
+                        }; 
+                    });
+                }
+
+                if (resHotspots.data) dataHotspots = resHotspots.data;
+
+                renderHotspotsToMap();
+                renderAllAdminLists();
+                renderTombolLokasiAsalDropdown(); 
+                renderTombolTujuan();             
+                
+                document.getElementById('loading-container').style.display = 'none';
+                const btnStart = document.getElementById('btn-start-app');
+                btnStart.style.display = 'block';
+                btnStart.classList.add('pulse-anim');
+                document.getElementById('sync-indicator').style.display = 'none';
+
+            } catch (error) {
+                console.error(error);
+                const detail = error instanceof Error ? error.message : String(error);
+                document.getElementById('loading-text').innerText = `Gagal memuat database: ${detail}`;
+                document.getElementById('sync-indicator').style.display = 'none';
+            }
+        }
+        
+        window.onload = fetchAllDataSupabase;
+
+        window.mulaiAplikasi = function() {
+            const overlay = document.getElementById('start-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 600);
+
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log("Fullscreen error:", err));
+            }
+            appStarted = true;
+            if (typeof window.bicara === 'function') {
+                window.bicara("Selamat datang di aplikasi Denah Digital Rumah Sakit Atma Husada Mahakam. Silahkan Pilih Lokasi anda berada saat ini di menu atas.");
+            }
+        }
+
+        window.toggleFullscreen = function() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } 
+            else { document.exitFullscreen(); }
+        };
+        window.kembaliFullscreen = function() {
+            document.documentElement.requestFullscreen().catch(err => console.log(err));
+            document.getElementById('force-fs-overlay').style.display = 'none';
+        }
+
+        window.toggleDropdownLoc = function() {
+            document.getElementById('dropdown-loc-menu').classList.toggle('show');
+        }
+
+        // AUTO COMPILE ASAL DARI TABEL TUJUAN (dataRute Keys)
+        function renderTombolLokasiAsalDropdown() {
+            const menu = document.getElementById('dropdown-loc-menu');
+            menu.innerHTML = "";
+            Object.keys(dataRute).forEach(nama => {
+                const div = document.createElement('div');
+                div.className = 'loc-item';
+                div.innerText = `📍 ${nama}`;
+                div.onclick = () => window.pilihLokasiSekarang(nama);
+                menu.appendChild(div);
+            });
+        }
+
+        window.pilihLokasiSekarang = function(lokasi) {
+            lokasiAsal = lokasi;
+            document.getElementById('btn-current-location').innerHTML = `📍 Lokasi Anda: ${lokasi} <span>▼</span>`;
+            document.getElementById('dropdown-loc-menu').classList.remove('show');
+            
+            document.getElementById('floating-instruction').style.display = 'none';
+            document.getElementById('main-sidebar').style.display = 'flex';
+            document.getElementById('lokasi-anda-info').innerText = "Dari: " + lokasiAsal;
+            
+            document.getElementById('content-tujuan').classList.remove('collapsed');
+            document.getElementById('tujuan-toggle-switch').classList.add('active');
+
+            document.getElementById('search-tujuan').value = "";
+            window.filterTujuan(); 
+
+            // Hapus rute jika ada
+            document.getElementById('greenPath').setAttribute('d', '');
+            document.getElementById('redPath').setAttribute('d', '');
+
+            window.bicara("Lokasi awal ditetapkan. Silahkan pilih lokasi tujuan anda.");
+        }
+
+        window.toggleTujuanAccordion = function() {
+            const content = document.getElementById('content-tujuan');
+            const toggleSw = document.getElementById('tujuan-toggle-switch');
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed'); toggleSw.classList.add('active');
+            } else {
+                content.classList.add('collapsed'); toggleSw.classList.remove('active');
+            }
+        }
+
+        function renderAllAdminLists() {
+            // Karena lokasi awal disatukan dari rute tujuan, list-asal dimatikan di C-Panel.
+            const listTujuan = document.getElementById('list-tujuan');
+            listTujuan.innerHTML = '';
+            for (let nama in dataRute) {
+                listTujuan.innerHTML += `<div class="data-item"><div class="data-item-name">${nama} <span style="font-size:10px; color:#d4af37;">(${dataRute[nama].akses})</span></div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormTujuan('${nama}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusTujuan('${nama}')">🗑️</button></div></div>`;
+            }
+
+            const listHotspot = document.getElementById('list-hotspot');
+            const selectTarget = document.getElementById('hs-target');
+            const selectRef = document.getElementById('hs-referensi');
+            
+            listHotspot.innerHTML = '';
+            dataHotspots.forEach(hs => {
+                const numLabel = hs.nomor_gedung && hs.nomor_gedung !== "-" ? `[${hs.nomor_gedung}] ` : '';
+                listHotspot.innerHTML += `<div class="data-item"><div class="data-item-name">${numLabel}${hs.nama_bangunan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormHotspot('${hs.id}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusHotspot('${hs.id}')">🗑️</button></div></div>`;
+            });
+
+            selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Info Label) --</option>';
+            for (let nama in dataRute) { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; }
+
+            selectRef.innerHTML = '<option value="">-- Ketik Manual atau Pilih Referensi --</option>';
+            dataNomorBangunan.forEach(ref => {
+                selectRef.innerHTML += `<option value="${ref.nomor}" data-nama="${ref.nama_bangunan}">[${ref.nomor}] ${ref.nama_bangunan}</option>`;
+            });
+        }
+
+        // --- C-PANEL FUNGSI CRUD TUJUAN & RUTE SVG ---
+        window.resetFormTujuan = function() {
+            editTujuanName = null;
+            document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]";
+            document.getElementById('label-mode-tujuan').style.color = "#4cd137";
+            document.getElementById('btn-save-tujuan').innerText = "➕ Tambah Rute Baru";
+            document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-akses').value = "PENGUNJUNG";
+            document.getElementById('admin-nomor').value = ""; document.getElementById('admin-lantai').value = "";
+            document.getElementById('admin-warna-dot').value = "#85e0a3"; document.getElementById('admin-nama-warna').value = "";
+            document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = "";
+            document.getElementById('admin-jalur-svg').value = ""; // Input Rute SVG
+            
+            document.getElementById('greenPath').setAttribute('d', '');
+            document.getElementById('redPath').setAttribute('d', '');
+        }
+
+        window.editFormTujuan = function(nama) {
+            editTujuanName = nama; const data = dataRute[nama];
+            document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]";
+            document.getElementById('label-mode-tujuan').style.color = "#e1b12c";
+            document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute";
+            document.getElementById('admin-nama-lokasi').value = nama; document.getElementById('admin-akses').value = data.akses;
+            document.getElementById('admin-nomor').value = data.nomor || ""; document.getElementById('admin-lantai').value = data.lantai || "";
+            document.getElementById('admin-warna-dot').value = data.warnaDot || "#85e0a3"; document.getElementById('admin-nama-warna').value = data.namaWarna || "";
+            document.getElementById('admin-rute').value = data.instruksi; document.getElementById('admin-tanda').value = data.gambarTanda;
+            document.getElementById('admin-jalur-svg').value = data.jalur_svg || ""; 
+
+            // Cek rute di peta (hanya garis hijau tebal tanpa titik putus2 saat mode edit)
+            if(data.jalur_svg) {
+                document.getElementById('greenPath').setAttribute('d', data.jalur_svg);
+                document.getElementById('redPath').setAttribute('d', '');
+            } else {
+                document.getElementById('greenPath').setAttribute('d', '');
+                document.getElementById('redPath').setAttribute('d', '');
+            }
+        }
+
+        window.simpanDataRuteSupabase = async function() {
+            const nama = document.getElementById('admin-nama-lokasi').value.trim(); const akses = document.getElementById('admin-akses').value;
+            const rute = document.getElementById('admin-rute').value.trim(); const tanda = document.getElementById('admin-tanda').value.trim();
+            const nomor = document.getElementById('admin-nomor').value.trim(); const lantai = document.getElementById('admin-lantai').value.trim();
+            const warnaDot = document.getElementById('admin-warna-dot').value; const namaWarna = document.getElementById('admin-nama-warna').value.trim();
+            const jalurSvg = document.getElementById('admin-jalur-svg').value.trim();
+
+            if (!nama) return alert("Nama Tujuan wajib diisi!");
+            const payload = { 
+                nama_lokasi: nama, akses: akses, instruksi: rute, gambar_tanda: tanda,
+                nomor_gedung: nomor || "-", info_lantai: lantai || "-", warna_dot: warnaDot, nama_warna: namaWarna || "-",
+                jalur_svg: jalurSvg || null
+            };
+            if (editTujuanName && editTujuanName !== nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else if (editTujuanName === nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else await supabase.from('lokasi_tujuan').insert([payload]);
+            window.resetFormTujuan(); await fetchAllDataSupabase();
+        }
+        window.hapusTujuan = async function(nama) {
+            if(confirm(`Hapus lokasi tujuan "${nama}" beserta rutenya?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', nama); await fetchAllDataSupabase(); }
+        }
+
+
+        // --- PEREKAM KLIK JALUR SVG (ROUTE DRAWER) ---
+        let isDrawingRoute = false;
+        let routePoints = [];
+        
+        window.mulaiGambarJalur = function() {
+            window.resetPosisiPeta(); 
+            isDrawingRoute = true;
+            routePoints = [];
+            document.getElementById('greenPath').setAttribute('d', '');
+            document.getElementById('redPath').setAttribute('d', '');
+            document.getElementById('panel-cpanel').classList.remove('open');
+            alert("Klik pada gambar peta dari titik mulai, ke setiap belokan, hingga ke titik tujuan akhir. Jika sudah selesai, klik tombol C-Panel kembali.");
+        };
+
+        document.getElementById('map-container-view').addEventListener('click', function(e) {
+            if(!isDrawingRoute) return;
+            const mImg = document.querySelector('.map-wrapper img');
+            const rect = mImg.getBoundingClientRect();
+            // Hanya rekam klik jika di dalam area gambar
+            if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                let pX = ((e.clientX - rect.left) / rect.width) * 100;
+                let pY = ((e.clientY - rect.top) / rect.height) * 100;
+                routePoints.push({x: pX.toFixed(2), y: pY.toFixed(2)});
+                
+                // Construct path
+                let pathStr = "";
+                routePoints.forEach((p, idx) => {
+                    pathStr += (idx === 0 ? `M ${p.x} ${p.y} ` : `L ${p.x} ${p.y} `);
+                });
+                
+                document.getElementById('greenPath').setAttribute('d', pathStr.trim());
+                document.getElementById('admin-jalur-svg').value = pathStr.trim();
+            }
+        });
+
+        // Hentikan gambar saat buka cpanel lagi
+        const cpanelButton = document.querySelector('.btn-cpanel');
+        if (cpanelButton) {
+            cpanelButton.addEventListener('click', () => {
+                if (isDrawingRoute) {
+                    isDrawingRoute = false;
+                    alert("Jalur rute telah terekam. Silakan klik 'Simpan Rute Baru'.");
+                }
+            });
+        }
+
+
+        // --- C-PANEL FUNGSI CRUD HOTSPOT ---
+        window.autoFillHotspot = function() {
+            const selectRef = document.getElementById('hs-referensi');
+            const selectedOption = selectRef.options[selectRef.selectedIndex];
+            if(selectRef.value) {
+                document.getElementById('hs-nomor').value = selectRef.value;
+                document.getElementById('hs-nama').value = selectedOption.getAttribute('data-nama');
+            }
+        }
+        window.resetFormHotspot = function() {
+            editHotspotId = null; document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hs').innerText = "➕ Simpan Baru";
+            document.getElementById('hs-referensi').value = ""; document.getElementById('hs-nomor').value = ""; document.getElementById('hs-nama').value = ""; 
+            document.getElementById('hs-target').value = ""; document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = "";
+            document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = "";
+            const preview = document.getElementById('hotspot-preview'); if(preview) preview.remove();
+        }
+        window.editFormHotspot = function(id) {
+            editHotspotId = id; const hs = dataHotspots.find(h => h.id === id);
+            if(hs) {
+                document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('label-mode-hs').style.color = "#e1b12c"; document.getElementById('btn-save-hs').innerText = "💾 Update Hotspot";
+                document.getElementById('hs-referensi').value = ""; document.getElementById('hs-nomor').value = hs.nomor_gedung || ""; document.getElementById('hs-nama').value = hs.nama_bangunan; 
+                document.getElementById('hs-target').value = hs.target_lokasi || ""; document.getElementById('hs-top').value = hs.pos_top; 
+                document.getElementById('hs-left').value = hs.pos_left; document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height;
+                window.previewHotspot();
+            }
+        }
+        window.simpanHotspotSupabase = async function() {
+            const nama = document.getElementById('hs-nama').value.trim(); const nomor = document.getElementById('hs-nomor').value.trim(); 
+            const target = document.getElementById('hs-target').value;
+            const top = parseFloat(document.getElementById('hs-top').value); const left = parseFloat(document.getElementById('hs-left').value);
+            const width = parseFloat(document.getElementById('hs-width').value); const height = parseFloat(document.getElementById('hs-height').value);
+            
+            if(!nama || isNaN(top) || isNaN(left) || isNaN(width) || isNaN(height)) return alert("Lengkapi Form & Koordinat!");
+            const payload = { nama_bangunan: nama, nomor_gedung: nomor || "-", target_lokasi: target || null, pos_top: top, pos_left: left, width: width, height: height };
+            if (editHotspotId) await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
+            else await supabase.from('map_hotspots').insert([payload]);
+            window.resetFormHotspot(); await fetchAllDataSupabase();
+        }
+        window.hapusHotspot = async function(id) { if(confirm("Hapus kotak interaktif ini dari gambar?")) { await supabase.from('map_hotspots').delete().eq('id', id); await fetchAllDataSupabase(); } }
+
+        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
+        window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
+        
+        document.getElementById('login-pin').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { window.prosesLogin(); }
+        });
+
+        window.prosesLogin = function() {
+            if (document.getElementById('login-pin').value === systemPIN) { window.tutupModal('login-modal'); bukaCPanel(); } else { alert("PIN Salah!"); }
+        }
+        function bukaCPanel() {
+            document.getElementById('panel-cpanel').classList.add('open');
+            document.getElementById('tts-volume').value = settingTTS.volume; document.getElementById('val-vol').innerText = settingTTS.volume;
+            document.getElementById('tts-rate').value = settingTTS.rate; document.getElementById('val-rate').innerText = settingTTS.rate;
+            renderAllAdminLists(); 
+        }
+        window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
+        window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
+        window.simpanPengaturanSupabase = async function() {
+            const vol = parseFloat(document.getElementById('tts-volume').value); const r = parseFloat(document.getElementById('tts-rate').value);
+            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
+            if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan Suara Disimpan"); }
+        }
+        window.tesSuara = function() { window.bicara("Cek satu dua tiga. Ini adalah pengujian suara C-Panel."); }
+        
+        window.uploadPeta = async function() {
+            const fileInput = document.getElementById('map-file');
+            if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih file gambar peta terlebih dahulu!");
+            const file = fileInput.files[0];
+            const fileName = `map_${Date.now()}.${file.name.split('.').pop()}`;
+            document.getElementById('map-status').innerText = "Mengunggah...";
+            const { error } = await supabase.storage.from('maps').upload(fileName, file);
+            if(error) { document.getElementById('map-status').innerText = "Gagal unggah!"; return alert("Gagal upload!"); }
+            const publicUrl = supabase.storage.from('maps').getPublicUrl(fileName).data.publicUrl;
+            await supabase.from('map_image').update({ image_url: publicUrl, file_path: fileName }).eq('id', 1);
+            alert("Peta berhasil diunggah!"); fetchAllDataSupabase();
+        }
+        window.hapusPeta = async function() {
+            if(!confirm("Hapus gambar peta ini dari server?")) return;
+            const { data } = await supabase.from('map_image').select('file_path').eq('id', 1).single();
+            if(data && data.file_path) await supabase.storage.from('maps').remove([data.file_path]);
+            await supabase.from('map_image').update({ image_url: null, file_path: null }).eq('id', 1);
+            alert("Peta dihapus!"); fetchAllDataSupabase();
+        }
+
+        // --- DRAWING HOTSPOT & RESIZE ---
+        let drawOverlay, drawBox, mapImg;
+        let isDraggingPreview = false; let isResizingPreview = false;
+
+        window.mulaiGambarHotspot = function() {
+            window.resetPosisiPeta(); 
+            drawOverlay = document.getElementById('draw-overlay'); drawBox = document.getElementById('draw-box'); mapImg = document.querySelector('.map-wrapper img');
+            document.getElementById('panel-cpanel').classList.remove('open'); drawOverlay.style.display = 'block'; drawBox.style.display = 'none';
+            alert("INFORMASI: Klik dan tahan, lalu tarik kursor Anda pada area gambar peta untuk mencetak kotak area (Hotspot).");
+        };
+
+        window.previewHotspot = function() {
+            const top = parseFloat(document.getElementById('hs-top').value) || 0; 
+            const left = parseFloat(document.getElementById('hs-left').value) || 0;
+            const width = parseFloat(document.getElementById('hs-width').value) || 10; 
+            const height = parseFloat(document.getElementById('hs-height').value) || 10;
+            const nomor = document.getElementById('hs-nomor').value || '';
+
+            let previewDiv = document.getElementById('hotspot-preview');
+            if(!previewDiv) {
+                previewDiv = document.createElement('div'); previewDiv.id = 'hotspot-preview'; previewDiv.style.position = 'absolute';
+                previewDiv.style.background = 'rgba(212, 175, 55, 0.4)'; previewDiv.style.border = '3px dashed #800000'; previewDiv.style.zIndex = '999'; previewDiv.style.cursor = 'move';
+                
+                const spanNum = document.createElement('div');
+                spanNum.id = 'preview-hs-num';
+                spanNum.style.position = 'absolute'; spanNum.style.top = '50%'; spanNum.style.left = '50%'; spanNum.style.transform = 'translate(-50%, -50%)';
+                spanNum.style.background = '#800000'; spanNum.style.color = '#d4af37'; spanNum.style.fontWeight = '900'; spanNum.style.fontSize = '14px';
+                spanNum.style.width = '28px'; spanNum.style.height = '28px'; spanNum.style.borderRadius = '50%'; spanNum.style.display = 'flex';
+                spanNum.style.justifyContent = 'center'; spanNum.style.alignItems = 'center'; spanNum.style.border = '2px solid #d4af37'; spanNum.style.pointerEvents = 'none';
+                previewDiv.appendChild(spanNum);
+
+                const handle = document.createElement('div');
+                handle.style.position = 'absolute'; handle.style.right = '-6px'; handle.style.bottom = '-6px';
+                handle.style.width = '15px'; handle.style.height = '15px'; handle.style.background = '#fff';
+                handle.style.border = '3px solid #800000'; handle.style.borderRadius = '50%'; handle.style.cursor = 'nwse-resize';
+                previewDiv.appendChild(handle);
+
+                document.getElementById('interactive-map').appendChild(previewDiv);
+
+                let startX, startY, startLeft, startTop, startWidth, startHeight;
+                const mImg = document.querySelector('.map-wrapper img');
+
+                handle.addEventListener('mousedown', function(e) { isResizingPreview = true; startX = e.clientX || e.touches[0].clientX; startY = e.clientY || e.touches[0].clientY; startWidth = parseFloat(previewDiv.style.width); startHeight = parseFloat(previewDiv.style.height); e.stopPropagation(); });
+                handle.addEventListener('touchstart', function(e) { isResizingPreview = true; startX = e.touches[0].clientX; startY = e.touches[0].clientY; startWidth = parseFloat(previewDiv.style.width); startHeight = parseFloat(previewDiv.style.height); e.stopPropagation(); }, {passive: false});
+                previewDiv.addEventListener('mousedown', function(e) { if(e.target === handle) return; isDraggingPreview = true; startX = e.clientX || e.touches[0].clientX; startY = e.clientY || e.touches[0].clientY; startLeft = parseFloat(previewDiv.style.left); startTop = parseFloat(previewDiv.style.top); e.stopPropagation(); });
+                previewDiv.addEventListener('touchstart', function(e) { if(e.target === handle) return; isDraggingPreview = true; startX = e.touches[0].clientX; startY = e.touches[0].clientY; startLeft = parseFloat(previewDiv.style.left); startTop = parseFloat(previewDiv.style.top); e.stopPropagation(); }, {passive: false});
+
+                function onPreviewMove(e) {
+                    if (!isDraggingPreview && !isResizingPreview) return;
+                    e.preventDefault();
+                    let clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0); let clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+                    const rect = mImg.getBoundingClientRect(); let dx = ((clientX - startX) / rect.width) * 100; let dy = ((clientY - startY) / rect.height) * 100;
+                    if (isDraggingPreview) {
+                        let newLeft = Math.max(0, Math.min(100 - parseFloat(previewDiv.style.width), startLeft + dx)); let newTop = Math.max(0, Math.min(100 - parseFloat(previewDiv.style.height), startTop + dy));
+                        previewDiv.style.left = newLeft + '%'; previewDiv.style.top = newTop + '%'; document.getElementById('hs-left').value = newLeft.toFixed(2); document.getElementById('hs-top').value = newTop.toFixed(2);
+                    } else if (isResizingPreview) {
+                        let newWidth = Math.max(1, startWidth + dx); let newHeight = Math.max(1, startHeight + dy);
+                        if (parseFloat(previewDiv.style.left) + newWidth > 100) newWidth = 100 - parseFloat(previewDiv.style.left); if (parseFloat(previewDiv.style.top) + newHeight > 100) newHeight = 100 - parseFloat(previewDiv.style.top);
+                        previewDiv.style.width = newWidth + '%'; previewDiv.style.height = newHeight + '%'; document.getElementById('hs-width').value = newWidth.toFixed(2); document.getElementById('hs-height').value = newHeight.toFixed(2);
+                    }
+                }
+                function onPreviewUp() { isDraggingPreview = false; isResizingPreview = false; }
+                document.addEventListener('mousemove', onPreviewMove); document.addEventListener('mouseup', onPreviewUp); document.addEventListener('touchmove', onPreviewMove, {passive: false}); document.addEventListener('touchend', onPreviewUp);
+            }
+            
+            previewDiv.style.top = `${top}%`; previewDiv.style.left = `${left}%`; previewDiv.style.width = `${width}%`; previewDiv.style.height = `${height}%`;
+            const numEl = document.getElementById('preview-hs-num');
+            if (numEl) { numEl.innerText = nomor; numEl.style.display = (nomor && nomor !== "-" && nomor.trim() !== "") ? 'flex' : 'none'; }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('draw-overlay'); const box = document.getElementById('draw-box');
+            function getEventPos(e) { return e.touches && e.touches.length > 0 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+            function sDraw(e) {
+                isDrawingArea = true; const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
+                drawStartX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100)); drawStartY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100));
+                box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%'; box.style.width = '0%'; box.style.height = '0%'; box.style.display = 'block';
+            }
+            function mDraw(e) {
+                if(!isDrawingArea) return; e.preventDefault(); 
+                const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
+                let cX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100)); let cY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100));
+                box.style.left = Math.min(drawStartX, cX) + '%'; box.style.top = Math.min(drawStartY, cY) + '%';
+                box.style.width = Math.abs(cX - drawStartX) + '%'; box.style.height = Math.abs(cY - drawStartY) + '%';
+            }
+            function eDraw(e) {
+                if(!isDrawingArea) return; isDrawingArea = false; overlay.style.display = 'none';
+                const fW = parseFloat(box.style.width); const fH = parseFloat(box.style.height);
+                if(fW < 1 || fH < 1) { document.getElementById('panel-cpanel').classList.add('open'); return; }
+                document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2); document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2);
+                document.getElementById('hs-width').value = fW.toFixed(2); document.getElementById('hs-height').value = fH.toFixed(2);
+                document.getElementById('panel-cpanel').classList.add('open'); window.previewHotspot();
+            }
+            overlay.addEventListener('mousedown', sDraw); overlay.addEventListener('mousemove', mDraw); overlay.addEventListener('mouseup', eDraw);
+            overlay.addEventListener('touchstart', sDraw, {passive: false}); overlay.addEventListener('touchmove', mDraw, {passive: false}); overlay.addEventListener('touchend', eDraw);
+        });
+
+        // ==========================================
+        // FITUR UTAMA PENGUNJUNG & NAVIGASI PINTAR
+        // ==========================================
+        function renderHotspotsToMap() {
+            const container = document.getElementById('interactive-map');
+            container.querySelectorAll('.hotspot').forEach(el => el.remove());
+            dataHotspots.forEach(hs => {
+                const div = document.createElement('div'); div.className = 'hotspot';
+                div.style.top = `${hs.pos_top}%`; div.style.left = `${hs.pos_left}%`; div.style.width = `${hs.width}%`; div.style.height = `${hs.height}%`;
+                div.id = `hs-${hs.id}`;
+                
+                if (hs.nomor_gedung && hs.nomor_gedung !== "-" && hs.nomor_gedung.trim() !== "") {
+                    const spanNum = document.createElement('div'); spanNum.className = 'hotspot-number'; spanNum.innerText = hs.nomor_gedung; div.appendChild(spanNum);
+                }
+
+                const tooltip = document.createElement('div'); tooltip.className = 'hotspot-tooltip'; tooltip.innerText = hs.nama_bangunan; div.appendChild(tooltip);
+                div.onclick = () => {
+                    document.getElementById('hs-info-nama').innerText = hs.nama_bangunan;
+                    const actionContainer = document.getElementById('hs-info-action'); actionContainer.innerHTML = '';
+                    if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
+                        window.bicara(`Anda memilih area ${hs.nama_bangunan}. Tersedia rute navigasi menuju lokasi ini.`);
+                        const btnNav = document.createElement('button'); btnNav.className = 'btn-primary'; btnNav.innerText = '🗺️ Mulai Navigasi ke Sini';
+                        btnNav.onclick = () => { window.tutupModal('hotspot-info-popup'); window.pilihTujuan(hs.target_lokasi); };
+                        actionContainer.appendChild(btnNav);
+                    } else { window.bicara(`Ini adalah bangunan ${hs.nama_bangunan}.`); }
+                    document.getElementById('hotspot-info-popup').style.display = 'flex';
+                };
+                container.insertBefore(div, document.getElementById('draw-overlay'));
+            });
+        }
+
+        function buatUcapanIndonesia(teks) {
+            const suara = new SpeechSynthesisUtterance(teks);
+            suara.lang = 'id-ID'; suara.volume = settingTTS.volume; suara.rate = settingTTS.rate;
+            const suaraIndonesia = window.speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().startsWith('id'));
+            if (suaraIndonesia) suara.voice = suaraIndonesia;
+            return suara;
+        }
+
+        window.bicara = function(teks, callback) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                ucapanAktif = buatUcapanIndonesia(teks);
+                if(callback) ucapanAktif.onend = callback; window.speechSynthesis.speak(ucapanAktif);
+            }
+        }
+
+        window.tutupModal = function(id) { document.getElementById(id).style.display = 'none'; }
+
+        function renderTombolTujuan() {
+            const container = document.getElementById('container-tujuan'); container.innerHTML = "";
+            for (let nama in dataRute) {
+                const lokasi = dataRute[nama];
+                const badgeClass = (lokasi.akses && lokasi.akses.includes('PENGUNJUNG')) ? 'badge-pengunjung' : 'badge-non';
+                const safeNomor = lokasi.nomor || lokasi.nomorBangunan || '-'; const safeLantai = lokasi.lantai || '-';
+                const safeWarnaDot = lokasi.warnaDot || '#000'; const safeNamaWarna = lokasi.namaWarna || '';
+                
+                const btn = document.createElement('a'); btn.className = 'btn-tujuan-card tujuan-item'; btn.onclick = () => window.pilihTujuan(nama);
+                btn.innerHTML = `
+                    <div class="nomor-circle">${safeNomor}</div>
+                    <div class="tujuan-content">
+                        <div class="tujuan-number">Gedung No. ${safeNomor}</div>
+                        <div class="tujuan-title nama-tujuan">${nama}</div>
+                        <div class="tujuan-subtitle">${safeLantai} • <span class="dot-warna" style="background-color: ${safeWarnaDot};"></span> ${safeNamaWarna}</div>
+                    </div>
+                    <div class="badge-akses ${badgeClass}">${lokasi.akses}</div>`;
+                container.appendChild(btn);
+            }
+        }
+
+        window.filterTujuan = function() {
+            let input = document.getElementById('search-tujuan').value.toLowerCase(); let buttons = document.getElementsByClassName('tujuan-item');
+            for (let i = 0; i < buttons.length; i++) {
+                let txtValue = buttons[i].querySelector('.nama-tujuan').textContent;
+                if (txtValue.toLowerCase().indexOf(input) > -1) buttons[i].style.display = "flex"; else buttons[i].style.display = "none";
+            }
+        }
+
+        // --- ENGINE KALKULASI ARAH & TTS SVG ---
+        function parseDanEksekusiJalurSVG(pathStr, fallbackInstruksi) {
+            timerInstruksiNavigasi.forEach(clearTimeout);
+            timerInstruksiNavigasi = [];
+            window.speechSynthesis.cancel();
+
+            const greenPath = document.getElementById('greenPath');
+            const redPath = document.getElementById('redPath');
+            
+            if(!pathStr || pathStr.trim() === "") {
+                greenPath.setAttribute('d', ''); redPath.setAttribute('d', '');
+                window.bicara("Tujuan telah dipilih. " + (fallbackInstruksi || "Silakan menuju lokasi."));
+                return;
+            }
+
+            greenPath.setAttribute('d', pathStr);
+            redPath.setAttribute('d', pathStr);
+
+            // Parsing Titik
+            const matches = pathStr.match(/[ML]\s*([\d.]+)\s+([\d.]+)/g);
+            if(!matches || matches.length < 2) {
+                window.bicara("Tujuan telah dipilih. " + (fallbackInstruksi || "")); return;
+            }
+
+            const points = matches.map(m => {
+                const parts = m.trim().split(/\s+/); return { x: parseFloat(parts[1]), y: parseFloat(parts[2]) };
+            });
+
+            // Kalkulasi Logika TTS Jarak dan Belokan
+            let instruksiArr = [];
+            let currentAngle = null;
+            let totalWaktu = 0;
+            let kecepatanGerakAnimasi = 180; // ms per meter
+            let skalaMeterPerPersen = 2.5; // Estimasi 1% Layar = 2.5 Meter
+            
+            // Pengantar
+            instruksiArr.push({ teks: `Navigasi dari ${lokasiAsal} dimulai.`, waktuDelay: 0 });
+
+            for(let i=0; i<points.length-1; i++) {
+                let dx = points[i+1].x - points[i].x;
+                let dy = points[i+1].y - points[i].y;
+                let jarakMeter = Math.sqrt(dx*dx + dy*dy) * skalaMeterPerPersen;
+                let angle = Math.atan2(dy, dx) * (180 / Math.PI); // Derajat
+                
+                let aksi = "Jalan lurus";
+                if (currentAngle !== null) {
+                    let diff = angle - currentAngle;
+                    while(diff <= -180) diff += 360; while(diff > 180) diff -= 360;
+
+                    if (diff > 25 && diff <= 150) aksi = "Belok kanan, kemudian jalan";
+                    else if (diff < -25 && diff >= -150) aksi = "Belok kiri, kemudian jalan";
+                    else if (Math.abs(diff) > 150) aksi = "Putar balik, kemudian jalan";
+                }
+                currentAngle = angle;
+                
+                // Jika titik belok sangat dekat (< 3 meter), gabungkan saja
+                if(jarakMeter > 3) {
+                    let durasiSegmen = jarakMeter * kecepatanGerakAnimasi;
+                    instruksiArr.push({ teks: `${aksi} sejauh kurang lebih ${Math.round(jarakMeter)} meter.`, waktuDelay: totalWaktu + 500 });
+                    totalWaktu += durasiSegmen;
+                }
+            }
+            
+            let instruksiAkhir = "Anda telah hampir sampai di tujuan.";
+            if (fallbackInstruksi && fallbackInstruksi !== "") instruksiAkhir += " " + fallbackInstruksi;
+            instruksiArr.push({ teks: instruksiAkhir, waktuDelay: totalWaktu + 1000 });
+
+            // Mulai Eksekusi Animasi Garis Merah
+            const panjangPath = redPath.getTotalLength();
+            redPath.style.transition = 'none';
+            redPath.style.strokeDasharray = `2, 2`; // putus-putus
+            redPath.style.strokeDashoffset = panjangPath;
+            redPath.getBoundingClientRect(); // trigger reflow
+
+            redPath.style.transition = `stroke-dashoffset ${totalWaktu}ms linear`;
+            redPath.style.strokeDashoffset = 0;
+
+            // Mulai Eksekusi Antrean Suara
+            instruksiArr.forEach(instruksi => {
+                const timerId = setTimeout(() => {
+                    // Panggil fungsi bicara tanpa cancel array lainnya
+                    const suara = buatUcapanIndonesia(instruksi.teks);
+                    window.speechSynthesis.speak(suara);
+                }, instruksi.waktuDelay);
+                timerInstruksiNavigasi.push(timerId);
+            });
+        }
+
+
+        window.pilihTujuan = function(tujuan) {
+            lokasiTujuan = tujuan; const rute = dataRute[tujuan];
+            if (!lokasiAsal) return alert("Silakan pilih Lokasi Asal di menu atas terlebih dahulu!");
+
+            // Tampilkan Popup Instruksi Kedatangan
+            document.getElementById('teks-instruksi').innerText = `Menuju ${tujuan}`; 
+            document.getElementById('gambar-tanda').src = rute.gambarTanda;
+            document.getElementById('nav-popup').style.display = 'flex'; 
+
+            // Eksekusi Garis SVG dan AI TTS Navigasi
+            parseDanEksekusiJalurSVG(rute.jalur_svg, rute.instruksi);
+        }
+
+        window.telahSampaiAkhir = function() {
+            document.getElementById('nav-popup').style.display = 'none';
+            window.bicara(`Anda telah sampai di tujuan. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
+        }
+
+        window.batalPilih = function() {
+            document.getElementById('btn-current-location').innerHTML = `📍 Lokasi Anda: Belum Disetel <span>▼</span>`;
+            document.getElementById('main-sidebar').style.display = 'none';
+            document.getElementById('floating-instruction').style.display = 'flex';
+            document.getElementById('tujuan-toggle-switch').classList.remove('active');
+            
+            document.getElementById('greenPath').setAttribute('d', '');
+            document.getElementById('redPath').setAttribute('d', '');
+
+            lokasiAsal = "";
+            window.speechSynthesis.cancel();
+            timerInstruksiNavigasi.forEach(clearTimeout);
+        }
+
+        // Q&A / SURVEY SPEECH RECOGNITION
+        let recognizer, isRecording = false, activeInputTarget = null; 
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognizer = new SR(); recognizer.lang = 'id-ID'; recognizer.continuous = false; recognizer.interimResults = false;
+            recognizer.onresult = (event) => {
+                const teksSuara = event.results[0][0].transcript;
+                if(activeInputTarget === 'QA') prosesPertanyaanQA(teksSuara);
+                else if (activeInputTarget === 'Survey') document.getElementById('ulasan-teks').value += teksSuara + " ";
+            };
+            recognizer.onend = () => { stopRekam(); };
+        }
+
+        window.toggleQARekam = function() {
+            if(!recognizer) return alert("Browser tidak mendukung mic."); activeInputTarget = 'QA';
+            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
+        }
+        window.toggleSurveyRekam = function() {
+            if(!recognizer) return alert("Browser tidak mendukung mic."); activeInputTarget = 'Survey';
+            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
+        }
+        function stopRekam() { if(recognizer) recognizer.stop(); isRecording = false; document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording')); }
+
+        window.bukaModalQA = function() {
+            document.getElementById('qa-modal').style.display = 'flex';
+            document.getElementById('qa-chat').innerHTML = '<div class="chat-bubble chat-bot">Halo! Silakan tekan tombol mic dan tanyakan sesuatu.</div>';
+            window.bicara("Ada yang bisa saya bantu informasikan?");
+        }
+
+        function prosesPertanyaanQA(pertanyaan) {
+            const chatArea = document.getElementById('qa-chat'); chatArea.innerHTML += `<div class="chat-bubble chat-user">${pertanyaan}</div>`;
+            let jawaban = "Maaf, saya belum mengerti pertanyaan tersebut."; let q = pertanyaan.toLowerCase();
+            if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk adalah pukul 10 pagi hingga 12 siang, dan 4 sore hingga 8 malam.";
+            else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet terdekat berada di sudut lorong sebelah kiri.";
+            else if (q.includes("jadwal dokter")) jawaban = "Silakan menuju bagian administrasi di lobi utama.";
+            setTimeout(() => { chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`; chatArea.scrollTop = chatArea.scrollHeight; window.bicara(jawaban); }, 500);
+        }
+
+        window.kirimSurveySupabase = async function() {
+            const teks = document.getElementById('ulasan-teks').value.trim();
+            if(teks) { await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]); }
+            window.tutupModal('survey-popup'); window.batalPilih(); 
+            window.bicara("Terima kasih atas ulasan Anda."); document.getElementById('ulasan-teks').value = ""; 
+        }
+    </script>
+</body>
+</html>
+        /* BALON PETUNJUK MELAYANG */
+        .floating-instruction {
+            position: absolute; top: 85px; left: 250px; background: #d4af37; color: #111; padding: 15px 25px; border-radius: 10px; font-weight: bold; font-size: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 950; display: flex; align-items: center; gap: 10px; animation: floatUpDown 2s infinite ease-in-out; border: 2px solid #800000;
+        }
+        .floating-instruction::after { content: ''; position: absolute; top: -12px; left: 30px; border-width: 0 10px 10px 10px; border-style: solid; border-color: transparent transparent #800000 transparent; }
+        @keyframes floatUpDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* ------------------------------------------- */
+        /* AREA DENAH (DARK CARBON GRID) & HUD         */
+        /* ------------------------------------------- */
+        .map-view { 
+            flex: 1; position: relative; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden;
+            background-color: #1a1a1a; 
+            background-image: 
+                repeating-linear-gradient(to right, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
+                repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(255,255,255,0.02) 80px, rgba(255,255,255,0.02) 81px);
+            perspective: 1200px; cursor: grab; 
+        }
+        
+        .no-map-warning { position: absolute; text-align: center; color: #e84118; font-weight: bold; font-size: 28px; background: rgba(26,26,26,0.9); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 3px dashed #800000; z-index: 50; display: none; }
+
+        .map-wrapper { 
+            position: relative; max-width: 100%; max-height: 100%; display: inline-block; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); border-radius: 10px; background: #111;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
+            transform-style: preserve-3d; transform-origin: center center;
+        }
+        .map-wrapper img { display: none; max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; pointer-events: none;}
+        
         #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px;}
         #draw-box { position: absolute; border: 2px solid #d4af37; background: rgba(212, 175, 55, 0.3); display: none; pointer-events: none; }
 
