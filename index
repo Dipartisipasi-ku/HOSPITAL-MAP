@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Denah Digital - RS Atma Husada Mahakam</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body, html { width: 100vw; height: 100vh; overflow: hidden; background: #1e272e; color: #2f3640; }
+        
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00a8ff; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; transition: 0.5s; }
+        #start-overlay h1 { font-size: 40px; margin-bottom: 20px; text-align: center;}
+        
+        .app-container { display: flex; width: 100%; height: 100%; position: relative;}
+        .sidebar { background: #f5f6fa; padding: 25px; flex: 1; max-width: 400px; display: flex; flex-direction: column; z-index: 10; box-shadow: 3px 0 15px rgba(0,0,0,0.2); overflow-y: auto;}
+        .map-view { flex: 3; background: #dcdde1; position: relative; display: flex; justify-content: center; align-items: center; }
+        .map-view img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .header-title { color: #2c3e50; font-size: 22px; text-align: center; border-bottom: 3px solid #00a8ff; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .step-panel { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.5s; }
+        .step-panel.active { display: flex; }
+        .step-title { font-size: 18px; font-weight: bold; color: #e1b12c; background: #2f3640; padding: 12px; border-radius: 8px; text-align: center; }
+        
+        .btn-pilihan { background: white; color: #2f3640; padding: 15px; border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; text-align: left; display: flex; flex-direction: column; gap: 5px;}
+        .btn-pilihan:hover { background: #00a8ff; color: white; border-color: #00a8ff; }
+        .badge-akses { font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; }
+        .badge-pengunjung { background: #4cd137; color: white; }
+        .badge-non { background: #e84118; color: white; }
+        
+        .btn-cpanel { position: absolute; top: 15px; right: 15px; background: #2f3640; color: white; border: 2px solid #7f8fa6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 900; transition: 0.3s; }
+        .btn-hud-tanya { position: absolute; bottom: 30px; right: 30px; background: #e1b12c; color: #2f3640; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; display: flex; align-items: center; gap: 10px;}
+        
+        .admin-panel { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #2f3640; color: white; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .admin-panel.open { right: 0; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4cd137; padding-bottom: 10px; }
+        .btn-close-admin { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        
+        .admin-section { background: #353b48; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
+        .admin-section h3 { color: #4cd137; font-size: 16px; margin-bottom: 5px; border-bottom: 1px solid #7f8fa6; padding-bottom: 5px;}
+        .admin-section label { font-size: 14px; color: #dcdde1; }
+        .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: none; background: #f5f6fa; font-family: inherit; margin-bottom: 5px;}
+        .btn-save-admin { background: #4cd137; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1;}
+        .btn-delete-admin { background: #e84118; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1;}
+
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease; }
+        
+        .login-box { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
+        .login-box select, .login-box input { padding: 15px; border-radius: 8px; border: 2px solid #dcdde1; font-size: 16px; }
+        
+        .sign-image { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin: 15px 0; border: 3px solid #e1b12c; }
+        .instruksi-teks { font-size: 22px; font-weight: bold; color: #2c3e50; line-height: 1.4; }
+        
+        .chat-area { height: 250px; background: #f5f6fa; border-radius: 10px; padding: 15px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #dcdde1; }
+        .chat-bubble { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 80%; line-height: 1.4; font-size: 15px;}
+        .chat-user { background: #00a8ff; color: white; margin-left: auto; border-bottom-right-radius: 2px; }
+        .chat-bot { background: #e1b12c; color: #2f3640; border-bottom-left-radius: 2px; font-weight: bold;}
+
+        .btn-primary { background: #00a8ff; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;}
+        .btn-mic { background: #e84118; color: white; border: none; padding: 15px; border-radius: 50%; cursor: pointer; width: 60px; height: 60px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; box-shadow: 0 5px 15px rgba(232, 65, 24, 0.4); transition: 0.3s; }
+        .btn-mic.recording { background: #c23616; animation: pulseMic 1s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 65, 24, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(232, 65, 24, 0); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay" onclick="mulaiAplikasi()">
+        <h1 style="font-size: 60px;">⏳</h1>
+        <h1>Sedang Menyiapkan Data...</h1>
+        <p id="loading-text">Menghubungkan ke Database</p>
+    </div>
+
+    <div class="app-container">
+        <!-- Tombol HUD -->
+        <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
+        <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
+
+        <!-- Panel Kiri (Navigasi) -->
+        <div class="sidebar">
+            <h2 class="header-title">🏥 RS. Atma Husada Mahakam</h2>
+            
+            <div id="step-1" class="step-panel">
+                <div class="step-title">📍 LOKASI ANDA SAAT INI</div>
+                <div id="container-lokasi-asal" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+
+            <div id="step-2" class="step-panel">
+                <div class="step-title" style="background:#00a8ff;">🎯 LOKASI TUJUAN</div>
+                <div id="lokasi-anda-info" style="margin-bottom: 10px; font-weight: bold; color: #7f8fa6;">Dari: -</div>
+                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <button class="btn-primary" onclick="batalPilih()" style="background: #e84118;">Batal / Kembali</button>
+            </div>
+        </div>
+
+        <!-- Area Denah -->
+        <div class="map-view">
+            <img src="https://via.placeholder.com/1280x720.png?text=PETA+RUMAH+SAKIT" alt="Peta RS">
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN C-PANEL -->
+    <div class="popup-overlay" id="login-modal">
+        <div class="popup-content">
+            <h2 style="color: #2c3e50;">Akses C-Panel</h2>
+            <div class="login-box">
+                <select id="login-role">
+                    <option value="superadmin">Superadmin</option>
+                    <option value="administrator">Administrator</option>
+                </select>
+                <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12">
+                <button class="btn-primary" onclick="prosesLogin()">LOGIN</button>
+                <button class="btn-primary" style="background: #95a5a6; margin-top:0;" onclick="tutupModal('login-modal')">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL C-PANEL (Slide Kanan) -->
+    <div class="admin-panel" id="panel-cpanel">
+        <div class="admin-header">
+            <h2>⚙️ Control Panel</h2>
+            <button class="btn-close-admin" onclick="tutupCPanel()">✖</button>
+        </div>
+
+        <!-- Section Pengaturan Suara -->
+        <div class="admin-section">
+            <h3>🎛️ Pengaturan Suara (TTS)</h3>
+            <label>Volume (<span id="val-vol">1.0</span>)</label>
+            <input type="range" id="tts-volume" min="0.1" max="1" step="0.1" value="1.0" oninput="updateTTSUI()">
+            <label>Kecepatan (<span id="val-rate">0.9</span>)</label>
+            <input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="0.9" oninput="updateTTSUI()">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-save-admin" style="background: #e1b12c; color: #2f3640;" onclick="tesSuara()">Tes Suara</button>
+                <button class="btn-save-admin" onclick="simpanPengaturanSupabase()">💾 Simpan TTS</button>
+            </div>
+        </div>
+
+        <!-- Section CRUD Lokasi Saat Ini (ASAL) -->
+        <div class="admin-section">
+            <h3>📍 Editor Lokasi Saat Ini (Asal)</h3>
+            <label>Pilih Lokasi Asal:</label>
+            <select id="admin-select-asal" onchange="loadDataAsalKeForm()"></select>
+            <label>Nama Lokasi:</label>
+            <input type="text" id="admin-nama-asal" placeholder="Misal: Lobi Utama">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-save-admin" onclick="simpanDataAsalSupabase()">💾 Simpan</button>
+                <button class="btn-delete-admin" onclick="hapusDataAsalSupabase()">🗑️ Hapus</button>
+            </div>
+        </div>
+
+        <!-- Section CRUD Lokasi Tujuan -->
+        <div class="admin-section">
+            <h3>🗺️ Editor Info Tujuan & Rute</h3>
+            <label>Pilih Lokasi Tujuan:</label>
+            <select id="admin-select-lokasi" onchange="loadDataKeForm()"></select>
+            <label>Nama Lokasi:</label>
+            <input type="text" id="admin-nama-lokasi" placeholder="Misal: Poli Mata">
+            <label>Hak Akses:</label>
+            <select id="admin-akses">
+                <option value="Pengunjung">Pengunjung Umum</option>
+                <option value="Non Pengunjung (Staf Medis)">Non Pengunjung (Staf Medis)</option>
+                <option value="Non Pengunjung (Khusus Dokter)">Non Pengunjung (Khusus Dokter)</option>
+                <option value="Non Pengunjung (Manajemen)">Non Pengunjung (Manajemen)</option>
+            </select>
+            <label>Rute & Instruksi Arah:</label>
+            <textarea id="admin-rute" placeholder="Misal: maju sejauh 10 meter..."></textarea>
+            <label>Gambar Tanda Patokan (URL):</label>
+            <input type="text" id="admin-tanda" placeholder="https://contoh.com/gambar.jpg">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-save-admin" onclick="simpanDataRuteSupabase()">💾 Simpan</button>
+                <button class="btn-delete-admin" onclick="hapusDataRuteSupabase()">🗑️ Hapus</button>
+            </div>
+        </div>
+
+        <!-- Section Edit PIN -->
+        <div class="admin-section">
+            <h3>🔐 Reset Akses PIN</h3>
+            <input type="password" id="pin-lama" placeholder="PIN Lama (12 Karakter)" maxlength="12">
+            <input type="password" id="pin-baru" placeholder="PIN Baru (12 Karakter)" maxlength="12">
+            <button class="btn-save-admin" style="background: #e1b12c; color:#2f3640;" onclick="resetPINSupabase()">Simpan PIN Baru</button>
+        </div>
+    </div>
+
+    <!-- MODAL TANYA JAWAB (Q&A) -->
+    <div class="popup-overlay" id="qa-modal">
+        <div class="popup-content" style="max-width: 500px;">
+            <h2 style="color: #e1b12c; margin-bottom: 10px;">💬 Tanya Jawab Cepat</h2>
+            <div class="chat-area" id="qa-chat">
+                <div class="chat-bubble chat-bot">Halo! Ada yang bisa saya bantu informasikan?</div>
+            </div>
+            <button class="btn-mic" id="btn-qa-rekam" onclick="toggleQARekam()">🎤</button>
+            <button class="btn-primary" style="background:#95a5a6; margin-top:20px;" onclick="tutupModal('qa-modal')">Tutup</button>
+        </div>
+    </div>
+
+    <!-- POP-UP NAVIGASI -->
+    <div class="popup-overlay" id="nav-popup">
+        <div class="popup-content">
+            <h2 style="color: #00a8ff; margin-bottom: 15px;">Ikuti Petunjuk Ini</h2>
+            <div class="instruksi-teks" id="teks-instruksi"></div>
+            <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
+            <button class="btn-primary" style="background:#4cd137;" onclick="telahSampai()">✅ SAYA SUDAH SAMPAI</button>
+        </div>
+    </div>
+
+    <!-- POP-UP SURVEY -->
+    <div class="popup-overlay" id="survey-popup">
+        <div class="popup-content">
+            <h2 style="color: #4cd137; margin-bottom: 15px;">Terima Kasih! 🎉</h2>
+            <textarea id="ulasan-teks" style="width: 100%; height: 100px; padding: 15px; border-radius: 10px; border: 2px solid #bdc3c7; resize:none; margin-bottom:10px;" placeholder="Ketik ulasan Anda atau gunakan suara..."></textarea>
+            <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()">🎤</button>
+            <button class="btn-primary" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA BERBASIS MODULE -->
+    <script type="module">
+        import supabase from './supabase_config.js';
+
+        // STATE VARIABEL
+        let systemPIN = '123456789012';
+        let settingTTS = { volume: 1.0, rate: 0.9 };
+        let dataLokasiAsal = []; 
+        let dataRute = {}; 
+        
+        let lokasiAsal = "";
+        let lokasiTujuan = "";
+        let ucapanAktif = null;
+
+        // ==========================================
+        // 1. FETCH SEMUA DATA DARI SUPABASE
+        // ==========================================
+        async function fetchAllDataSupabase() {
+            try {
+                // Fetch Settings
+                const { data: set } = await supabase.from('app_settings').select('*').eq('id', 1).single();
+                if (set) {
+                    systemPIN = set.pin;
+                    settingTTS.volume = parseFloat(set.tts_volume);
+                    settingTTS.rate = parseFloat(set.tts_rate);
+                }
+
+                // Fetch Lokasi Asal
+                const { data: asal } = await supabase.from('lokasi_asal').select('nama_lokasi');
+                if (asal) dataLokasiAsal = asal.map(a => a.nama_lokasi);
+
+                // Fetch Lokasi Tujuan
+                const { data: tujuan } = await supabase.from('lokasi_tujuan').select('*');
+                if (tujuan) {
+                    dataRute = {};
+                    tujuan.forEach(t => {
+                        dataRute[t.nama_lokasi] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda };
+                    });
+                }
+
+                document.getElementById('loading-text').innerText = "Data Siap!";
+                document.getElementById('start-overlay').style.pointerEvents = "auto";
+                document.getElementById('start-overlay').querySelector('h1:first-child').innerText = "👆";
+                document.getElementById('start-overlay').querySelector('h1:nth-child(2)').innerText = "Sentuh Layar Untuk Memulai";
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek Koneksi / API Key.";
+            }
+        }
+        
+        document.getElementById('start-overlay').style.pointerEvents = "none";
+        window.onload = fetchAllDataSupabase;
+
+        // ==========================================
+        // 2. FUNGSI NAVIGASI & PENGUNJUNG
+        // ==========================================
+        window.bicara = function(teks, callback) {
+            window.speechSynthesis.cancel();
+            if ('speechSynthesis' in window) {
+                ucapanAktif = new SpeechSynthesisUtterance(teks);
+                ucapanAktif.lang = 'id-ID';
+                ucapanAktif.volume = settingTTS.volume;
+                ucapanAktif.rate = settingTTS.rate;
+                if(callback) ucapanAktif.onend = callback;
+                window.speechSynthesis.speak(ucapanAktif);
+            }
+        }
+
+        window.tutupModal = function(id) {
+            document.getElementById(id).style.display = 'none';
+            window.speechSynthesis.cancel();
+            if(recognizer) { recognizer.stop(); isRecording = false; }
+            document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording'));
+        }
+
+        window.mulaiAplikasi = function() {
+            document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('step-1').classList.add('active');
+            renderTombolLokasiAsal();
+            renderTombolTujuan();
+            window.bicara("Selamat datang di aplikasi Denah Digital Rumah Sakit Atma Husada Mahakam. Silahkan Pilih Lokasi anda berada saat ini.");
+        }
+
+        function renderTombolLokasiAsal() {
+            const container = document.getElementById('container-lokasi-asal');
+            container.innerHTML = "";
+            dataLokasiAsal.forEach(nama => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-pilihan';
+                btn.innerHTML = `<span style="font-size:18px;">${nama}</span>`;
+                btn.onclick = () => window.pilihLokasiSekarang(nama);
+                container.appendChild(btn);
+            });
+        }
+
+        window.pilihLokasiSekarang = function(lokasi) {
+            lokasiAsal = lokasi;
+            document.getElementById('step-1').classList.remove('active');
+            document.getElementById('step-2').classList.add('active');
+            document.getElementById('lokasi-anda-info').innerText = "Dari: " + lokasiAsal;
+            window.bicara("Silahkan pilih lokasi tujuan anda.");
+        }
+
+        function renderTombolTujuan() {
+            const container = document.getElementById('container-tujuan');
+            container.innerHTML = "";
+            for (let nama in dataRute) {
+                const lokasi = dataRute[nama];
+                const badgeClass = lokasi.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
+                const btn = document.createElement('button');
+                btn.className = 'btn-pilihan';
+                btn.innerHTML = `<span style="font-size:18px;">${nama}</span> <span class="badge-akses ${badgeClass}">${lokasi.akses}</span>`;
+                btn.onclick = () => window.pilihTujuan(nama);
+                container.appendChild(btn);
+            }
+        }
+
+        window.pilihTujuan = function(tujuan) {
+            lokasiTujuan = tujuan;
+            const rute = dataRute[tujuan];
+            const teksArahan = `Silahkan ${rute.instruksi} sampai menemukan tanda seperti ini.`;
+            document.getElementById('teks-instruksi').innerText = teksArahan;
+            document.getElementById('gambar-tanda').src = rute.gambarTanda;
+            document.getElementById('nav-popup').style.display = 'flex';
+            window.bicara(teksArahan);
+        }
+
+        window.telahSampai = function() {
+            document.getElementById('nav-popup').style.display = 'none';
+            window.bicara(`Anda sudah sampai di ${lokasiTujuan}. Kami senang bisa membantu anda.`, () => {
+                document.getElementById('survey-popup').style.display = 'flex';
+            });
+        }
+
+        window.batalPilih = function() {
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            window.speechSynthesis.cancel();
+        }
+
+        // ==========================================
+        // 3. C-PANEL & CRUD SUPABASE
+        // ==========================================
+        window.bukaModalLogin = function() {
+            document.getElementById('login-pin').value = ""; 
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        window.prosesLogin = function() {
+            const role = document.getElementById('login-role').value;
+            const pinInput = document.getElementById('login-pin').value;
+            
+            if (pinInput === systemPIN && role === "superadmin") {
+                window.tutupModal('login-modal');
+                bukaCPanel();
+            } else {
+                alert("Role atau PIN Salah! Akses ditolak.");
+            }
+        }
+
+        window.resetPINSupabase = async function() {
+            const lama = document.getElementById('pin-lama').value;
+            const baru = document.getElementById('pin-baru').value;
+            if (lama !== systemPIN) return alert("PIN Lama salah!");
+            if (baru.length !== 12) return alert("PIN Baru harus 12 karakter!");
+            
+            const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
+            if(error) return alert("Gagal update Database");
+            
+            systemPIN = baru;
+            alert("PIN berhasil direset!");
+            document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = "";
+        }
+
+        function bukaCPanel() {
+            document.getElementById('panel-cpanel').classList.add('open');
+            document.getElementById('tts-volume').value = settingTTS.volume;
+            document.getElementById('val-vol').innerText = settingTTS.volume;
+            document.getElementById('tts-rate').value = settingTTS.rate;
+            document.getElementById('val-rate').innerText = settingTTS.rate;
+            renderSelectAdminAsal();
+            renderSelectAdminTujuan();
+        }
+        window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
+        
+        window.updateTTSUI = function() {
+            document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value;
+            document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value;
+        }
+
+        window.simpanPengaturanSupabase = async function() {
+            const vol = parseFloat(document.getElementById('tts-volume').value);
+            const r = parseFloat(document.getElementById('tts-rate').value);
+            
+            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
+            if(!error) {
+                settingTTS.volume = vol; settingTTS.rate = r;
+                alert("Pengaturan Suara Disimpan ke Database");
+            }
+        }
+        
+        window.tesSuara = function() { 
+            let vol = document.getElementById('tts-volume').value;
+            let rate = document.getElementById('tts-rate').value;
+            window.speechSynthesis.cancel();
+            let u = new SpeechSynthesisUtterance("Ini adalah pengujian suara C-Panel.");
+            u.lang = 'id-ID'; u.volume = vol; u.rate = rate;
+            window.speechSynthesis.speak(u);
+        }
+
+        // CRUD Lokasi Asal
+        function renderSelectAdminAsal() {
+            const select = document.getElementById('admin-select-asal');
+            select.innerHTML = '<option value="">-- Buat Lokasi Asal Baru --</option>';
+            dataLokasiAsal.forEach(nama => { select.innerHTML += `<option value="${nama}">${nama}</option>`; });
+        }
+
+        window.loadDataAsalKeForm = function() {
+            document.getElementById('admin-nama-asal').value = document.getElementById('admin-select-asal').value;
+        }
+
+        window.simpanDataAsalSupabase = async function() {
+            const namaBaru = document.getElementById('admin-nama-asal').value.trim();
+            const namaLama = document.getElementById('admin-select-asal').value;
+            if (!namaBaru) return alert("Nama tidak boleh kosong!");
+
+            if (namaLama && namaLama !== namaBaru) {
+                await supabase.from('lokasi_asal').update({ nama_lokasi: namaBaru }).eq('nama_lokasi', namaLama);
+            } else if (!namaLama) {
+                await supabase.from('lokasi_asal').insert([{ nama_lokasi: namaBaru }]);
+            }
+            
+            await fetchAllDataSupabase(); 
+            renderSelectAdminAsal();
+            renderTombolLokasiAsal();
+            document.getElementById('admin-nama-asal').value = "";
+            alert("Lokasi Asal Disimpan!");
+        }
+
+        window.hapusDataAsalSupabase = async function() {
+            const namaLama = document.getElementById('admin-select-asal').value;
+            if (!namaLama) return alert("Pilih lokasi!");
+            if(confirm(`Yakin ingin menghapus ${namaLama}?`)) {
+                await supabase.from('lokasi_asal').delete().eq('nama_lokasi', namaLama);
+                await fetchAllDataSupabase();
+                renderSelectAdminAsal();
+                renderTombolLokasiAsal();
+                document.getElementById('admin-nama-asal').value = "";
+                alert("Dihapus!");
+            }
+        }
+
+        // CRUD Lokasi Tujuan
+        function renderSelectAdminTujuan() {
+            const select = document.getElementById('admin-select-lokasi');
+            select.innerHTML = '<option value="">-- Buat Tujuan Baru --</option>';
+            for (let nama in dataRute) { select.innerHTML += `<option value="${nama}">${nama}</option>`; }
+        }
+
+        window.loadDataKeForm = function() {
+            const select = document.getElementById('admin-select-lokasi').value;
+            if (select) {
+                document.getElementById('admin-nama-lokasi').value = select;
+                document.getElementById('admin-akses').value = dataRute[select].akses || 'Pengunjung';
+                document.getElementById('admin-rute').value = dataRute[select].instruksi;
+                document.getElementById('admin-tanda').value = dataRute[select].gambarTanda;
+            } else {
+                document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = "";
+            }
+        }
+
+        window.simpanDataRuteSupabase = async function() {
+            const nama = document.getElementById('admin-nama-lokasi').value.trim();
+            const akses = document.getElementById('admin-akses').value;
+            const rute = document.getElementById('admin-rute').value.trim();
+            const tanda = document.getElementById('admin-tanda').value.trim();
+            const namaLama = document.getElementById('admin-select-lokasi').value;
+
+            if (!nama || !rute || !tanda) return alert("Lengkapi data!");
+
+            if (namaLama && namaLama !== nama) {
+                await supabase.from('lokasi_tujuan').update({ nama_lokasi: nama, akses: akses, instruksi: rute, gambar_tanda: tanda }).eq('nama_lokasi', namaLama);
+            } else if (namaLama === nama) {
+                await supabase.from('lokasi_tujuan').update({ akses: akses, instruksi: rute, gambar_tanda: tanda }).eq('nama_lokasi', namaLama);
+            } else {
+                await supabase.from('lokasi_tujuan').insert([{ nama_lokasi: nama, akses: akses, instruksi: rute, gambar_tanda: tanda }]);
+            }
+
+            await fetchAllDataSupabase();
+            renderSelectAdminTujuan();
+            renderTombolTujuan();
+            alert("Data Tujuan Disimpan!");
+        }
+
+        window.hapusDataRuteSupabase = async function() {
+            const nama = document.getElementById('admin-select-lokasi').value;
+            if (!nama) return alert("Pilih lokasi!");
+            if(confirm(`Yakin ingin menghapus ${nama}?`)) {
+                await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', nama);
+                await fetchAllDataSupabase();
+                renderSelectAdminTujuan();
+                renderTombolTujuan();
+                document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = "";
+                alert("Dihapus!");
+            }
+        }
+
+        // ==========================================
+        // 4. FITUR Q&A DAN SPEECH TO TEXT
+        // ==========================================
+        let recognizer, isRecording = false, activeInputTarget = null; 
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognizer = new SR(); recognizer.lang = 'id-ID'; recognizer.continuous = false; recognizer.interimResults = false;
+            
+            recognizer.onresult = (event) => {
+                const teksSuara = event.results[0][0].transcript;
+                if(activeInputTarget === 'QA') prosesPertanyaanQA(teksSuara);
+                else if (activeInputTarget === 'Survey') document.getElementById('ulasan-teks').value += teksSuara + " ";
+            };
+            recognizer.onend = () => { stopRekam(); };
+        }
+
+        window.toggleQARekam = function() {
+            if(!recognizer) return alert("Browser tidak mendukung mic.");
+            activeInputTarget = 'QA';
+            if(isRecording) stopRekam();
+            else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
+        }
+        
+        window.toggleSurveyRekam = function() {
+            if(!recognizer) return alert("Browser tidak mendukung mic.");
+            activeInputTarget = 'Survey';
+            if(isRecording) stopRekam();
+            else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
+        }
+
+        function stopRekam() {
+            if(recognizer) recognizer.stop(); isRecording = false;
+            document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording'));
+        }
+
+        window.bukaModalQA = function() {
+            document.getElementById('qa-modal').style.display = 'flex';
+            document.getElementById('qa-chat').innerHTML = '<div class="chat-bubble chat-bot">Halo! Silakan tekan tombol mic dan tanyakan sesuatu.</div>';
+            window.bicara("Ada yang bisa saya bantu informasikan?");
+        }
+
+        function prosesPertanyaanQA(pertanyaan) {
+            const chatArea = document.getElementById('qa-chat');
+            chatArea.innerHTML += `<div class="chat-bubble chat-user">${pertanyaan}</div>`;
+            
+            let jawaban = "Maaf, saya belum mengerti pertanyaan tersebut.";
+            let q = pertanyaan.toLowerCase();
+            
+            if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk adalah pukul 10 pagi hingga 12 siang, dan 4 sore hingga 8 malam.";
+            else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet terdekat berada di sudut lorong sebelah kiri.";
+            else if (q.includes("jadwal dokter")) jawaban = "Silakan menuju bagian administrasi di lobi utama.";
+
+            setTimeout(() => {
+                chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`;
+                chatArea.scrollTop = chatArea.scrollHeight;
+                window.bicara(jawaban);
+            }, 500);
+        }
+
+        // ==========================================
+        // 5. KIRIM SURVEY
+        // ==========================================
+        window.kirimSurveySupabase = async function() {
+            const teks = document.getElementById('ulasan-teks').value.trim();
+            if(teks) {
+                await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]);
+            }
+            
+            window.tutupModal('survey-popup');
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            window.bicara("Terima kasih atas ulasan Anda.");
+            document.getElementById('ulasan-teks').value = ""; 
+        }
+    </script>
+</body>
+</html>
