@@ -9,109 +9,83 @@
         * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body, html { width: 100vw; height: 100vh; overflow: hidden; background: #1e272e; color: #2f3640; }
         
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00a8ff; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; cursor: pointer; transition: 0.5s; }
+        /* Layar Utama / Landing */
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00a8ff; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; transition: 0.5s; }
         #start-overlay h1 { font-size: 40px; margin-bottom: 20px; text-align: center;}
         
-        /* Area Denah Utama (Full Screen) */
+        /* Tata Letak Utama (Kembali ke versi standar Sidebar Kiri, Peta Kanan) */
+        .app-container { display: flex; width: 100%; height: 100%; position: relative;}
+        .sidebar { background: #f5f6fa; padding: 25px; flex: 1; max-width: 400px; display: flex; flex-direction: column; z-index: 10; box-shadow: 3px 0 15px rgba(0,0,0,0.2); overflow-y: auto;}
+        
+        /* Area Denah (Latar Belakang Kayu Terang & Perspektif 3D) */
         .map-view { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            flex: 3; position: relative; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden;
             background-color: #dcb383; 
             background-image: 
                 repeating-linear-gradient(to right, transparent, transparent 40px, rgba(0,0,0,0.05) 40px, rgba(0,0,0,0.05) 41px),
                 repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(0,0,0,0.03) 80px, rgba(0,0,0,0.03) 81px);
-            perspective: 1200px; cursor: grab; z-index: 1;
+            perspective: 1200px; cursor: grab; 
         }
         
-        /* PERBAIKAN BUG ROTASI & HOTSPOT: Wadah kini memeluk gambar (Shrink-Wrap) */
-        .map-wrapper { 
-            position: relative; 
-            display: inline-block; /* Kunci agar wadah presisi seukuran gambar di dalamnya */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 10px; background: white;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
-            transform-style: preserve-3d; transform-origin: center center;
-        }
-        
-        .map-wrapper img { 
-            display: none; 
-            max-width: 95vw; /* Batasan ukuran diletakkan langsung di gambar */
-            max-height: 95vh; 
-            width: auto; 
-            height: auto; 
-            object-fit: contain; border-radius: 10px; pointer-events: none;
-        }
-        
+        /* Teks Peringatan Peta Kosong */
         .no-map-warning {
             position: absolute; text-align: center; color: #e84118; font-weight: bold; font-size: 28px;
             background: rgba(255,255,255,0.8); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             border: 3px dashed #e84118; z-index: 50; display: none;
         }
 
-        /* Panel Floating Draggable */
-        .floating-panel {
-            position: absolute; top: 20px; left: 20px; width: 360px; max-height: 90vh;
-            background: rgba(245, 246, 250, 0.95); backdrop-filter: blur(10px);
-            border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; z-index: 1000; overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.5);
+        /* PERBAIKAN BUG ROTASI HOTSPOT: Wrapper dibuat memeluk ketat gambar (Shrink-Wrap) */
+        .map-wrapper { 
+            position: relative; display: inline-block; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 10px; background: white;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
+            transform-style: preserve-3d; transform-origin: center center;
         }
-        .drag-handle {
-            background: #2c3e50; color: white; padding: 15px; text-align: center;
-            font-weight: bold; font-size: 18px; cursor: grab; user-select: none;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .drag-handle:active { cursor: grabbing; }
-        .panel-content { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .map-wrapper img { display: none; max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain; border-radius: 10px; pointer-events: none;}
+        
+        /* Draw Overlay Hotspot */
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.1); border-radius: 10px; }
+        #draw-box { position: absolute; border: 2px solid #e84118; background: rgba(232, 65, 24, 0.4); display: none; pointer-events: none; }
 
-        /* HUD Kontrol Draggable */
-        .map-controls-hud {
-            position: absolute; bottom: 30px; left: 30px; width: 250px;
-            background: rgba(47, 54, 64, 0.9); border-radius: 15px; overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4); display: flex; flex-direction: column; z-index: 1000; backdrop-filter: blur(5px);
-        }
-        .hud-handle {
-            background: #e1b12c; color: #2f3640; padding: 10px; text-align: center;
-            font-weight: bold; font-size: 14px; cursor: grab; user-select: none;
-        }
-        .hud-handle:active { cursor: grabbing; }
-        .hud-content { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        /* Kontrol Zoom (Pojok Kanan Atas) */
+        .zoom-controls { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 900; }
+        .btn-zoom { background: rgba(47, 54, 64, 0.9); color: white; border: none; width: 45px; height: 45px; border-radius: 8px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+        .btn-zoom:hover { background: #00a8ff; transform: scale(1.05); }
 
+        /* HUD KONTROL TAMPILAN PETA (Pojok Kiri Bawah) */
+        .map-controls-hud { position: absolute; bottom: 30px; left: 30px; background: rgba(47, 54, 64, 0.9); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; z-index: 900; backdrop-filter: blur(5px); }
+        .map-controls-hud h4 { color: #f5f6fa; margin: 0; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
         .control-row { display: flex; gap: 10px; justify-content: center;}
-        .btn-map-control { flex: 1; background: #7f8fa6; color: white; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;}
+        .btn-map-control { background: #7f8fa6; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
         .btn-map-control:hover { background: #dcdde1; color: #2f3640;}
         .btn-map-control.active { background: #e1b12c; color: #2f3640; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
 
-        .zoom-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px;}
-        .btn-zoom { background: #00a8ff; color: white; border: none; width: 45px; height: 45px; border-radius: 8px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-        .btn-zoom:hover { background: #0097e6; transform: scale(1.05); }
-
         /* Hotspot */
-        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.1); border-radius: 10px; }
-        #draw-box { position: absolute; border: 2px solid #e84118; background: rgba(232, 65, 24, 0.4); display: none; pointer-events: none; }
         .hotspot { position: absolute; background: rgba(0, 168, 255, 0.4); border: 2px dashed #00a8ff; cursor: pointer; transition: all 0.3s ease; border-radius: 4px; z-index: 5; }
         .hotspot:hover { background: rgba(76, 209, 55, 0.6); border-color: #4cd137; transform: scale(1.02); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .hotspot-tooltip { position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%); background: #2f3640; color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2f3640 transparent transparent transparent; }
         .hotspot:hover .hotspot-tooltip { opacity: 1; bottom: 115%; }
 
-        /* Navigasi Panel Dalam */
+        /* UI Panel Navigasi */
+        .header-title { color: #2c3e50; font-size: 22px; text-align: center; border-bottom: 3px solid #00a8ff; padding-bottom: 15px; margin-bottom: 20px; }
         .step-panel { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.5s; }
         .step-panel.active { display: flex; }
-        .step-title { font-size: 16px; font-weight: bold; color: #e1b12c; background: #2f3640; padding: 10px; border-radius: 8px; text-align: center; }
-        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #bdc3c7; border-radius: 8px; font-size: 15px; margin-bottom: 5px; outline: none; transition: 0.3s; }
+        .step-title { font-size: 18px; font-weight: bold; color: #e1b12c; background: #2f3640; padding: 12px; border-radius: 8px; text-align: center; }
+        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #bdc3c7; border-radius: 8px; font-size: 16px; margin-bottom: 5px; outline: none; transition: 0.3s; }
         .search-box:focus { border-color: #00a8ff; box-shadow: 0 0 8px rgba(0, 168, 255, 0.3); }
-        .btn-pilihan { background: white; color: #2f3640; padding: 12px; border: 2px solid #bdc3c7; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; text-align: left; display: flex; flex-direction: column; gap: 5px;}
+        .btn-pilihan { background: white; color: #2f3640; padding: 15px; border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; text-align: left; display: flex; flex-direction: column; gap: 5px;}
         .btn-pilihan:hover { background: #00a8ff; color: white; border-color: #00a8ff; }
-        .badge-akses { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; }
+        .badge-akses { font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; }
         .badge-pengunjung { background: #4cd137; color: white; }
         .badge-non { background: #e84118; color: white; }
         
-        /* Tombol Top Right Umum */
-        .btn-cpanel { position: absolute; top: 20px; right: 20px; background: #2f3640; color: white; border: 2px solid #7f8fa6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 1000; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
-        .btn-hud-tanya { position: absolute; bottom: 30px; right: 30px; background: #e1b12c; color: #2f3640; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; display: flex; align-items: center; gap: 10px;}
+        /* HUD Tombol Lainnya */
+        .btn-cpanel { position: absolute; top: 15px; right: 15px; background: #2f3640; color: white; border: 2px solid #7f8fa6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 900; transition: 0.3s; }
+        .btn-hud-tanya { position: absolute; bottom: 30px; right: 30px; background: #e1b12c; color: #2f3640; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; display: flex; align-items: center; gap: 10px;}
         
-        /* Panel Admin */
-        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #2f3640; color: white; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 2000; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        /* Panel C-Panel Admin */
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #2f3640; color: white; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         .admin-panel.open { right: 0; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4cd137; padding-bottom: 10px; }
         .btn-close-admin { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
@@ -128,7 +102,8 @@
         .btn-cancel-admin { background: #95a5a6; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; transition: 0.2s;}
         .btn-cancel-admin:hover { background: #7f8fa6; }
 
-        .data-list { max-height: 180px; overflow-y: auto; background: #2f3640; border-radius: 5px; padding: 5px; margin-bottom: 10px; border: 1px solid #7f8fa6;}
+        /* List Data Admin */
+        .data-list { max-height: 200px; overflow-y: auto; background: #2f3640; border-radius: 5px; padding: 5px; margin-bottom: 10px; border: 1px solid #7f8fa6;}
         .data-list::-webkit-scrollbar { width: 6px; }
         .data-list::-webkit-scrollbar-thumb { background: #7f8fa6; border-radius: 3px; }
         .data-item { display: flex; justify-content: space-between; align-items: center; background: #353b48; padding: 8px 12px; margin-bottom: 5px; border-radius: 5px; font-size: 14px; border-left: 4px solid #00a8ff; transition: 0.2s;}
@@ -140,7 +115,7 @@
         .sync-loader { font-size: 12px; color: #e1b12c; font-style: italic; display: none; }
 
         /* Modals & Popups */
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
         .popup-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease; }
         .login-box { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
         .login-box select, .login-box input { padding: 15px; border-radius: 8px; border: 2px solid #dcdde1; font-size: 16px; }
@@ -157,6 +132,7 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 65, 24, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(232, 65, 24, 0); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -167,73 +143,70 @@
         <p id="loading-text">Menghubungkan ke Supabase</p>
     </div>
 
-    <!-- AREA DENAH (FULL SCREEN) -->
-    <div class="map-view" id="map-container-view">
-        <div class="no-map-warning" id="no-map-warning">
-            ⚠️ PETA TIDAK TERSEDIA<br>
-            <span style="font-size:16px; color:#2f3640; font-weight:normal;">Silakan unggah gambar peta melalui C-Panel (Superadmin).</span>
-        </div>
-
-        <div class="map-wrapper" id="interactive-map">
-            <img id="main-map-image" src="" alt="Peta RS">
-            <div id="draw-overlay">
-                <div id="draw-box"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- WIDGET FLOATING 1: NAVIGASI PENGUNJUNG (Draggable) -->
-    <div class="floating-panel" id="drag-nav-panel">
-        <div class="drag-handle" id="nav-drag-handle">
-            <span>🏥 RS Atma Husada</span>
-            <span style="font-size: 14px;">🔀 Tarik</span>
-        </div>
-        
-        <div class="panel-content">
+    <div class="app-container">
+        <!-- Panel Kiri (Navigasi Pengunjung) -->
+        <div class="sidebar">
+            <h2 class="header-title">🏥 RS. Atma Husada Mahakam</h2>
+            
             <div id="step-1" class="step-panel">
                 <div class="step-title">📍 LOKASI ANDA SAAT INI</div>
-                <div id="container-lokasi-asal" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <div id="container-lokasi-asal" style="display: flex; flex-direction: column; gap: 10px; padding-top: 10px;"></div>
             </div>
 
             <div id="step-2" class="step-panel">
                 <div class="step-title" style="background:#00a8ff;">🎯 LOKASI TUJUAN</div>
                 <div id="lokasi-anda-info" style="margin-bottom: 5px; font-weight: bold; color: #7f8fa6;">Dari: -</div>
                 
-                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari ruangan / tujuan..." onkeyup="filterTujuan()">
+                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / tujuan..." onkeyup="filterTujuan()">
 
-                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; max-height: 40vh; overflow-y: auto; padding-right: 5px;"></div>
+                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px;"></div>
                 <button class="btn-primary" onclick="batalPilih()" style="background: #e84118;">Batal / Kembali</button>
             </div>
         </div>
-    </div>
 
-    <!-- WIDGET FLOATING 2: HUD KONTROL PETA (Draggable) -->
-    <div class="map-controls-hud" id="drag-hud-panel">
-        <div class="hud-handle" id="hud-drag-handle">🔀 Kontrol Peta</div>
-        <div class="hud-content">
-            <div class="zoom-group">
-                <button class="btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕</button>
-                <button class="btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖</button>
-            </div>
+        <!-- Area Denah Interaktif (Peta di sebelah Kanan) -->
+        <div class="map-view" id="map-container-view">
             
-            <div class="control-row">
-                <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 Flat</button>
-                <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D</button>
+            <div class="zoom-controls">
+                <button class="btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">+</button>
+                <button class="btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">-</button>
             </div>
-            
-            <div class="control-row">
-                <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
-                <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
+
+            <div class="no-map-warning" id="no-map-warning">
+                ⚠️ PETA TIDAK TERSEDIA<br>
+                <span style="font-size:16px; color:#2f3640; font-weight:normal;">Silakan unggah gambar peta melalui C-Panel (Superadmin).</span>
             </div>
-            <button class="btn-map-control" style="background:#e84118; margin-top:5px;" onclick="resetPosisiPeta()">🔄 Reset Tampilan</button>
+
+            <!-- HUD KONTROL TAMPILAN PETA -->
+            <div class="map-controls-hud">
+                <h4>Mode Efek Tampilan</h4>
+                <div class="control-row">
+                    <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 Flat 2D</button>
+                    <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D Waze</button>
+                </div>
+                <h4>Rotasi Peta</h4>
+                <div class="control-row">
+                    <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
+                    <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
+                </div>
+                <button class="btn-map-control" style="background:#e84118; margin-top:5px;" onclick="resetPosisiPeta()">🔄 Reset Tampilan</button>
+            </div>
+
+            <!-- Wrapper Pembungkus Gambar & Hotspot -->
+            <div class="map-wrapper" id="interactive-map">
+                <img id="main-map-image" src="" alt="Peta RS">
+                
+                <div id="draw-overlay">
+                    <div id="draw-box"></div>
+                </div>
+            </div>
         </div>
+        
+        <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
+        <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
     </div>
 
-    <!-- Tombol Tetap (Fixed) -->
-    <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
-    <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
-
-    <!-- MODAL LOGIN -->
+    <!-- MODAL LOGIN C-PANEL -->
     <div class="popup-overlay" id="login-modal">
         <div class="popup-content">
             <h2 style="color: #2c3e50;">Akses C-Panel</h2>
@@ -249,7 +222,7 @@
         </div>
     </div>
 
-    <!-- PANEL C-PANEL ADMIN -->
+    <!-- PANEL C-PANEL -->
     <div class="admin-panel" id="panel-cpanel">
         <div class="admin-header">
             <h2>⚙️ Control Panel</h2>
@@ -259,6 +232,7 @@
         <button class="btn-save-admin" style="background: #e1b12c; color:#2f3640; margin-bottom:10px;" onclick="syncDataAdmin()">🔄 Muat Ulang / Sync Data Cloud</button>
         <div class="sync-loader" id="sync-indicator">Memuat data dari database...</div>
 
+        <!-- Section Peta Utama -->
         <div class="admin-section" style="border: 2px solid #e1b12c;">
             <h3 style="color: #e1b12c;">🖼️ Peta Utama (Map Image)</h3>
             <p id="map-status" style="font-size: 13px; color: #dcdde1; margin-bottom: 10px;"></p>
@@ -269,6 +243,7 @@
             <button id="btn-hapus-peta" class="btn-delete-admin" style="display:none; width: 100%;" onclick="hapusPeta()">🗑️ Hapus Peta Saat Ini</button>
         </div>
 
+        <!-- Section CRUD Hotspot Peta -->
         <div class="admin-section" style="border: 2px solid #00a8ff;">
             <h3 style="color: #00a8ff;">🔲 Hotspot Bangunan / Peta</h3>
             <div class="data-list" id="list-hotspot"></div>
@@ -301,6 +276,7 @@
         <div class="admin-section">
             <h3>📍 Lokasi Saat Ini (Titik Kiosk)</h3>
             <div class="data-list" id="list-asal"></div>
+            
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:10px;">
                 <label id="label-mode-asal" style="color:#4cd137; font-weight:bold;">Mode: [ Tambah Baru ]</label>
                 <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormAsal()">Batal Edit</button>
@@ -312,10 +288,12 @@
         <div class="admin-section">
             <h3>🗺️ Direktori Tujuan & Rute</h3>
             <div class="data-list" id="list-tujuan"></div>
+            
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:10px;">
                 <label id="label-mode-tujuan" style="color:#4cd137; font-weight:bold;">Mode: [ Tambah Baru ]</label>
                 <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormTujuan()">Batal Edit</button>
             </div>
+            
             <input type="text" id="admin-nama-lokasi" placeholder="Nama Lokasi Tujuan (Misal: Poli Mata)">
             <select id="admin-akses">
                 <option value="Pengunjung">Akses: Pengunjung Umum</option>
@@ -323,6 +301,7 @@
             </select>
             <textarea id="admin-rute" placeholder="Instruksi Arah Rute..."></textarea>
             <input type="text" id="admin-tanda" placeholder="URL Gambar Patokan">
+            
             <button class="btn-save-admin" id="btn-save-tujuan" onclick="simpanDataRuteSupabase()">➕ Tambah Rute Baru</button>
         </div>
 
@@ -395,7 +374,6 @@
         let dataRute = {}; 
         let dataHotspots = []; 
         
-        // State Editing C-Panel
         let editAsalName = null;
         let editTujuanName = null;
         let editHotspotId = null;
@@ -404,7 +382,9 @@
         let lokasiTujuan = "";
         let ucapanAktif = null;
 
-        // Kontrol Peta
+        // ==========================================
+        // KONTROL PETA (ZOOM, PAN, ROTATE)
+        // ==========================================
         let modePeta = 'FLAT'; 
         let rotasiPeta = 0;
         let currentZoom = 1;
@@ -412,62 +392,6 @@
         let isPanning = false;
         let startPanX = 0, startPanY = 0;
 
-        // ==========================================
-        // FITUR FLOATING DRAGGABLE WIDGETS
-        // ==========================================
-        function makeDraggable(elmnt, handleId) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            const handle = document.getElementById(handleId);
-            
-            if (handle) {
-                handle.onmousedown = dragMouseDown;
-                handle.addEventListener('touchstart', dragTouchStart, {passive: false});
-            }
-
-            function dragMouseDown(e) {
-                e.preventDefault();
-                e.stopPropagation(); // Mencegah peta ikut tergeser
-                pos3 = e.clientX; pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-            }
-
-            function dragTouchStart(e) {
-                e.stopPropagation();
-                pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
-                document.addEventListener('touchend', closeDragElement, {passive: false});
-                document.addEventListener('touchmove', elementTouchDrag, {passive: false});
-            }
-
-            function elementDrag(e) {
-                e.preventDefault();
-                pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-                pos3 = e.clientX; pos4 = e.clientY;
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-            
-            function elementTouchDrag(e) {
-                pos1 = pos3 - e.touches[0].clientX; pos2 = pos4 - e.touches[0].clientY;
-                pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null; document.onmousemove = null;
-                document.removeEventListener('touchend', closeDragElement);
-                document.removeEventListener('touchmove', elementTouchDrag);
-            }
-        }
-
-        // Terapkan fungsi geser ke Panel Navigasi & HUD
-        makeDraggable(document.getElementById("drag-nav-panel"), "nav-drag-handle");
-        makeDraggable(document.getElementById("drag-hud-panel"), "hud-drag-handle");
-
-        // ==========================================
-        // KONTROL PETA (ZOOM, PAN, ROTATE)
-        // ==========================================
         window.aturModePeta = function(mode) {
             modePeta = mode;
             document.getElementById('btn-flat').classList.toggle('active', mode === 'FLAT');
@@ -499,14 +423,13 @@
             }
         }
 
-        // Panning (Geser Peta)
         const mapView = document.getElementById('map-container-view');
         const mapWrapper = document.getElementById('interactive-map');
 
         function startPan(e) {
             if(isDrawingArea) return; 
-            // Jangan geser peta jika mengklik HUD atau Panel
-            if(e.target.closest('.floating-panel') || e.target.closest('.map-controls-hud')) return;
+            // Jangan geser saat klik elemen lain
+            if(e.target.closest('.map-controls-hud') || e.target.closest('.zoom-controls') || e.target.closest('.btn-cpanel')) return;
             
             isPanning = true;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -537,9 +460,8 @@
         mapView.addEventListener('touchmove', doPan, {passive: true});
         window.addEventListener('touchend', endPan);
 
-
         // ==========================================
-        // FETCH DATA CLOUD & HOTSPOTS
+        // FETCH DATA CLOUD
         // ==========================================
         window.fetchAllDataSupabase = async function() {
             try {
@@ -609,7 +531,6 @@
         // C-PANEL: RENDER LIST VIEWS
         // ==========================================
         function renderAllAdminLists() {
-            // 1. Render Asal
             const listAsal = document.getElementById('list-asal');
             listAsal.innerHTML = '';
             dataLokasiAsal.forEach(nama => {
@@ -623,7 +544,6 @@
                     </div>`;
             });
 
-            // 2. Render Tujuan
             const listTujuan = document.getElementById('list-tujuan');
             listTujuan.innerHTML = '';
             for (let nama in dataRute) {
@@ -637,7 +557,6 @@
                     </div>`;
             }
 
-            // 3. Render Hotspot
             const listHotspot = document.getElementById('list-hotspot');
             const selectTarget = document.getElementById('hs-target');
             
@@ -653,7 +572,6 @@
                     </div>`;
             });
 
-            // Update Dropdown "Target Rute" di form Hotspot
             selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Info) --</option>';
             for (let nama in dataRute) { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; }
         }
@@ -833,9 +751,35 @@
             document.getElementById('val-vol').innerText = settingTTS.volume;
             document.getElementById('tts-rate').value = settingTTS.rate;
             document.getElementById('val-rate').innerText = settingTTS.rate;
-            renderAllAdminLists(); // Render seluruh list
+            renderAllAdminLists(); 
         }
         window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
+
+        window.updateTTSUI = function() {
+            document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value;
+            document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value;
+        }
+
+        window.simpanPengaturanSupabase = async function() {
+            const vol = parseFloat(document.getElementById('tts-volume').value);
+            const r = parseFloat(document.getElementById('tts-rate').value);
+            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
+            if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan Suara Disimpan"); }
+        }
+
+        window.resetPINSupabase = async function() {
+            const lama = document.getElementById('pin-lama').value;
+            const baru = document.getElementById('pin-baru').value;
+            if (lama !== systemPIN) return alert("PIN Lama salah!");
+            if (baru.length !== 12) return alert("PIN Baru harus 12 karakter!");
+            
+            const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
+            if(error) return alert("Gagal update Database");
+            
+            systemPIN = baru;
+            alert("PIN berhasil direset!");
+            document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = "";
+        }
 
         window.uploadPeta = async function() {
             const fileInput = document.getElementById('map-file');
@@ -952,8 +896,6 @@
                 isDrawingArea = false;
                 overlay.style.display = 'none';
                 
-                const finalLeft = parseFloat(box.style.left);
-                const finalTop = parseFloat(box.style.top);
                 const finalWidth = parseFloat(box.style.width);
                 const finalHeight = parseFloat(box.style.height);
 
@@ -962,8 +904,8 @@
                     return;
                 }
 
-                document.getElementById('hs-left').value = finalLeft.toFixed(2);
-                document.getElementById('hs-top').value = finalTop.toFixed(2);
+                document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2);
+                document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2);
                 document.getElementById('hs-width').value = finalWidth.toFixed(2);
                 document.getElementById('hs-height').value = finalHeight.toFixed(2);
 
@@ -982,6 +924,46 @@
         // ==========================================
         // APLIKASI PENGUNJUNG (NAVIGASI & UI)
         // ==========================================
+        function renderHotspotsToMap() {
+            const container = document.getElementById('interactive-map');
+            container.querySelectorAll('.hotspot').forEach(el => el.remove());
+
+            dataHotspots.forEach(hs => {
+                const div = document.createElement('div');
+                div.className = 'hotspot';
+                div.style.top = `${hs.pos_top}%`; div.style.left = `${hs.pos_left}%`;
+                div.style.width = `${hs.width}%`; div.style.height = `${hs.height}%`;
+                div.id = `hs-${hs.id}`;
+
+                const tooltip = document.createElement('div');
+                tooltip.className = 'hotspot-tooltip';
+                tooltip.innerText = hs.nama_bangunan;
+                div.appendChild(tooltip);
+
+                div.onclick = () => {
+                    document.getElementById('hs-info-nama').innerText = hs.nama_bangunan;
+                    const actionContainer = document.getElementById('hs-info-action');
+                    actionContainer.innerHTML = '';
+                    
+                    if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
+                        window.bicara(`Anda memilih area ${hs.nama_bangunan}. Tersedia rute navigasi menuju lokasi ini.`);
+                        const btnNav = document.createElement('button');
+                        btnNav.className = 'btn-primary';
+                        btnNav.innerText = '🗺️ Mulai Navigasi ke Sini';
+                        btnNav.onclick = () => {
+                            window.tutupModal('hotspot-info-popup');
+                            window.pilihTujuan(hs.target_lokasi);
+                        };
+                        actionContainer.appendChild(btnNav);
+                    } else {
+                        window.bicara(`Ini adalah bangunan ${hs.nama_bangunan}.`);
+                    }
+                    document.getElementById('hotspot-info-popup').style.display = 'flex';
+                };
+                container.insertBefore(div, document.getElementById('draw-overlay'));
+            });
+        }
+
         window.mulaiAplikasi = function() {
             document.getElementById('start-overlay').style.display = 'none';
             document.getElementById('step-1').classList.add('active');
