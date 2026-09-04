@@ -11,9 +11,7 @@
         * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body, html { width: 100vw; height: 100vh; overflow: hidden; background: #111111; color: #111111; }
         
-        /* ------------------------------------------- */
         /* LAYAR LANDING RESMI */
-        /* ------------------------------------------- */
         #start-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(92, 0, 0, 0.88), rgba(17, 17, 17, 0.95)), 
@@ -29,32 +27,31 @@
         .pulse-text { animation: pulseAnim 1.6s infinite ease-in-out; }
         @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
 
-        /* ------------------------------------------- */
-        /* STRUKTUR UTAMA (SIDEBAR KIRI & PETA KANAN) */
-        /* ------------------------------------------- */
+        /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
         .app-container { display: flex; width: 100%; height: 100%; position: relative; }
         
+        /* Sidebar Pengunjung */
         .sidebar { 
-            background: #E0E0E0; padding: 25px; flex: 1; max-width: 420px; 
+            background: #E0E0E0; padding: 25px; flex: 1; max-width: 400px; 
             display: flex; flex-direction: column; z-index: 100; 
             box-shadow: 4px 0 20px rgba(0,0,0,0.5); border-right: 4px solid #8B0000;
         }
         
-        .header-title { color: #8B0000; font-size: 24px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
+        .header-title { color: #8B0000; font-size: 22px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
         
-        /* Lokasi Asal (Disederhanakan di barisan atas) */
+        /* Lokasi Asal (Row Atas) */
         .origin-section { background: #FFFFFF; padding: 15px; border-radius: 10px; border: 2px solid #BDC3C7; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
         .origin-section label { display: block; font-size: 13px; font-weight: bold; color: #8B0000; margin-bottom: 8px; text-transform: uppercase;}
         .origin-select { width: 100%; padding: 10px; border: 2px solid #D4AF37; border-radius: 6px; font-size: 15px; font-weight: bold; color: #111; cursor: pointer; outline: none; background: #F9F9F9;}
         
-        .search-divider { height: 2px; background: #D4AF37; margin: 10px 0 20px 0; border-radius: 2px; }
+        .search-divider { height: 2px; background: #D4AF37; margin: 5px 0 20px 0; border-radius: 2px; }
 
-        /* Lokasi Tujuan */
+        /* Pencarian Tujuan */
         .target-label { font-size: 14px; font-weight: bold; color: #8B0000; margin-bottom: 8px; text-transform: uppercase; }
-        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #BDC3C7; background: #FFFFFF; color: #111111; border-radius: 8px; font-size: 15px; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .search-box { width: 100%; padding: 14px 15px; border: 2px solid #BDC3C7; background: #FFFFFF; color: #111111; border-radius: 8px; font-size: 15px; margin-bottom: 10px; outline: none; transition: 0.3s; }
         .search-box:focus { border-color: #8B0000; box-shadow: 0 0 8px rgba(139, 0, 0, 0.4); }
 
-        .tujuan-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; flex: 1; }
+        .tujuan-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; flex: 1;}
         .tujuan-list::-webkit-scrollbar { width: 6px; }
         .tujuan-list::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 3px; }
 
@@ -77,7 +74,7 @@
         .btn-pilihan:hover .badge-akses { border: 1px solid #FFFFFF; }
 
         /* ------------------------------------------- */
-        /* AREA PETA (BRING TO FRONT) */
+        /* AREA PETA (BRING TO FRONT & SHRINK-WRAP) */
         /* ------------------------------------------- */
         .map-view { 
             flex: 3; position: relative; display: flex; justify-content: center; align-items: center; 
@@ -101,18 +98,23 @@
             transform-style: preserve-3d; transform-origin: center center; z-index: 60;
         }
         .map-wrapper img { 
-            display: none; max-width: 90vw; max-height: 85vh; width: auto; height: auto; 
+            display: none; max-width: 100%; max-height: 85vh; width: auto; height: auto; 
             border-radius: 10px; pointer-events: none; border: 2px solid #D4AF37; background: #fff;
         }
+        
+        /* Animasi SVG Jalur Rute */
+        #route-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 65; display: none; pointer-events: none; }
+        .path-anim { animation: moveDash 1.2s linear infinite; filter: drop-shadow(0px 0px 5px rgba(0, 168, 255, 0.9)); }
+        @keyframes moveDash { to { stroke-dashoffset: -24; } }
 
-        /* Hotspot Overlay */
+        /* Overlay Hotspot */
         #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 70; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
         #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; }
 
         .hotspot { position: absolute; background: rgba(212, 175, 55, 0.25); border: 2px dashed #D4AF37; cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 75; line-height: normal; }
         .hotspot:hover { background: rgba(139, 0, 0, 0.5); border-color: #FFD700; transform: scale(1.03); z-index: 80; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
         
-        /* Label Nomor: Hitam Putih */
+        /* Label Nomor: Hitam Putih Sesuai Permintaan */
         .hotspot-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             min-width: 24px; padding: 3px 5px; background: #FFFFFF; color: #000000; 
@@ -130,50 +132,43 @@
         .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
 
         /* ------------------------------------------- */
-        /* HUD KONTROL TAMPILAN PETA (TERPADU) */
+        /* HUD KONTROL PETA (Pojok KANAN ATAS) */
         /* ------------------------------------------- */
         .map-controls-hud { 
-            position: absolute; bottom: 25px; left: 25px; background: rgba(17, 17, 17, 0.9); 
+            position: absolute; top: 25px; right: 25px; background: rgba(17, 17, 17, 0.9); 
             padding: 14px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.7); 
             display: flex; flex-direction: column; gap: 10px; z-index: 150; 
-            backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 220px;
+            backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 200px;
         }
         .map-controls-hud h4 { color: #D4AF37; margin: 0; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
         .control-row { display: flex; gap: 8px; justify-content: center; }
         
-        .btn-map-control { 
-            background: #E0E0E0; color: #111111; border: 1.5px solid transparent; 
-            padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; 
-            font-size: 13px; transition: 0.25s; text-align: center; flex: 1; 
-        }
+        .btn-map-control { background: #E0E0E0; color: #111111; border: 1.5px solid transparent; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.25s; text-align: center; flex: 1; }
         .btn-map-control:hover { background: #D4AF37; color: #111111; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
         .btn-map-control.active { background: #8B0000; color: #D4AF37; border-color: #D4AF37; }
         .btn-zoom { font-size: 16px; background: #262626; color: #E0E0E0; border-color: #444; }
         .btn-zoom:hover { background: #D4AF37; color: #111;}
 
-        /* Tombol Top Right & Bottom Right Umum */
+        /* Tombol Bottom Right Umum */
         .btn-cpanel { 
-            position: absolute; top: 20px; right: 20px; background: #1A1A1A; color: #D4AF37; 
-            border: 2px solid #555; padding: 10px 22px; border-radius: 8px; font-weight: bold; 
+            position: absolute; bottom: 25px; right: 25px; background: #1A1A1A; color: #D4AF37; 
+            border: 2px solid #555; padding: 12px 22px; border-radius: 8px; font-weight: bold; 
             cursor: pointer; z-index: 150; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .btn-cpanel:hover { background: #D4AF37; color: #111111; border-color: #111111; }
         
         .btn-hud-tanya { 
-            position: absolute; bottom: 25px; right: 25px; background: #8B0000; color: #D4AF37; 
-            border: 2px solid #D4AF37; padding: 14px 24px; border-radius: 30px; font-weight: bold; 
-            font-size: 16px; cursor: pointer; z-index: 150; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
+            position: absolute; bottom: 25px; right: 160px; background: #8B0000; color: #D4AF37; 
+            border: 2px solid #D4AF37; padding: 12px 24px; border-radius: 30px; font-weight: bold; 
+            font-size: 15px; cursor: pointer; z-index: 150; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
             transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
         .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
 
-        /* Panel C-Panel Admin */
-        .admin-panel { 
-            position: fixed; top: 0; right: -500px; width: 500px; height: 100%; 
-            background: #111111; color: #E0E0E0; box-shadow: -5px 0 25px rgba(0,0,0,0.85); 
-            z-index: 3500; transition: right 0.4s ease-in-out; padding: 25px; 
-            overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;
-        }
+        /* ------------------------------------------- */
+        /* ADMIN PANEL & POPUPS */
+        /* ------------------------------------------- */
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #111111; color: #E0E0E0; box-shadow: -5px 0 35px rgba(0,0,0,0.9); z-index: 3000; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;}
         .admin-panel.open { right: 0; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
         .btn-close-admin { background: none; border: none; color: #D4AF37; font-size: 26px; cursor: pointer; transition: 0.2s;}
@@ -184,7 +179,6 @@
         .admin-section label { font-size: 13px; color: #C0C0C0; }
         .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #262626; color: #E0E0E0; font-family: inherit; margin-bottom: 5px;}
         .admin-section input:focus, .admin-section select:focus { outline: none; border-color: #D4AF37; }
-        
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
         
@@ -204,8 +198,9 @@
         .data-item-actions { display: flex; gap: 5px; }
         .action-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 3px; border-radius: 3px; transition: 0.2s;}
         .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
+        .sync-loader { font-size: 12px; color: #D4AF37; font-style: italic; display: none; }
 
-        /* Tombol Aksi Utama (Popup) */
+        /* Tombol Aksi Popup Utama */
         .btn-primary { background: #8B0000; color: #E0E0E0; border: 2px solid transparent; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.25s;}
         .btn-primary:hover { background: #D4AF37; color: #111111; border-color: #8B0000; }
         .btn-danger { background: #111111; color: #D4AF37; border: 2px solid #D4AF37; }
@@ -213,13 +208,11 @@
         .btn-success { background: #27ae60; color: #111111; border: 2px solid transparent; }
         .btn-success:hover { background: #D4AF37; color: #111111; border-color: #27ae60;}
         
-        .btn-evakuasi { background: #e84118; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(232, 65, 24, 0.4); transition: 0.3s;}
+        .btn-evakuasi { background: #e84118; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(232, 65, 24, 0.4); transition: 0.3s;}
         .btn-evakuasi:hover { background: #c23616; transform: scale(1.02); }
-
         .btn-group-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-group-row button { flex: 1; margin: 0;}
+        .btn-group-row button { margin: 0; }
 
-        /* Popups */
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
         .popup-content { background: #F0F0F0; color: #111111; padding: 30px; border-radius: 15px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 3px solid #8B0000; animation: slideDown 0.3s ease; }
         
@@ -234,7 +227,6 @@
         .chat-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; font-size: 14px; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
         .chat-user { background: #8B0000; color: #E0E0E0; margin-left: auto; border-bottom-right-radius: 2px; }
         .chat-bot { background: #E0E0E0; color: #111111; border-bottom-left-radius: 2px; font-weight: 600;}
-        
         .btn-mic { background: #8B0000; color: #D4AF37; border: 2px solid #D4AF37; padding: 15px; border-radius: 50%; cursor: pointer; width: 65px; height: 65px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; transition: 0.3s; box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);}
         .btn-mic.recording { background: #D4AF37; color: #8B0000; border-color: #8B0000; animation: pulseMic 1s infinite; }
 
@@ -250,11 +242,11 @@
             .sidebar { width: 100%; max-width: 100%; height: 35vh; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
             .map-view { width: 100%; height: 65vh; padding: 10px; z-index: 50;}
             
-            .map-controls-hud { bottom: 10px; left: 10px; padding: 10px; width: 160px; }
+            .map-controls-hud { top: 10px; right: 10px; bottom: auto; left: auto; padding: 10px; width: 160px; transform: scale(0.9); transform-origin: top right;}
             .map-controls-hud h4 { font-size: 10px; }
             .btn-map-control { padding: 6px; font-size: 11px; }
-            .btn-cpanel { top: 10px; right: 10px; padding: 8px 15px; font-size: 12px; }
-            .btn-hud-tanya { bottom: 10px; right: 10px; padding: 10px 18px; font-size: 14px; }
+            .btn-cpanel { bottom: 10px; right: 10px; top: auto; padding: 8px 15px; font-size: 12px; }
+            .btn-hud-tanya { bottom: 10px; right: 120px; padding: 10px 18px; font-size: 14px; }
             .tujuan-list { max-height: 100%; }
         }
     </style>
@@ -275,7 +267,7 @@
             <h2 class="header-title">🗺️ Navigasi Pintar</h2>
             
             <div class="origin-section">
-                <label>📍 LOKASI ANDA SAAT INI:</label>
+                <label>📍 TITIK AWAL ANDA (SAAT INI):</label>
                 <select id="select-lokasi-asal" class="origin-select" onchange="setLokasiAsal()"></select>
             </div>
             
@@ -295,7 +287,7 @@
                 <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- HUD Kontrol Tampilan -->
+            <!-- HUD Kontrol Tampilan (Pojok Kanan Atas) -->
             <div class="map-controls-hud">
                 <h4>Zoom Peta</h4>
                 <div class="control-row">
@@ -320,6 +312,14 @@
             <!-- Wrapper Pembungkus Gambar & Hotspot -->
             <div class="map-wrapper" id="interactive-map">
                 <img id="main-map-image" src="" alt="Denah Rumah Sakit">
+                
+                <!-- Animasi Garis Navigasi SVG -->
+                <svg id="route-svg">
+                    <line id="route-line" x1="50%" y1="95%" x2="50%" y2="50%" stroke="#00a8ff" stroke-width="6" stroke-dasharray="14,10" stroke-linecap="round" class="path-anim"/>
+                    <circle id="route-start" cx="50%" cy="95%" r="7" fill="#D4AF37" stroke="#8B0000" stroke-width="3"/>
+                    <circle id="route-end" cx="50%" cy="50%" r="7" fill="#4cd137" stroke="#fff" stroke-width="3"/>
+                </svg>
+
                 <div id="draw-overlay"><div id="draw-box"></div></div>
             </div>
         </div>
@@ -458,6 +458,16 @@
         </div>
     </div>
 
+    <!-- POPUP INFO HOTSPOT KLIK BEBAS -->
+    <div class="popup-overlay" id="hotspot-info-popup">
+        <div class="popup-content" style="max-width: 440px;">
+            <h2 style="color: #D4AF37; margin-bottom: 5px;">🏢 Informasi Area</h2>
+            <h3 id="hs-info-nama" style="font-size: 22px; color: #8B0000; margin-bottom: 18px; font-weight: 800;">Nama Bangunan</h3>
+            <div id="hs-info-action"></div>
+            <button class="btn-primary btn-danger" style="margin-top:12px;" onclick="tutupModal('hotspot-info-popup')">❌ Tutup</button>
+        </div>
+    </div>
+
     <!-- POPUP NAVIGASI RUTE UTAMA (Khusus Rute Tujuan) -->
     <div class="popup-overlay" id="nav-popup">
         <div class="popup-content">
@@ -539,6 +549,11 @@
             const el = document.getElementById(id);
             if(el) el.style.display = 'none'; 
             window.speechSynthesis.cancel();
+            
+            // Hentikan suara dan sembunyikan animasi jalur jika popup navigasi/evakuasi tertutup
+            if(id === 'nav-popup' || id === 'evakuasi-popup' || id === 'qa-modal' || id === 'survey-popup' || id === 'hotspot-info-popup') {
+                document.getElementById('route-svg').style.display = 'none';
+            }
         }
         
         window.bicara = function(teks, callback) {
@@ -548,7 +563,7 @@
             if(callback) msg.onend = callback;
             window.speechSynthesis.speak(msg);
         }
-        window.tesSuara = function() { window.bicara("Sistem audio navigasi siap digunakan."); }
+        window.tesSuara = function() { window.bicara("Sistem audio dan navigasi siap digunakan."); }
 
         // ==========================================
         // KONTROL PETA (ZOOM, PAN, ROTATE)
@@ -684,7 +699,7 @@
         window.onload = fetchAllDataSupabase;
 
         // ==========================================
-        // C-PANEL: RENDER LISTS & CRUD (SAMA)
+        // C-PANEL: RENDER LISTS & CRUD
         // ==========================================
         function renderAllAdminLists() {
             const listAsal = document.getElementById('list-asal'); listAsal.innerHTML = '';
@@ -821,7 +836,6 @@
 
                 div.onclick = () => {
                     document.getElementById('route-svg').style.display = 'none'; // Sembunyikan garis animasi
-                    // Set Navigasi
                     if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
                         window.pilihTujuan(hs.target_lokasi);
                     } else { 
@@ -836,23 +850,30 @@
             document.getElementById('start-overlay').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('start-overlay').style.display = 'none';
-                renderTombolLokasiAsal(); 
-                renderTombolTujuan();
-                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan cari ruangan tujuan Anda di menu navigasi.");
+                
+                if(dataLokasiAsal.length > 0) window.pilihLokasiSekarang(dataLokasiAsal[0], false);
+
+                renderTombolLokasiAsal(); renderTombolTujuan();
+                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan cari ruangan tujuan Anda.");
             }, 600);
         }
 
         function renderTombolLokasiAsal() {
             const select = document.getElementById('select-lokasi-asal'); select.innerHTML = "";
-            dataLokasiAsal.forEach(nama => {
-                select.innerHTML += `<option value="${nama}">${nama}</option>`;
-            });
+            dataLokasiAsal.forEach(nama => { select.innerHTML += `<option value="${nama}">${nama}</option>`; });
             if(dataLokasiAsal.length > 0) lokasiAsal = dataLokasiAsal[0];
         }
 
         window.setLokasiAsal = function() {
             lokasiAsal = document.getElementById('select-lokasi-asal').value;
             window.bicara(`Titik awal Anda sekarang berada di ${lokasiAsal}.`);
+        }
+
+        window.pilihLokasiSekarang = function(nama, mainSuara = true) {
+            lokasiAsal = nama;
+            document.getElementById('search-tujuan').value = "";
+            window.filterTujuan(); 
+            if(mainSuara) { window.bicara(`Titik awal diatur ke ${lokasiAsal}. Silakan cari ruangan tujuan Anda.`); }
         }
 
         function renderTombolTujuan() {
@@ -887,7 +908,21 @@
         window.pilihTujuan = function(tujuan) {
             lokasiTujuan = tujuan; const rute = dataRute[tujuan];
             
-            const teksArahan = `Silakan ikuti rute menuju ${tujuan}. ${rute.instruksi}. Di akhir rute, Anda akan menemukan tanda patokan seperti pada foto di layar.`;
+            const hs = dataHotspots.find(h => h.target_lokasi === tujuan);
+            if(hs) {
+                const tx = parseFloat(hs.pos_left) + (parseFloat(hs.width) / 2);
+                const ty = parseFloat(hs.pos_top) + (parseFloat(hs.height) / 2);
+                
+                document.getElementById('route-line').setAttribute('x2', tx + '%');
+                document.getElementById('route-line').setAttribute('y2', ty + '%');
+                document.getElementById('route-end').setAttribute('cx', tx + '%');
+                document.getElementById('route-end').setAttribute('cy', ty + '%');
+                document.getElementById('route-line').setAttribute('stroke', '#00a8ff');
+                document.getElementById('route-end').setAttribute('fill', '#4cd137');
+                document.getElementById('route-svg').style.display = 'block';
+            }
+
+            const teksArahan = `Silakan ikuti arah berikut: ${rute.instruksi}. Di akhir rute, Anda akan menemukan tanda patokan seperti pada foto di layar.`;
             document.getElementById('teks-instruksi').innerText = teksArahan;
             document.getElementById('gambar-tanda').src = rute.gambarTanda;
             
@@ -900,16 +935,14 @@
             document.getElementById('evakuasi-popup').style.display = 'flex'; 
             
             window.bicara("Perhatian! Ini adalah instruksi evakuasi darurat. Dari lokasi Anda saat ini, ikuti jalur evakuasi hijau menuju titik kumpul. Jika membawa pasien atau korban, ikuti jalur kuning menuju I G D. Perhatikan rambu APAR di sekitar gedung. Harap tetap tenang dan jangan berlari.");
+            
+            document.getElementById('route-line').setAttribute('stroke', '#27ae60');
+            document.getElementById('route-end').setAttribute('fill', '#e84118');
         }
 
         window.telahSampai = function() {
             window.tutupModal('nav-popup');
             window.bicara(`Anda telah menyelesaikan rute. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
-        }
-
-        window.batalPilih = function() {
-            document.getElementById('search-tujuan').value = ""; window.filterTujuan();
-            window.tutupModal('nav-popup');
         }
 
         // ==========================================
