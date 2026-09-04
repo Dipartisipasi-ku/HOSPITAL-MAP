@@ -5,148 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Denah Digital - RS Atma Husada Mahakam</title>
     <style>
-        /* CSS Reset & Dasar */
+        /* =========================================
+           PALET WARNA TEMA:
+           Maroon : #8B0000 / #5c0000
+           Black  : #111111 / #1A1A1A
+           Silver : #E0E0E0 / #C0C0C0
+           Gold   : #D4AF37 / #FFD700
+        ========================================= */
         * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body, html { width: 100vw; height: 100vh; overflow: hidden; background: #1e272e; color: #2f3640; }
+        body, html { width: 100vw; height: 100vh; overflow: hidden; background: #111111; color: #111111; }
         
-        /* Layar Utama / Landing */
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00a8ff; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; transition: 0.5s; }
-        #start-overlay h1 { font-size: 40px; margin-bottom: 20px; text-align: center;}
+        /* ------------------------------------------- */
+        /* LAYAR LANDING RESMI & ELEGAN */
+        /* ------------------------------------------- */
+        #start-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(rgba(92, 0, 0, 0.88), rgba(17, 17, 17, 0.95)), 
+                        url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 2000; cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s; text-align: center;
+        }
+        #start-overlay .icon-landing { font-size: 70px; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+        #start-overlay .title-landing { font-size: 42px; margin-bottom: 8px; color: #D4AF37; font-weight: 800; letter-spacing: 2px; text-shadow: 0 3px 10px rgba(0,0,0,0.8); }
+        #start-overlay .subtitle-landing { font-size: 18px; color: #E0E0E0; font-weight: 400; margin-bottom: 35px; letter-spacing: 1px; }
+        #start-overlay .badge-status { font-size: 16px; background: rgba(17, 17, 17, 0.7); color: #D4AF37; padding: 12px 25px; border-radius: 30px; border: 1.5px solid #D4AF37; }
         
-        /* Tata Letak Utama (Kembali ke versi standar Sidebar Kiri, Peta Kanan) */
-        .app-container { display: flex; width: 100%; height: 100%; position: relative;}
-        .sidebar { background: #f5f6fa; padding: 25px; flex: 1; max-width: 400px; display: flex; flex-direction: column; z-index: 10; box-shadow: 3px 0 15px rgba(0,0,0,0.2); overflow-y: auto;}
+        .pulse-text { animation: pulseAnim 1.6s infinite ease-in-out; }
+        @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
+
+        /* ------------------------------------------- */
+        /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
+        /* ------------------------------------------- */
+        .app-container { display: flex; width: 100%; height: 100%; position: relative; }
         
-        /* Area Denah (Latar Belakang Kayu Terang & Perspektif 3D) */
+        .sidebar { 
+            background: #E0E0E0; padding: 25px; flex: 1; max-width: 400px; 
+            display: flex; flex-direction: column; z-index: 10; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.5); overflow-y: auto; border-right: 4px solid #8B0000;
+        }
+        
+        .header-title { color: #8B0000; font-size: 22px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
+        .step-panel { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.4s ease; }
+        .step-panel.active { display: flex; }
+        .step-title { font-size: 15px; font-weight: bold; color: #D4AF37; background: #111111; padding: 12px; border-radius: 8px; text-align: center; border-left: 5px solid #8B0000; }
+        
+        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #BDC3C7; background: #FFFFFF; color: #111111; border-radius: 8px; font-size: 15px; margin-bottom: 5px; outline: none; transition: 0.3s; }
+        .search-box:focus { border-color: #8B0000; box-shadow: 0 0 8px rgba(139, 0, 0, 0.4); }
+
+        /* Tombol Pilihan (Kontras saat hover disesuaikan) */
+        .btn-pilihan { 
+            background: #FFFFFF; color: #111111; padding: 14px; border: 2px solid #BDC3C7; 
+            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; 
+            transition: all 0.25s ease; text-align: left; display: flex; flex-direction: column; gap: 5px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+        }
+        .btn-pilihan .span-nomor { color: #8B0000; font-weight: 900; margin-right: 5px; transition: color 0.25s; }
+        .btn-pilihan .nama-tujuan { transition: color 0.25s; }
+        
+        .btn-pilihan:hover { 
+            background: #8B0000; color: #FFFFFF; border-color: #D4AF37; 
+            transform: translateY(-2px); box-shadow: 0 6px 14px rgba(139, 0, 0, 0.4); 
+        }
+        .btn-pilihan:hover .span-nomor { color: #FFD700; }
+        .btn-pilihan:hover .nama-tujuan { color: #FFFFFF; }
+        
+        .badge-akses { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; transition: 0.25s; }
+        .badge-pengunjung { background: #27ae60; color: #FFFFFF; }
+        .badge-non { background: #111111; color: #D4AF37; }
+        .btn-pilihan:hover .badge-akses { border: 1px solid #FFFFFF; }
+
+        /* ------------------------------------------- */
+        /* AREA PETA & PERBAIKAN ROTASI/SHRINK-WRAP */
+        /* ------------------------------------------- */
         .map-view { 
-            flex: 3; position: relative; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden;
-            background-color: #dcb383; 
+            flex: 3; position: relative; display: flex; justify-content: center; align-items: center; 
+            padding: 20px; overflow: hidden;
+            background-color: #1A1A1A; 
             background-image: 
-                repeating-linear-gradient(to right, transparent, transparent 40px, rgba(0,0,0,0.05) 40px, rgba(0,0,0,0.05) 41px),
-                repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(0,0,0,0.03) 80px, rgba(0,0,0,0.03) 81px);
+                repeating-linear-gradient(to right, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
+                repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(255,255,255,0.02) 80px, rgba(255,255,255,0.02) 81px);
             perspective: 1200px; cursor: grab; 
         }
         
-        /* Teks Peringatan Peta Kosong */
         .no-map-warning {
-            position: absolute; text-align: center; color: #e84118; font-weight: bold; font-size: 28px;
-            background: rgba(255,255,255,0.8); padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            border: 3px dashed #e84118; z-index: 50; display: none;
+            position: absolute; text-align: center; color: #D4AF37; font-weight: bold; font-size: 24px;
+            background: rgba(17, 17, 17, 0.92); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border: 2px dashed #8B0000; z-index: 50; display: none; line-height: 1.5;
         }
 
-        /* PERBAIKAN BUG ROTASI HOTSPOT: Wrapper dibuat memeluk ketat gambar (Shrink-Wrap) */
+        /* Pembungkus Dinamis (Memeluk persis ukuran piksel gambar) */
         .map-wrapper { 
-            position: relative; display: inline-block; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 10px; background: white;
+            position: relative; display: inline-block; line-height: 0;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7); border-radius: 10px; background: transparent;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
             transform-style: preserve-3d; transform-origin: center center;
         }
-        .map-wrapper img { display: none; max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain; border-radius: 10px; pointer-events: none;}
+        .map-wrapper img { 
+            display: none; max-width: 90vw; max-height: 85vh; width: auto; height: auto; 
+            border-radius: 10px; pointer-events: none; border: 2px solid #D4AF37;
+        }
         
-        /* Draw Overlay Hotspot */
-        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.1); border-radius: 10px; }
-        #draw-box { position: absolute; border: 2px solid #e84118; background: rgba(232, 65, 24, 0.4); display: none; pointer-events: none; }
+        /* ------------------------------------------- */
+        /* ELEMEN HOTSPOT & TOOLTIP */
+        /* ------------------------------------------- */
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
+        #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; }
 
-        /* Kontrol Zoom (Pojok Kanan Atas) */
-        .zoom-controls { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 900; }
-        .btn-zoom { background: rgba(47, 54, 64, 0.9); color: white; border: none; width: 45px; height: 45px; border-radius: 8px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-        .btn-zoom:hover { background: #00a8ff; transform: scale(1.05); }
+        .hotspot { 
+            position: absolute; background: rgba(212, 175, 55, 0.35); border: 2px dashed #D4AF37; 
+            cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 10; line-height: normal; 
+        }
+        .hotspot:hover { 
+            background: rgba(139, 0, 0, 0.65); border-color: #FFD700; 
+            transform: scale(1.03); z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.6); 
+        }
+        .hotspot-label { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            min-width: 22px; padding: 2px 4px; background: rgba(17,17,17,0.9); color: #D4AF37; 
+            border: 1px solid #D4AF37; border-radius: 4px; font-size: 12px; font-weight: bold; 
+            line-height: 1; text-align: center; pointer-events: none; 
+        }
+        .hotspot-tooltip { 
+            position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); 
+            background: #111111; color: #E0E0E0; padding: 6px 10px; border-radius: 6px; 
+            font-size: 13px; font-weight: bold; white-space: nowrap; pointer-events: none; 
+            opacity: 0; visibility: hidden; transition: 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            border: 1px solid #8B0000;
+        }
+        .hotspot-tooltip::after { 
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; 
+            border-width: 5px; border-style: solid; border-color: #8B0000 transparent transparent transparent; 
+        }
+        .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
 
-        /* HUD KONTROL TAMPILAN PETA (Pojok Kiri Bawah) */
-        .map-controls-hud { position: absolute; bottom: 30px; left: 30px; background: rgba(47, 54, 64, 0.9); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px; z-index: 900; backdrop-filter: blur(5px); }
-        .map-controls-hud h4 { color: #f5f6fa; margin: 0; font-size: 13px; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
-        .control-row { display: flex; gap: 10px; justify-content: center;}
-        .btn-map-control { background: #7f8fa6; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
-        .btn-map-control:hover { background: #dcdde1; color: #2f3640;}
-        .btn-map-control.active { background: #e1b12c; color: #2f3640; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
-
-        /* Hotspot */
-        .hotspot { position: absolute; background: rgba(0, 168, 255, 0.4); border: 2px dashed #00a8ff; cursor: pointer; transition: all 0.3s ease; border-radius: 4px; z-index: 5; }
-        .hotspot:hover { background: rgba(76, 209, 55, 0.6); border-color: #4cd137; transform: scale(1.02); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .hotspot-tooltip { position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%); background: #2f3640; color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2f3640 transparent transparent transparent; }
-        .hotspot:hover .hotspot-tooltip { opacity: 1; bottom: 115%; }
-
-        /* UI Panel Navigasi */
-        .header-title { color: #2c3e50; font-size: 22px; text-align: center; border-bottom: 3px solid #00a8ff; padding-bottom: 15px; margin-bottom: 20px; }
-        .step-panel { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.5s; }
-        .step-panel.active { display: flex; }
-        .step-title { font-size: 18px; font-weight: bold; color: #e1b12c; background: #2f3640; padding: 12px; border-radius: 8px; text-align: center; }
-        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #bdc3c7; border-radius: 8px; font-size: 16px; margin-bottom: 5px; outline: none; transition: 0.3s; }
-        .search-box:focus { border-color: #00a8ff; box-shadow: 0 0 8px rgba(0, 168, 255, 0.3); }
-        .btn-pilihan { background: white; color: #2f3640; padding: 15px; border: 2px solid #bdc3c7; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; text-align: left; display: flex; flex-direction: column; gap: 5px;}
-        .btn-pilihan:hover { background: #00a8ff; color: white; border-color: #00a8ff; }
-        .badge-akses { font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; }
-        .badge-pengunjung { background: #4cd137; color: white; }
-        .badge-non { background: #e84118; color: white; }
+        /* ------------------------------------------- */
+        /* HUD KONTROL TAMPILAN PETA (TERPADU) */
+        /* ------------------------------------------- */
+        .map-controls-hud { 
+            position: absolute; bottom: 25px; left: 25px; background: rgba(17, 17, 17, 0.9); 
+            padding: 14px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.7); 
+            display: flex; flex-direction: column; gap: 10px; z-index: 900; 
+            backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 220px;
+        }
+        .map-controls-hud h4 { color: #D4AF37; margin: 0; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
+        .control-row { display: flex; gap: 8px; justify-content: center; }
         
-        /* HUD Tombol Lainnya */
-        .btn-cpanel { position: absolute; top: 15px; right: 15px; background: #2f3640; color: white; border: 2px solid #7f8fa6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 900; transition: 0.3s; }
-        .btn-hud-tanya { position: absolute; bottom: 30px; right: 30px; background: #e1b12c; color: #2f3640; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; display: flex; align-items: center; gap: 10px;}
+        .btn-map-control { 
+            background: #E0E0E0; color: #111111; border: 1.5px solid transparent; 
+            padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; 
+            font-size: 13px; transition: 0.25s; text-align: center; flex: 1; 
+        }
+        .btn-map-control:hover { background: #D4AF37; color: #111111; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+        .btn-map-control.active { background: #8B0000; color: #D4AF37; border-color: #D4AF37; }
+        .btn-zoom { font-size: 16px; background: #262626; color: #E0E0E0; border-color: #444; }
+
+        /* Tombol Top Right Umum */
+        .btn-cpanel { 
+            position: absolute; top: 20px; right: 20px; background: #1A1A1A; color: #D4AF37; 
+            border: 2px solid #555; padding: 10px 22px; border-radius: 8px; font-weight: bold; 
+            cursor: pointer; z-index: 900; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .btn-cpanel:hover { background: #D4AF37; color: #111111; border-color: #111111; }
         
+        .btn-hud-tanya { 
+            position: absolute; bottom: 25px; right: 25px; background: #8B0000; color: #D4AF37; 
+            border: 2px solid #D4AF37; padding: 14px 24px; border-radius: 30px; font-weight: bold; 
+            font-size: 16px; cursor: pointer; z-index: 900; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
+            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
+
         /* Panel C-Panel Admin */
-        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #2f3640; color: white; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .admin-panel { 
+            position: fixed; top: 0; right: -500px; width: 500px; height: 100%; 
+            background: #111111; color: #E0E0E0; box-shadow: -5px 0 25px rgba(0,0,0,0.85); 
+            z-index: 2500; transition: right 0.4s ease-in-out; padding: 25px; 
+            overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;
+        }
         .admin-panel.open { right: 0; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4cd137; padding-bottom: 10px; }
-        .btn-close-admin { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .admin-section { background: #353b48; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
-        .admin-section h3 { color: #4cd137; font-size: 16px; margin-bottom: 5px; border-bottom: 1px solid #7f8fa6; padding-bottom: 5px;}
-        .admin-section label { font-size: 14px; color: #dcdde1; }
-        .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: none; background: #f5f6fa; font-family: inherit; margin-bottom: 5px;}
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
+        .btn-close-admin { background: none; border: none; color: #D4AF37; font-size: 26px; cursor: pointer; }
+        .admin-section { background: #1A1A1A; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #333; }
+        .admin-section h3 { color: #D4AF37; font-size: 15px; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px;}
+        .admin-section label { font-size: 13px; color: #C0C0C0; }
+        .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #262626; color: #E0E0E0; font-family: inherit; margin-bottom: 5px;}
+        .admin-section input:focus, .admin-section select:focus { outline: none; border-color: #D4AF37; }
+
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
-        .btn-save-admin { background: #4cd137; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1; transition: 0.2s;}
-        .btn-save-admin:hover { background: #44bd32; }
-        .btn-delete-admin { background: #e84118; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; flex: 1; transition: 0.2s;}
-        .btn-delete-admin:hover { background: #c23616; }
-        .btn-cancel-admin { background: #95a5a6; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; transition: 0.2s;}
-        .btn-cancel-admin:hover { background: #7f8fa6; }
-
-        /* List Data Admin */
-        .data-list { max-height: 200px; overflow-y: auto; background: #2f3640; border-radius: 5px; padding: 5px; margin-bottom: 10px; border: 1px solid #7f8fa6;}
-        .data-list::-webkit-scrollbar { width: 6px; }
-        .data-list::-webkit-scrollbar-thumb { background: #7f8fa6; border-radius: 3px; }
-        .data-item { display: flex; justify-content: space-between; align-items: center; background: #353b48; padding: 8px 12px; margin-bottom: 5px; border-radius: 5px; font-size: 14px; border-left: 4px solid #00a8ff; transition: 0.2s;}
-        .data-item:hover { background: #404856; }
-        .data-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #f5f6fa;}
-        .data-item-actions { display: flex; gap: 5px; }
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-        .sync-loader { font-size: 12px; color: #e1b12c; font-style: italic; display: none; }
-
-        /* Modals & Popups */
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
-        .popup-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease; }
-        .login-box { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
-        .login-box select, .login-box input { padding: 15px; border-radius: 8px; border: 2px solid #dcdde1; font-size: 16px; }
-        .sign-image { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin: 15px 0; border: 3px solid #e1b12c; }
-        .instruksi-teks { font-size: 22px; font-weight: bold; color: #2c3e50; line-height: 1.4; }
         
-        .chat-area { height: 250px; background: #f5f6fa; border-radius: 10px; padding: 15px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #dcdde1; }
-        .chat-bubble { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 80%; line-height: 1.4; font-size: 15px;}
-        .chat-user { background: #00a8ff; color: white; margin-left: auto; border-bottom-right-radius: 2px; }
-        .chat-bot { background: #e1b12c; color: #2f3640; border-bottom-left-radius: 2px; font-weight: bold;}
-        .btn-primary { background: #00a8ff; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;}
-        .btn-mic { background: #e84118; color: white; border: none; padding: 15px; border-radius: 50%; cursor: pointer; width: 60px; height: 60px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; box-shadow: 0 5px 15px rgba(232, 65, 24, 0.4); transition: 0.3s; }
-        .btn-mic.recording { background: #c23616; animation: pulseMic 1s infinite; }
+        .btn-save-admin { background: #8B0000; color: #D4AF37; border: 1px solid #D4AF37; padding: 11px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; transition: 0.2s;}
+        .btn-save-admin:hover { background: #D4AF37; color: #111111; }
+        .btn-delete-admin { background: #111111; color: #E0E0E0; border: 1px solid #777; padding: 11px; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; transition: 0.2s;}
+        .btn-delete-admin:hover { background: #E0E0E0; color: #111111; }
+        .btn-cancel-admin { background: #333333; color: #C0C0C0; border: none; padding: 11px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .btn-cancel-admin:hover { background: #555555; color: #FFFFFF; }
+
+        .data-list { max-height: 180px; overflow-y: auto; background: #0D0D0D; border-radius: 5px; padding: 5px; margin-bottom: 10px; border: 1px solid #333;}
+        .data-list::-webkit-scrollbar { width: 6px; }
+        .data-list::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 3px; }
+        .data-item { display: flex; justify-content: space-between; align-items: center; background: #1A1A1A; padding: 8px 12px; margin-bottom: 5px; border-radius: 5px; font-size: 13px; border-left: 4px solid #D4AF37; }
+        .data-item:hover { background: #262626; }
+        .data-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #E0E0E0;}
+        .data-item-actions { display: flex; gap: 5px; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 3px; border-radius: 3px; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
+        .sync-loader { font-size: 12px; color: #D4AF37; font-style: italic; display: none; }
+
+        /* Tombol Aksi */
+        .btn-primary { background: #8B0000; color: #E0E0E0; border: 2px solid transparent; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.25s;}
+        .btn-primary:hover { background: #D4AF37; color: #111111; border-color: #8B0000; }
+        .btn-danger { background: #111111; color: #D4AF37; border: 2px solid #D4AF37; }
+        .btn-danger:hover { background: #D4AF37; color: #111111; }
+
+        /* Popups */
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
+        .popup-content { background: #F0F0F0; color: #111111; padding: 30px; border-radius: 15px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 3px solid #8B0000; animation: slideDown 0.3s ease; }
+        .login-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px;}
+        .login-box select, .login-box input { padding: 12px; border-radius: 6px; border: 1.5px solid #BDC3C7; background: #FFFFFF; font-size: 15px; color: #111111; }
+        .sign-image { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin: 15px 0; border: 3px solid #D4AF37; }
+        .instruksi-teks { font-size: 20px; font-weight: bold; color: #8B0000; line-height: 1.4; }
+        
+        .chat-area { height: 230px; background: #FFFFFF; border-radius: 8px; padding: 15px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #BDC3C7; }
+        .chat-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .chat-user { background: #8B0000; color: #E0E0E0; margin-left: auto; border-bottom-right-radius: 2px; }
+        .chat-bot { background: #E0E0E0; color: #111111; border-bottom-left-radius: 2px; font-weight: 600;}
+        .btn-mic { background: #8B0000; color: #D4AF37; border: 2px solid #D4AF37; padding: 15px; border-radius: 50%; cursor: pointer; width: 65px; height: 65px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; transition: 0.3s; }
+        .btn-mic.recording { background: #D4AF37; color: #8B0000; animation: pulseMic 1s infinite; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 65, 24, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(232, 65, 24, 0); } 100% { transform: scale(1); } }
+        @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
+    <!-- LAYAR LANDING -->
     <div id="start-overlay" onclick="mulaiAplikasi()">
-        <h1 style="font-size: 60px;">⏳</h1>
-        <h1>Sedang Mengunduh Data Cloud...</h1>
-        <p id="loading-text">Menghubungkan ke Supabase</p>
+        <h1 class="icon-landing">🏥</h1>
+        <h1 class="title-landing pulse-text">RS ATMA HUSADA MAHAKAM</h1>
+        <h3 class="subtitle-landing">Sistem Navigasi & Denah Evakuasi Digital</h3>
+        <p id="loading-text" class="badge-status">⏳ Menghubungkan ke Server Database...</p>
     </div>
 
     <div class="app-container">
         <!-- Panel Kiri (Navigasi Pengunjung) -->
         <div class="sidebar">
-            <h2 class="header-title">🏥 RS. Atma Husada Mahakam</h2>
+            <h2 class="header-title">🏥 Navigasi Digital</h2>
             
             <div id="step-1" class="step-panel">
                 <div class="step-title">📍 LOKASI ANDA SAAT INI</div>
@@ -154,62 +259,61 @@
             </div>
 
             <div id="step-2" class="step-panel">
-                <div class="step-title" style="background:#00a8ff;">🎯 LOKASI TUJUAN</div>
-                <div id="lokasi-anda-info" style="margin-bottom: 5px; font-weight: bold; color: #7f8fa6;">Dari: -</div>
+                <div class="step-title" style="background:#8B0000; border-left:none; border-bottom: 3px solid #D4AF37;">🎯 LOKASI TUJUAN</div>
+                <div id="lokasi-anda-info" style="margin-bottom: 5px; font-weight: bold; color: #555;">Dari: -</div>
                 
-                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / tujuan..." onkeyup="filterTujuan()">
+                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / gedung..." onkeyup="filterTujuan()">
 
-                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px;"></div>
-                <button class="btn-primary" onclick="batalPilih()" style="background: #e84118;">Batal / Kembali</button>
+                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; max-height: 55vh;"></div>
+                <button class="btn-primary btn-danger" onclick="batalPilih()">Batal / Kembali</button>
             </div>
         </div>
 
-        <!-- Area Denah Interaktif (Peta di sebelah Kanan) -->
+        <!-- Area Denah Interaktif -->
         <div class="map-view" id="map-container-view">
-            
-            <div class="zoom-controls">
-                <button class="btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">+</button>
-                <button class="btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">-</button>
-            </div>
-
             <div class="no-map-warning" id="no-map-warning">
-                ⚠️ PETA TIDAK TERSEDIA<br>
-                <span style="font-size:16px; color:#2f3640; font-weight:normal;">Silakan unggah gambar peta melalui C-Panel (Superadmin).</span>
+                ⚠️ GAMBAR PETA TIDAK TERSEDIA<br>
+                <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel (Superadmin).</span>
             </div>
 
-            <!-- HUD KONTROL TAMPILAN PETA -->
+            <!-- HUD Kontrol Tampilan (Zoom & Rotasi Menyatu) -->
             <div class="map-controls-hud">
-                <h4>Mode Efek Tampilan</h4>
+                <h4>Zoom Peta</h4>
                 <div class="control-row">
-                    <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 Flat 2D</button>
-                    <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D Waze</button>
+                    <button class="btn-map-control btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕</button>
+                    <button class="btn-map-control btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖</button>
                 </div>
-                <h4>Rotasi Peta</h4>
+                
+                <h4 style="margin-top: 4px;">Mode Tampilan</h4>
+                <div class="control-row">
+                    <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 2D</button>
+                    <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D</button>
+                </div>
+                
+                <h4 style="margin-top: 4px;">Rotasi</h4>
                 <div class="control-row">
                     <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
                     <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
                 </div>
-                <button class="btn-map-control" style="background:#e84118; margin-top:5px;" onclick="resetPosisiPeta()">🔄 Reset Tampilan</button>
+                <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset</button>
             </div>
 
             <!-- Wrapper Pembungkus Gambar & Hotspot -->
             <div class="map-wrapper" id="interactive-map">
-                <img id="main-map-image" src="" alt="Peta RS">
-                
-                <div id="draw-overlay">
-                    <div id="draw-box"></div>
-                </div>
+                <img id="main-map-image" src="" alt="Denah Rumah Sakit">
+                <div id="draw-overlay"><div id="draw-box"></div></div>
             </div>
         </div>
         
+        <!-- Tombol Aksi Mengambang -->
         <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
         <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
     </div>
 
     <!-- MODAL LOGIN C-PANEL -->
     <div class="popup-overlay" id="login-modal">
-        <div class="popup-content">
-            <h2 style="color: #2c3e50;">Akses C-Panel</h2>
+        <div class="popup-content" style="max-width: 400px;">
+            <h2 style="color: #8B0000; border-bottom: 2px solid #D4AF37; padding-bottom: 10px;">Akses C-Panel</h2>
             <div class="login-box">
                 <select id="login-role">
                     <option value="superadmin">Superadmin</option>
@@ -217,7 +321,7 @@
                 </select>
                 <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12">
                 <button class="btn-primary" onclick="prosesLogin()">LOGIN</button>
-                <button class="btn-primary" style="background: #95a5a6; margin-top:0;" onclick="tutupModal('login-modal')">Batal</button>
+                <button class="btn-primary btn-danger" style="margin-top:0;" onclick="tutupModal('login-modal')">Batal</button>
             </div>
         </div>
     </div>
@@ -229,13 +333,13 @@
             <button class="btn-close-admin" onclick="tutupCPanel()">✖</button>
         </div>
         
-        <button class="btn-save-admin" style="background: #e1b12c; color:#2f3640; margin-bottom:10px;" onclick="syncDataAdmin()">🔄 Muat Ulang / Sync Data Cloud</button>
+        <button class="btn-save-admin" style="background: #D4AF37; color:#111; border-color:#111; margin-bottom:10px;" onclick="syncDataAdmin()">🔄 Muat Ulang / Sync Data</button>
         <div class="sync-loader" id="sync-indicator">Memuat data dari database...</div>
 
         <!-- Section Peta Utama -->
-        <div class="admin-section" style="border: 2px solid #e1b12c;">
-            <h3 style="color: #e1b12c;">🖼️ Peta Utama (Map Image)</h3>
-            <p id="map-status" style="font-size: 13px; color: #dcdde1; margin-bottom: 10px;"></p>
+        <div class="admin-section" style="border-color: #D4AF37;">
+            <h3 style="color: #D4AF37;">🖼️ Peta Utama (Supabase Storage)</h3>
+            <p id="map-status" style="font-size: 13px; color: #C0C0C0; margin-bottom: 8px;"></p>
             <div id="upload-map-container">
                 <input type="file" id="map-file" accept="image/*">
                 <button class="btn-save-admin" style="width: 100%;" onclick="uploadPeta()">⬆️ Upload Peta Baru</button>
@@ -243,21 +347,21 @@
             <button id="btn-hapus-peta" class="btn-delete-admin" style="display:none; width: 100%;" onclick="hapusPeta()">🗑️ Hapus Peta Saat Ini</button>
         </div>
 
-        <!-- Section CRUD Hotspot Peta -->
-        <div class="admin-section" style="border: 2px solid #00a8ff;">
-            <h3 style="color: #00a8ff;">🔲 Hotspot Bangunan / Peta</h3>
+        <!-- Section Hotspot Peta -->
+        <div class="admin-section" style="border-color: #8B0000;">
+            <h3 style="color: #8B0000;">🔲 Hotspot Bangunan / Peta</h3>
             <div class="data-list" id="list-hotspot"></div>
-            <hr style="border-color:#7f8fa6; margin:10px 0;">
+            <hr style="border-color:#333; margin:10px 0;">
             
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="color:#00a8ff; font-weight:bold;" id="label-mode-hs">Mode: [ Tambah Baru ]</label>
-                <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormHotspot()">Bersihkan Form</button>
+                <label style="color:#D4AF37; font-weight:bold;" id="label-mode-hs">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormHotspot()">Batal</button>
             </div>
             
             <input type="text" id="hs-nama" placeholder="Nama Bangunan (Misal: IGD)">
             <select id="hs-target"></select> 
             
-            <button type="button" class="btn-save-admin" style="background: #e1b12c; color: #2f3640; width: 100%; margin-bottom: 5px;" onclick="mulaiGambarHotspot()">🖱️ Tarik & Gambar Area Langsung di Peta</button>
+            <button type="button" class="btn-save-admin" style="background: #D4AF37; color: #111; width: 100%; margin-bottom: 5px;" onclick="mulaiGambarHotspot()">🖱️ Tarik & Gambar Area di Peta</button>
             
             <label>Koordinat Persentase (%):</label>
             <div class="flex-row">
@@ -268,43 +372,42 @@
             </div>
             
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <button class="btn-save-admin" style="background: #00a8ff;" onclick="previewHotspot()">👁️ Cek</button>
-                <button class="btn-save-admin" id="btn-save-hs" onclick="simpanHotspotSupabase()">➕ Simpan Baru</button>
+                <button class="btn-save-admin" style="background: #555; color:#FFF; border-color:#555;" onclick="previewHotspot()">👁️ Cek</button>
+                <button class="btn-save-admin" id="btn-save-hs" onclick="simpanHotspotSupabase()">➕ Simpan</button>
             </div>
         </div>
 
+        <!-- Section Asal -->
         <div class="admin-section">
-            <h3>📍 Lokasi Saat Ini (Titik Kiosk)</h3>
+            <h3>📍 Lokasi Saat Ini (Kiosk Asal)</h3>
             <div class="data-list" id="list-asal"></div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:10px;">
-                <label id="label-mode-asal" style="color:#4cd137; font-weight:bold;">Mode: [ Tambah Baru ]</label>
-                <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormAsal()">Batal Edit</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
+                <label id="label-mode-asal" style="color:#D4AF37; font-weight:bold;">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormAsal()">Batal</button>
             </div>
             <input type="text" id="admin-nama-asal" placeholder="Misal: Lobi Utama">
             <button class="btn-save-admin" id="btn-save-asal" onclick="simpanDataAsalSupabase()">➕ Tambah Baru</button>
         </div>
 
+        <!-- Section Tujuan -->
         <div class="admin-section">
             <h3>🗺️ Direktori Tujuan & Rute</h3>
             <div class="data-list" id="list-tujuan"></div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:10px;">
-                <label id="label-mode-tujuan" style="color:#4cd137; font-weight:bold;">Mode: [ Tambah Baru ]</label>
-                <button class="btn-cancel-admin" style="padding: 5px 10px; margin:0; font-size:12px;" onclick="resetFormTujuan()">Batal Edit</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
+                <label id="label-mode-tujuan" style="color:#D4AF37; font-weight:bold;">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormTujuan()">Batal</button>
             </div>
-            
-            <input type="text" id="admin-nama-lokasi" placeholder="Nama Lokasi Tujuan (Misal: Poli Mata)">
+            <input type="text" id="admin-nama-lokasi" placeholder="Nama Lokasi Tujuan">
             <select id="admin-akses">
                 <option value="Pengunjung">Akses: Pengunjung Umum</option>
                 <option value="Non Pengunjung (Staf Medis)">Akses: Non Pengunjung (Staf Medis)</option>
             </select>
             <textarea id="admin-rute" placeholder="Instruksi Arah Rute..."></textarea>
             <input type="text" id="admin-tanda" placeholder="URL Gambar Patokan">
-            
-            <button class="btn-save-admin" id="btn-save-tujuan" onclick="simpanDataRuteSupabase()">➕ Tambah Rute Baru</button>
+            <button class="btn-save-admin" id="btn-save-tujuan" onclick="simpanDataRuteSupabase()">➕ Simpan Rute</button>
         </div>
 
+        <!-- Section TTS & Keamanan -->
         <div class="admin-section">
             <h3>🎛️ Pengaturan Suara (TTS)</h3>
             <label>Volume (<span id="val-vol">1.0</span>)</label>
@@ -312,59 +415,59 @@
             <label>Kecepatan (<span id="val-rate">0.9</span>)</label>
             <input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="0.9" oninput="updateTTSUI()">
             <div style="display: flex; gap: 10px;">
-                <button class="btn-save-admin" style="background: #e1b12c; color: #2f3640;" onclick="tesSuara()">Tes Suara</button>
+                <button class="btn-save-admin" style="background: #111; color: #D4AF37; border-color:#D4AF37;" onclick="tesSuara()">Tes Suara</button>
                 <button class="btn-save-admin" onclick="simpanPengaturanSupabase()">💾 Simpan TTS</button>
             </div>
         </div>
         
         <div class="admin-section">
-            <h3>🔐 Reset Akses PIN</h3>
+            <h3>🔐 Reset PIN Akses</h3>
             <input type="password" id="pin-lama" placeholder="PIN Lama (12 Karakter)" maxlength="12">
             <input type="password" id="pin-baru" placeholder="PIN Baru (12 Karakter)" maxlength="12">
-            <button class="btn-save-admin" style="background: #e1b12c; color:#2f3640;" onclick="resetPINSupabase()">Simpan PIN Baru</button>
+            <button class="btn-save-admin" style="background: #111; color:#D4AF37; border-color:#D4AF37;" onclick="resetPINSupabase()">Simpan PIN Baru</button>
         </div>
     </div>
 
     <!-- MODAL POPUPS -->
     <div class="popup-overlay" id="qa-modal">
-        <div class="popup-content" style="max-width: 500px;">
-            <h2 style="color: #e1b12c; margin-bottom: 10px;">💬 Tanya Jawab Cepat</h2>
+        <div class="popup-content" style="max-width: 480px;">
+            <h2 style="color: #8B0000; margin-bottom: 10px;">💬 Tanya Jawab Cepat</h2>
             <div class="chat-area" id="qa-chat">
                 <div class="chat-bubble chat-bot">Halo! Ada yang bisa saya bantu informasikan?</div>
             </div>
             <button class="btn-mic" id="btn-qa-rekam" onclick="toggleQARekam()">🎤</button>
-            <button class="btn-primary" style="background:#95a5a6; margin-top:20px;" onclick="tutupModal('qa-modal')">Tutup</button>
+            <button class="btn-primary btn-danger" style="margin-top:15px;" onclick="tutupModal('qa-modal')">Tutup</button>
         </div>
     </div>
 
     <div class="popup-overlay" id="hotspot-info-popup">
-        <div class="popup-content" style="max-width: 450px;">
-            <h2 style="color: #e1b12c; margin-bottom: 5px;">🏢 Informasi Area</h2>
-            <h3 id="hs-info-nama" style="font-size: 24px; color: #2c3e50; margin-bottom: 20px;">Nama Bangunan</h3>
+        <div class="popup-content" style="max-width: 440px;">
+            <h2 style="color: #D4AF37; margin-bottom: 5px;">🏢 Informasi Area</h2>
+            <h3 id="hs-info-nama" style="font-size: 22px; color: #8B0000; margin-bottom: 18px; font-weight: 800;">Nama Bangunan</h3>
             <div id="hs-info-action"></div>
-            <button class="btn-primary" style="background:#95a5a6; margin-top:15px;" onclick="tutupModal('hotspot-info-popup')">Tutup</button>
+            <button class="btn-primary btn-danger" style="margin-top:12px;" onclick="tutupModal('hotspot-info-popup')">Tutup</button>
         </div>
     </div>
 
     <div class="popup-overlay" id="nav-popup">
         <div class="popup-content">
-            <h2 style="color: #00a8ff; margin-bottom: 15px;">Ikuti Petunjuk Ini</h2>
+            <h2 style="color: #8B0000; margin-bottom: 12px;">Petunjuk Jalur Evakuasi</h2>
             <div class="instruksi-teks" id="teks-instruksi"></div>
             <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
-            <button class="btn-primary" style="background:#4cd137;" onclick="telahSampai()">✅ SAYA SUDAH SAMPAI</button>
+            <button class="btn-primary" style="background:#D4AF37; color:#111; font-weight:900;" onclick="telahSampai()">✅ SAYA SUDAH SAMPAI</button>
         </div>
     </div>
 
     <div class="popup-overlay" id="survey-popup">
         <div class="popup-content">
-            <h2 style="color: #4cd137; margin-bottom: 15px;">Terima Kasih! 🎉</h2>
-            <textarea id="ulasan-teks" style="width: 100%; height: 100px; padding: 15px; border-radius: 10px; border: 2px solid #bdc3c7; resize:none; margin-bottom:10px;" placeholder="Ketik ulasan Anda atau gunakan suara..."></textarea>
+            <h2 style="color: #D4AF37; margin-bottom: 10px;">Terima Kasih! 🎉</h2>
+            <textarea id="ulasan-teks" style="width: 100%; height: 90px; padding: 12px; border-radius: 8px; border: 2px solid #C0C0C0; resize:none; margin-bottom:10px;" placeholder="Tuliskan ulasan Anda atau gunakan suara..."></textarea>
             <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()">🎤</button>
-            <button class="btn-primary" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
+            <button class="btn-primary" style="margin-top:15px;" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
         </div>
     </div>
 
-    <!-- SCRIPT UTAMA BERBASIS MODULE -->
+    <!-- SCRIPT UTAMA MODULE -->
     <script type="module">
         import supabase from './supabase_config.js';
 
@@ -374,13 +477,21 @@
         let dataRute = {}; 
         let dataHotspots = []; 
         
-        let editAsalName = null;
-        let editTujuanName = null;
-        let editHotspotId = null;
+        let editAsalName = null, editTujuanName = null, editHotspotId = null;
+        let lokasiAsal = "", lokasiTujuan = "";
 
-        let lokasiAsal = "";
-        let lokasiTujuan = "";
-        let ucapanAktif = null;
+        // ==========================================
+        // UTILS
+        // ==========================================
+        window.tutupModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        window.bicara = function(teks, callback) {
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance(teks);
+            msg.lang = 'id-ID'; msg.volume = settingTTS.volume; msg.rate = settingTTS.rate;
+            if(callback) msg.onend = callback;
+            window.speechSynthesis.speak(msg);
+        }
+        window.tesSuara = function() { window.bicara("Tes sistem suara berhasil dijalankan."); }
 
         // ==========================================
         // KONTROL PETA (ZOOM, PAN, ROTATE)
@@ -389,8 +500,7 @@
         let rotasiPeta = 0;
         let currentZoom = 1;
         let panX = 0, panY = 0;
-        let isPanning = false;
-        let startPanX = 0, startPanY = 0;
+        let isPanning = false, startPanX = 0, startPanY = 0;
 
         window.aturModePeta = function(mode) {
             modePeta = mode;
@@ -402,7 +512,7 @@
         window.zoomPeta = function(factor) {
             currentZoom += factor;
             if(currentZoom < 0.5) currentZoom = 0.5; 
-            if(currentZoom > 5) currentZoom = 5;     
+            if(currentZoom > 4.5) currentZoom = 4.5;     
             terapkanTransformasiPeta();
         }
         window.resetPosisiPeta = function() {
@@ -415,11 +525,11 @@
         function terapkanTransformasiPeta() {
             const wadahPeta = document.getElementById('interactive-map');
             if (modePeta === '3D') {
-                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(55deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom * 1.3})`;
-                wadahPeta.style.boxShadow = `0 30px 60px rgba(0,0,0,0.6)`;
+                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(55deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom * 1.25})`;
+                wadahPeta.style.boxShadow = `0 30px 60px rgba(0,0,0,0.85)`;
             } else {
                 wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(0deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom})`;
-                wadahPeta.style.boxShadow = `0 10px 30px rgba(0,0,0,0.3)`;
+                wadahPeta.style.boxShadow = `0 15px 40px rgba(0,0,0,0.6)`;
             }
         }
 
@@ -428,8 +538,7 @@
 
         function startPan(e) {
             if(isDrawingArea) return; 
-            // Jangan geser saat klik elemen lain
-            if(e.target.closest('.map-controls-hud') || e.target.closest('.zoom-controls') || e.target.closest('.btn-cpanel')) return;
+            if(e.target.closest('.map-controls-hud') || e.target.closest('.btn-cpanel') || e.target.closest('.btn-hud-tanya')) return;
             
             isPanning = true;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -461,7 +570,7 @@
         window.addEventListener('touchend', endPan);
 
         // ==========================================
-        // FETCH DATA CLOUD
+        // FETCH DATA SUPABASE
         // ==========================================
         window.fetchAllDataSupabase = async function() {
             try {
@@ -489,7 +598,7 @@
                 } else {
                     imgEl.style.display = 'none';
                     warnEl.style.display = 'block'; upCont.style.display = 'block'; btnDel.style.display = 'none';
-                    statusTxt.innerText = "Belum ada peta. Silakan upload gambar peta Anda.";
+                    statusTxt.innerText = "Peta belum diunggah.";
                 }
 
                 const { data: asal } = await supabase.from('lokasi_asal').select('nama_lokasi').order('created_at', { ascending: true });
@@ -498,27 +607,22 @@
                 const { data: tujuan } = await supabase.from('lokasi_tujuan').select('*').order('nama_lokasi', { ascending: true });
                 if (tujuan) {
                     dataRute = {};
-                    tujuan.forEach(t => { dataRute[t.nama_lokasi] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda }; });
+                    tujuan.forEach(t => { dataRute[t.nama_lokasi] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor }; });
                 }
 
                 const { data: hotspots } = await supabase.from('map_hotspots').select('*').order('created_at', { ascending: true });
                 if (hotspots) dataHotspots = hotspots;
 
-                // Update Public UI
-                document.getElementById('loading-text').innerText = "Data Siap!";
+                // Update Landing Status
+                document.getElementById('loading-text').innerText = "Data Siap! Sentuh Layar Untuk Memulai";
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
-                document.getElementById('start-overlay').querySelector('h1:first-child').innerText = "👆";
-                document.getElementById('start-overlay').querySelector('h1:nth-child(2)').innerText = "Sentuh Layar Untuk Memulai";
+                
                 renderHotspotsToMap();
-                
-                // Update Admin Lists
                 renderAllAdminLists();
-                
                 document.getElementById('sync-indicator').style.display = 'none';
-
             } catch (error) {
                 console.error(error);
-                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek Koneksi / API Key.";
+                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek API Key.";
                 document.getElementById('sync-indicator').style.display = 'none';
             }
         }
@@ -526,9 +630,8 @@
         document.getElementById('start-overlay').style.pointerEvents = "none";
         window.onload = fetchAllDataSupabase;
 
-
         // ==========================================
-        // C-PANEL: RENDER LIST VIEWS
+        // C-PANEL: RENDER LISTS
         // ==========================================
         function renderAllAdminLists() {
             const listAsal = document.getElementById('list-asal');
@@ -549,7 +652,7 @@
             for (let nama in dataRute) {
                 listTujuan.innerHTML += `
                     <div class="data-item">
-                        <div class="data-item-name">${nama} <span style="font-size:10px; color:#e1b12c;">(${dataRute[nama].akses})</span></div>
+                        <div class="data-item-name">${nama} <span style="font-size:10px; color:#D4AF37;">(${dataRute[nama].akses})</span></div>
                         <div class="data-item-actions">
                             <button class="action-btn" title="Edit" onclick="editFormTujuan('${nama}')">✏️</button>
                             <button class="action-btn" title="Hapus" onclick="hapusTujuan('${nama}')">🗑️</button>
@@ -559,12 +662,11 @@
 
             const listHotspot = document.getElementById('list-hotspot');
             const selectTarget = document.getElementById('hs-target');
-            
             listHotspot.innerHTML = '';
             dataHotspots.forEach(hs => {
                 listHotspot.innerHTML += `
                     <div class="data-item">
-                        <div class="data-item-name">${hs.nama_bangunan}</div>
+                        <div class="data-item-name">${hs.nomor ? `[${hs.nomor}] ` : ''}${hs.nama_bangunan}</div>
                         <div class="data-item-actions">
                             <button class="action-btn" title="Edit" onclick="editFormHotspot('${hs.id}')">✏️</button>
                             <button class="action-btn" title="Hapus" onclick="hapusHotspot('${hs.id}')">🗑️</button>
@@ -572,13 +674,12 @@
                     </div>`;
             });
 
-            selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Info) --</option>';
+            selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Label Info) --</option>';
             for (let nama in dataRute) { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; }
         }
 
-
         // ==========================================
-        // C-PANEL: CRUD LOKASI ASAL
+        // C-PANEL: CRUD LOGIC
         // ==========================================
         window.resetFormAsal = function() {
             editAsalName = null;
@@ -589,33 +690,20 @@
         window.editFormAsal = function(nama) {
             editAsalName = nama;
             document.getElementById('label-mode-asal').innerText = "Mode: [ EDIT DATA ]";
-            document.getElementById('label-mode-asal').style.color = "#e1b12c";
             document.getElementById('btn-save-asal').innerText = "💾 Update Data";
             document.getElementById('admin-nama-asal').value = nama;
         }
         window.simpanDataAsalSupabase = async function() {
             const namaBaru = document.getElementById('admin-nama-asal').value.trim();
             if (!namaBaru) return alert("Nama tidak boleh kosong!");
-
-            if (editAsalName) {
-                await supabase.from('lokasi_asal').update({ nama_lokasi: namaBaru }).eq('nama_lokasi', editAsalName);
-            } else {
-                await supabase.from('lokasi_asal').insert([{ nama_lokasi: namaBaru }]);
-            }
-            window.resetFormAsal();
-            await fetchAllDataSupabase();
+            if (editAsalName) await supabase.from('lokasi_asal').update({ nama_lokasi: namaBaru }).eq('nama_lokasi', editAsalName);
+            else await supabase.from('lokasi_asal').insert([{ nama_lokasi: namaBaru }]);
+            window.resetFormAsal(); await fetchAllDataSupabase();
         }
         window.hapusAsal = async function(nama) {
-            if(confirm(`Hapus lokasi asal "${nama}"?`)) {
-                await supabase.from('lokasi_asal').delete().eq('nama_lokasi', nama);
-                await fetchAllDataSupabase();
-            }
+            if(confirm(`Hapus lokasi asal "${nama}"?`)) { await supabase.from('lokasi_asal').delete().eq('nama_lokasi', nama); await fetchAllDataSupabase(); }
         }
 
-
-        // ==========================================
-        // C-PANEL: CRUD LOKASI TUJUAN
-        // ==========================================
         window.resetFormTujuan = function() {
             editTujuanName = null;
             document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]";
@@ -625,12 +713,9 @@
             document.getElementById('admin-tanda').value = "";
         }
         window.editFormTujuan = function(nama) {
-            editTujuanName = nama;
-            const data = dataRute[nama];
+            editTujuanName = nama; const data = dataRute[nama];
             document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]";
-            document.getElementById('label-mode-tujuan').style.color = "#e1b12c";
             document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute";
-            
             document.getElementById('admin-nama-lokasi').value = nama;
             document.getElementById('admin-akses').value = data.akses;
             document.getElementById('admin-rute').value = data.instruksi;
@@ -643,64 +728,66 @@
             const tanda = document.getElementById('admin-tanda').value.trim();
 
             if (!nama || !rute || !tanda) return alert("Lengkapi data form!");
-
             const payload = { nama_lokasi: nama, akses: akses, instruksi: rute, gambar_tanda: tanda };
 
-            if (editTujuanName && editTujuanName !== nama) {
-                await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            } else if (editTujuanName === nama) {
-                await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            } else {
-                await supabase.from('lokasi_tujuan').insert([payload]);
-            }
-            window.resetFormTujuan();
-            await fetchAllDataSupabase();
+            if (editTujuanName && editTujuanName !== nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else if (editTujuanName === nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else await supabase.from('lokasi_tujuan').insert([payload]);
+            window.resetFormTujuan(); await fetchAllDataSupabase();
         }
         window.hapusTujuan = async function(nama) {
-            if(confirm(`Hapus lokasi tujuan "${nama}" beserta rutenya?`)) {
-                await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', nama);
-                await fetchAllDataSupabase();
-            }
+            if(confirm(`Hapus lokasi tujuan "${nama}"?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', nama); await fetchAllDataSupabase(); }
         }
 
+        window.uploadPeta = async function() {
+            const fileInput = document.getElementById('map-file');
+            if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih berkas gambar denah terlebih dahulu!");
+            const file = fileInput.files[0]; const fileExt = file.name.split('.').pop();
+            const fileName = `map_${Date.now()}.${fileExt}`;
+            document.getElementById('map-status').innerText = "Mengunggah ke Cloud...";
+
+            const { error: uploadError } = await supabase.storage.from('maps').upload(fileName, file);
+            if(uploadError) { document.getElementById('map-status').innerText = "Gagal unggah!"; return alert("Gagal upload! Periksa Storage Policy Supabase."); }
+            const publicUrl = supabase.storage.from('maps').getPublicUrl(fileName).data.publicUrl;
+            await supabase.from('map_image').update({ image_url: publicUrl, file_path: fileName }).eq('id', 1);
+            alert("Peta berhasil diunggah!"); fetchAllDataSupabase();
+        }
+
+        window.hapusPeta = async function() {
+            if(!confirm("Hapus berkas peta ini dari server?")) return;
+            const { data } = await supabase.from('map_image').select('file_path').eq('id', 1).single();
+            if(data && data.file_path) { await supabase.storage.from('maps').remove([data.file_path]); }
+            await supabase.from('map_image').update({ image_url: null, file_path: null }).eq('id', 1);
+            alert("Peta berhasil dihapus!"); fetchAllDataSupabase();
+        }
 
         // ==========================================
-        // C-PANEL: CRUD HOTSPOT PETA
+        // C-PANEL: GAMBAR AREA HOTSPOT
         // ==========================================
+        let isDrawingArea = false, drawStartX = 0, drawStartY = 0;
+        let drawOverlay, drawBox, mapImg;
+
         window.resetFormHotspot = function() {
             editHotspotId = null;
             document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]";
-            document.getElementById('btn-save-hs').innerText = "➕ Simpan Baru";
-            
-            document.getElementById('hs-nama').value = "";
-            document.getElementById('hs-target').value = "";
-            document.getElementById('hs-top').value = "";
-            document.getElementById('hs-left').value = "";
-            document.getElementById('hs-width').value = "";
-            document.getElementById('hs-height').value = "";
-            
-            const preview = document.getElementById('hotspot-preview');
-            if(preview) preview.remove();
+            document.getElementById('btn-save-hs').innerText = "➕ Simpan";
+            document.getElementById('hs-nama').value = ""; document.getElementById('hs-target').value = "";
+            document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = "";
+            document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = "";
+            const preview = document.getElementById('hotspot-preview'); if(preview) preview.remove();
         }
-
         window.editFormHotspot = function(id) {
-            editHotspotId = id;
-            const hs = dataHotspots.find(h => h.id === id);
+            editHotspotId = id; const hs = dataHotspots.find(h => h.id === id);
             if(hs) {
                 document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]";
-                document.getElementById('label-mode-hs').style.color = "#e1b12c";
-                document.getElementById('btn-save-hs').innerText = "💾 Update Hotspot";
-                
+                document.getElementById('btn-save-hs').innerText = "💾 Update";
                 document.getElementById('hs-nama').value = hs.nama_bangunan;
                 document.getElementById('hs-target').value = hs.target_lokasi || "";
-                document.getElementById('hs-top').value = hs.pos_top;
-                document.getElementById('hs-left').value = hs.pos_left;
-                document.getElementById('hs-width').value = hs.width;
-                document.getElementById('hs-height').value = hs.height;
+                document.getElementById('hs-top').value = hs.pos_top; document.getElementById('hs-left').value = hs.pos_left;
+                document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height;
                 window.previewHotspot();
             }
         }
-
         window.simpanHotspotSupabase = async function() {
             const nama = document.getElementById('hs-nama').value.trim();
             const target = document.getElementById('hs-target').value;
@@ -709,112 +796,16 @@
             const width = parseFloat(document.getElementById('hs-width').value);
             const height = parseFloat(document.getElementById('hs-height').value);
 
-            if(!nama || isNaN(top) || isNaN(left) || isNaN(width) || isNaN(height)) { return alert("Lengkapi Form & Koordinat!"); }
-
+            if(!nama || isNaN(top) || isNaN(left) || isNaN(width) || isNaN(height)) return alert("Lengkapi form koordinat area!");
             const payload = { nama_bangunan: nama, target_lokasi: target || null, pos_top: top, pos_left: left, width: width, height: height };
             
-            if (editHotspotId) {
-                await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
-            } else {
-                await supabase.from('map_hotspots').insert([payload]);
-            }
-            
-            window.resetFormHotspot();
-            await fetchAllDataSupabase();
+            if (editHotspotId) await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
+            else await supabase.from('map_hotspots').insert([payload]);
+            window.resetFormHotspot(); await fetchAllDataSupabase();
         }
-
         window.hapusHotspot = async function(id) {
-            if(confirm("Hapus kotak interaktif ini dari gambar?")) {
-                await supabase.from('map_hotspots').delete().eq('id', id);
-                await fetchAllDataSupabase();
-            }
+            if(confirm("Hapus kotak area hotspot ini?")) { await supabase.from('map_hotspots').delete().eq('id', id); await fetchAllDataSupabase(); }
         }
-
-
-        // ==========================================
-        // C-PANEL LOGIC (LAINNYA)
-        // ==========================================
-        window.syncDataAdmin = function() {
-            fetchAllDataSupabase();
-        }
-
-        window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
-        window.prosesLogin = function() {
-            if (document.getElementById('login-pin').value === systemPIN) {
-                window.tutupModal('login-modal');
-                bukaCPanel();
-            } else { alert("PIN Salah!"); }
-        }
-        function bukaCPanel() {
-            document.getElementById('panel-cpanel').classList.add('open');
-            document.getElementById('tts-volume').value = settingTTS.volume;
-            document.getElementById('val-vol').innerText = settingTTS.volume;
-            document.getElementById('tts-rate').value = settingTTS.rate;
-            document.getElementById('val-rate').innerText = settingTTS.rate;
-            renderAllAdminLists(); 
-        }
-        window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
-
-        window.updateTTSUI = function() {
-            document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value;
-            document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value;
-        }
-
-        window.simpanPengaturanSupabase = async function() {
-            const vol = parseFloat(document.getElementById('tts-volume').value);
-            const r = parseFloat(document.getElementById('tts-rate').value);
-            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
-            if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan Suara Disimpan"); }
-        }
-
-        window.resetPINSupabase = async function() {
-            const lama = document.getElementById('pin-lama').value;
-            const baru = document.getElementById('pin-baru').value;
-            if (lama !== systemPIN) return alert("PIN Lama salah!");
-            if (baru.length !== 12) return alert("PIN Baru harus 12 karakter!");
-            
-            const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
-            if(error) return alert("Gagal update Database");
-            
-            systemPIN = baru;
-            alert("PIN berhasil direset!");
-            document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = "";
-        }
-
-        window.uploadPeta = async function() {
-            const fileInput = document.getElementById('map-file');
-            if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih file gambar peta terlebih dahulu!");
-            const file = fileInput.files[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `map_${Date.now()}.${fileExt}`;
-            document.getElementById('map-status').innerText = "Mengunggah...";
-
-            const { error: uploadError } = await supabase.storage.from('maps').upload(fileName, file);
-            if(uploadError) {
-                document.getElementById('map-status').innerText = "Gagal unggah!";
-                return alert("Gagal upload! Pastikan koneksi dan Policy RLS Supabase sudah benar.");
-            }
-            const publicUrl = supabase.storage.from('maps').getPublicUrl(fileName).data.publicUrl;
-            await supabase.from('map_image').update({ image_url: publicUrl, file_path: fileName }).eq('id', 1);
-            alert("Peta berhasil diunggah!");
-            fetchAllDataSupabase();
-        }
-
-        window.hapusPeta = async function() {
-            if(!confirm("Anda yakin ingin menghapus gambar peta ini dari server?")) return;
-            const { data } = await supabase.from('map_image').select('file_path').eq('id', 1).single();
-            if(data && data.file_path) { await supabase.storage.from('maps').remove([data.file_path]); }
-            await supabase.from('map_image').update({ image_url: null, file_path: null }).eq('id', 1);
-            alert("Peta berhasil dihapus!");
-            fetchAllDataSupabase();
-        }
-
-        // ==========================================
-        // FITUR GAMBAR HOTSPOT MOUSE (DRAWING)
-        // ==========================================
-        let isDrawingArea = false;
-        let drawStartX = 0; let drawStartY = 0;
-        let drawOverlay, drawBox, mapImg;
 
         window.mulaiGambarHotspot = function() {
             window.resetPosisiPeta(); 
@@ -823,9 +814,8 @@
             mapImg = document.querySelector('.map-wrapper img');
             
             document.getElementById('panel-cpanel').classList.remove('open');
-            drawOverlay.style.display = 'block';
-            drawBox.style.display = 'none';
-            alert("INFORMASI: Klik dan tahan, lalu tarik kursor Anda pada area gambar peta untuk mencetak kotak area (Hotspot).");
+            drawOverlay.style.display = 'block'; drawBox.style.display = 'none';
+            alert("Tarik kursor (klik & geser) di atas denah untuk membuat kotak batas area hotspot.");
         };
 
         window.previewHotspot = function() {
@@ -839,8 +829,8 @@
                 previewDiv = document.createElement('div');
                 previewDiv.id = 'hotspot-preview';
                 previewDiv.style.position = 'absolute';
-                previewDiv.style.background = 'rgba(232, 65, 24, 0.6)'; 
-                previewDiv.style.border = '3px solid #e84118';
+                previewDiv.style.background = 'rgba(212, 175, 55, 0.45)'; 
+                previewDiv.style.border = '2px solid #8B0000';
                 previewDiv.style.zIndex = '999';
                 document.getElementById('interactive-map').appendChild(previewDiv);
             }
@@ -849,77 +839,70 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const overlay = document.getElementById('draw-overlay');
-            const box = document.getElementById('draw-box');
-            
-            function getEventPos(e) {
-                if(e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                return { x: e.clientX, y: e.clientY };
-            }
+            const overlay = document.getElementById('draw-overlay'); const box = document.getElementById('draw-box');
+            function getEventPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
 
             function sDraw(e) {
-                isDrawingArea = true;
-                const pos = getEventPos(e);
-                const rect = mapImg.getBoundingClientRect();
+                isDrawingArea = true; const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
                 drawStartX = ((pos.x - rect.left) / rect.width) * 100;
                 drawStartY = ((pos.y - rect.top) / rect.height) * 100;
-                drawStartX = Math.max(0, Math.min(100, drawStartX));
-                drawStartY = Math.max(0, Math.min(100, drawStartY));
-
-                box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%';
-                box.style.width = '0%'; box.style.height = '0%';
-                box.style.display = 'block';
+                drawStartX = Math.max(0, Math.min(100, drawStartX)); drawStartY = Math.max(0, Math.min(100, drawStartY));
+                box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%'; box.style.width = '0%'; box.style.height = '0%'; box.style.display = 'block';
             }
-
             function mDraw(e) {
-                if(!isDrawingArea) return;
-                e.preventDefault(); 
-                const pos = getEventPos(e);
-                const rect = mapImg.getBoundingClientRect();
-                
-                let currentX = ((pos.x - rect.left) / rect.width) * 100;
-                let currentY = ((pos.y - rect.top) / rect.height) * 100;
-                currentX = Math.max(0, Math.min(100, currentX));
-                currentY = Math.max(0, Math.min(100, currentY));
-
-                let left = Math.min(drawStartX, currentX);
-                let top = Math.min(drawStartY, currentY);
-                let width = Math.abs(currentX - drawStartX);
-                let height = Math.abs(currentY - drawStartY);
-
-                box.style.left = left + '%'; box.style.top = top + '%';
-                box.style.width = width + '%'; box.style.height = height + '%';
+                if(!isDrawingArea) return; e.preventDefault(); 
+                const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
+                let currentX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100));
+                let currentY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100));
+                let left = Math.min(drawStartX, currentX); let top = Math.min(drawStartY, currentY);
+                let width = Math.abs(currentX - drawStartX); let height = Math.abs(currentY - drawStartY);
+                box.style.left = left + '%'; box.style.top = top + '%'; box.style.width = width + '%'; box.style.height = height + '%';
             }
-
             function eDraw(e) {
-                if(!isDrawingArea) return;
-                isDrawingArea = false;
-                overlay.style.display = 'none';
+                if(!isDrawingArea) return; isDrawingArea = false; overlay.style.display = 'none';
+                const finalWidth = parseFloat(box.style.width); const finalHeight = parseFloat(box.style.height);
+                if(finalWidth < 1 || finalHeight < 1) { document.getElementById('panel-cpanel').classList.add('open'); return; }
                 
-                const finalWidth = parseFloat(box.style.width);
-                const finalHeight = parseFloat(box.style.height);
-
-                if(finalWidth < 1 || finalHeight < 1) {
-                    document.getElementById('panel-cpanel').classList.add('open');
-                    return;
-                }
-
                 document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2);
                 document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2);
                 document.getElementById('hs-width').value = finalWidth.toFixed(2);
                 document.getElementById('hs-height').value = finalHeight.toFixed(2);
-
-                document.getElementById('panel-cpanel').classList.add('open');
-                window.previewHotspot();
+                
+                document.getElementById('panel-cpanel').classList.add('open'); window.previewHotspot();
             }
-
-            overlay.addEventListener('mousedown', sDraw);
-            overlay.addEventListener('mousemove', mDraw);
-            overlay.addEventListener('mouseup', eDraw);
-            overlay.addEventListener('touchstart', sDraw, {passive: false});
-            overlay.addEventListener('touchmove', mDraw, {passive: false});
-            overlay.addEventListener('touchend', eDraw);
+            overlay.addEventListener('mousedown', sDraw); overlay.addEventListener('mousemove', mDraw); overlay.addEventListener('mouseup', eDraw);
+            overlay.addEventListener('touchstart', sDraw, {passive: false}); overlay.addEventListener('touchmove', mDraw, {passive: false}); overlay.addEventListener('touchend', eDraw);
         });
+
+        // ==========================================
+        // C-PANEL UTILS & LOGIN
+        // ==========================================
+        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
+        window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
+        window.prosesLogin = function() {
+            if (document.getElementById('login-pin').value === systemPIN) {
+                window.tutupModal('login-modal'); document.getElementById('panel-cpanel').classList.add('open');
+                document.getElementById('tts-volume').value = settingTTS.volume; document.getElementById('val-vol').innerText = settingTTS.volume;
+                document.getElementById('tts-rate').value = settingTTS.rate; document.getElementById('val-rate').innerText = settingTTS.rate;
+                renderAllAdminLists(); 
+            } else { alert("PIN Akses Salah!"); }
+        }
+        window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
+        window.updateTTSUI = function() {
+            document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value;
+            document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value;
+        }
+        window.simpanPengaturanSupabase = async function() {
+            const vol = parseFloat(document.getElementById('tts-volume').value); const r = parseFloat(document.getElementById('tts-rate').value);
+            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
+            if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan TTS Disimpan!"); }
+        }
+        window.resetPINSupabase = async function() {
+            const lama = document.getElementById('pin-lama').value; const baru = document.getElementById('pin-baru').value;
+            if (lama !== systemPIN) return alert("PIN Lama tidak sesuai!"); if (baru.length !== 12) return alert("PIN Baru wajib 12 karakter!");
+            const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
+            if(!error) { systemPIN = baru; alert("PIN berhasil diperbarui!"); document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = ""; }
+        }
 
         // ==========================================
         // APLIKASI PENGUNJUNG (NAVIGASI & UI)
@@ -935,29 +918,19 @@
                 div.style.width = `${hs.width}%`; div.style.height = `${hs.height}%`;
                 div.id = `hs-${hs.id}`;
 
-                const tooltip = document.createElement('div');
-                tooltip.className = 'hotspot-tooltip';
-                tooltip.innerText = hs.nama_bangunan;
-                div.appendChild(tooltip);
+                const tooltip = document.createElement('div'); tooltip.className = 'hotspot-tooltip'; tooltip.innerText = hs.nama_bangunan; div.appendChild(tooltip);
+                const label = document.createElement('div'); label.className = 'hotspot-label'; label.innerText = hs.nomor ?? '-'; div.appendChild(label);
 
                 div.onclick = () => {
                     document.getElementById('hs-info-nama').innerText = hs.nama_bangunan;
-                    const actionContainer = document.getElementById('hs-info-action');
-                    actionContainer.innerHTML = '';
+                    const actionContainer = document.getElementById('hs-info-action'); actionContainer.innerHTML = '';
                     
                     if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
-                        window.bicara(`Anda memilih area ${hs.nama_bangunan}. Tersedia rute navigasi menuju lokasi ini.`);
-                        const btnNav = document.createElement('button');
-                        btnNav.className = 'btn-primary';
-                        btnNav.innerText = '🗺️ Mulai Navigasi ke Sini';
-                        btnNav.onclick = () => {
-                            window.tutupModal('hotspot-info-popup');
-                            window.pilihTujuan(hs.target_lokasi);
-                        };
+                        window.bicara(`Area ${hs.nama_bangunan}. Tersedia petunjuk rute.`);
+                        const btnNav = document.createElement('button'); btnNav.className = 'btn-primary'; btnNav.innerText = '🗺️ Tunjukkan Rute ke Sini';
+                        btnNav.onclick = () => { window.tutupModal('hotspot-info-popup'); window.pilihTujuan(hs.target_lokasi); };
                         actionContainer.appendChild(btnNav);
-                    } else {
-                        window.bicara(`Ini adalah bangunan ${hs.nama_bangunan}.`);
-                    }
+                    } else { window.bicara(`Area ${hs.nama_bangunan}.`); }
                     document.getElementById('hotspot-info-popup').style.display = 'flex';
                 };
                 container.insertBefore(div, document.getElementById('draw-overlay'));
@@ -965,46 +938,37 @@
         }
 
         window.mulaiAplikasi = function() {
-            document.getElementById('start-overlay').style.display = 'none';
-            document.getElementById('step-1').classList.add('active');
-            renderTombolLokasiAsal();
-            renderTombolTujuan();
-            window.bicara("Selamat datang. Silahkan Pilih Lokasi anda berada saat ini.");
+            document.getElementById('start-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-overlay').style.display = 'none';
+                document.getElementById('step-1').classList.add('active');
+                renderTombolLokasiAsal(); renderTombolTujuan();
+                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan pilih lokasi Anda saat ini.");
+            }, 600);
         }
 
         function renderTombolLokasiAsal() {
-            const container = document.getElementById('container-lokasi-asal');
-            container.innerHTML = "";
+            const container = document.getElementById('container-lokasi-asal'); container.innerHTML = "";
             dataLokasiAsal.forEach(nama => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-pilihan';
-                btn.innerHTML = `<span style="font-size:18px;">${nama}</span>`;
-                btn.onclick = () => window.pilihLokasiSekarang(nama);
-                container.appendChild(btn);
+                const btn = document.createElement('button'); btn.className = 'btn-pilihan'; btn.innerHTML = `<span>${nama}</span>`;
+                btn.onclick = () => window.pilihLokasiSekarang(nama); container.appendChild(btn);
             });
         }
 
         window.pilihLokasiSekarang = function(lokasi) {
             lokasiAsal = lokasi;
-            document.getElementById('step-1').classList.remove('active');
-            document.getElementById('step-2').classList.add('active');
-            document.getElementById('lokasi-anda-info').innerText = "Dari: " + lokasiAsal;
-            document.getElementById('search-tujuan').value = "";
-            window.filterTujuan(); 
-            window.bicara("Silahkan pilih lokasi tujuan anda.");
+            document.getElementById('step-1').classList.remove('active'); document.getElementById('step-2').classList.add('active');
+            document.getElementById('lokasi-anda-info').innerText = "Dari: " + lokasiAsal; document.getElementById('search-tujuan').value = "";
+            window.filterTujuan(); window.bicara("Silakan pilih ruangan tujuan Anda.");
         }
 
         function renderTombolTujuan() {
-            const container = document.getElementById('container-tujuan');
-            container.innerHTML = "";
+            const container = document.getElementById('container-tujuan'); container.innerHTML = "";
             for (let nama in dataRute) {
-                const lokasi = dataRute[nama];
-                const badgeClass = lokasi.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
-                const btn = document.createElement('button');
-                btn.className = 'btn-pilihan tujuan-item';
-                btn.innerHTML = `<span class="nama-tujuan" style="font-size:18px;">${nama}</span> <span class="badge-akses ${badgeClass}">${lokasi.akses}</span>`;
-                btn.onclick = () => window.pilihTujuan(nama);
-                container.appendChild(btn);
+                const lokasi = dataRute[nama]; const badgeClass = lokasi.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
+                const btn = document.createElement('button'); btn.className = 'btn-pilihan tujuan-item';
+                btn.innerHTML = `<span class="nama-tujuan"><span class="span-nomor">${lokasi.nomor ? `[${lokasi.nomor}]` : ''}</span>${nama}</span> <span class="badge-akses ${badgeClass}">${lokasi.akses}</span>`;
+                btn.onclick = () => window.pilihTujuan(nama); container.appendChild(btn);
             }
         }
 
@@ -1013,42 +977,35 @@
             let buttons = document.getElementsByClassName('tujuan-item');
             for (let i = 0; i < buttons.length; i++) {
                 let txtValue = buttons[i].querySelector('.nama-tujuan').textContent;
-                if (txtValue.toLowerCase().indexOf(input) > -1) buttons[i].style.display = "";
-                else buttons[i].style.display = "none";
+                if (txtValue.toLowerCase().indexOf(input) > -1) buttons[i].style.display = ""; else buttons[i].style.display = "none";
             }
         }
 
         window.pilihTujuan = function(tujuan) {
-            lokasiTujuan = tujuan;
-            const rute = dataRute[tujuan];
+            lokasiTujuan = tujuan; const rute = dataRute[tujuan];
             const teksArahan = `Silahkan ${rute.instruksi} sampai menemukan tanda seperti ini.`;
             document.getElementById('teks-instruksi').innerText = teksArahan;
             document.getElementById('gambar-tanda').src = rute.gambarTanda;
-            document.getElementById('nav-popup').style.display = 'flex';
-            window.bicara(teksArahan);
+            document.getElementById('nav-popup').style.display = 'flex'; window.bicara(teksArahan);
         }
 
         window.telahSampai = function() {
             document.getElementById('nav-popup').style.display = 'none';
-            window.bicara(`Anda sudah sampai. Terima kasih.`, () => {
-                document.getElementById('survey-popup').style.display = 'flex';
-            });
+            window.bicara(`Anda sudah sampai di tujuan. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
         }
 
         window.batalPilih = function() {
-            document.getElementById('step-2').classList.remove('active');
-            document.getElementById('step-1').classList.add('active');
+            document.getElementById('step-2').classList.remove('active'); document.getElementById('step-1').classList.add('active');
             window.speechSynthesis.cancel();
         }
 
         // ==========================================
-        // Q&A / SURVEY SPEECH RECOGNITION
+        // Q&A / STT RECOGNITION
         // ==========================================
         let recognizer, isRecording = false, activeInputTarget = null; 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognizer = new SR(); recognizer.lang = 'id-ID'; recognizer.continuous = false; recognizer.interimResults = false;
-            
             recognizer.onresult = (event) => {
                 const teksSuara = event.results[0][0].transcript;
                 if(activeInputTarget === 'QA') prosesPertanyaanQA(teksSuara);
@@ -1058,27 +1015,20 @@
         }
 
         window.toggleQARekam = function() {
-            if(!recognizer) return alert("Browser tidak mendukung mic.");
+            if(!recognizer) return alert("Browser tidak mendukung pengenalan suara.");
             activeInputTarget = 'QA';
-            if(isRecording) stopRekam();
-            else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
+            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
         }
-        
         window.toggleSurveyRekam = function() {
-            if(!recognizer) return alert("Browser tidak mendukung mic.");
+            if(!recognizer) return alert("Browser tidak mendukung pengenalan suara.");
             activeInputTarget = 'Survey';
-            if(isRecording) stopRekam();
-            else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
+            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
         }
-
-        function stopRekam() {
-            if(recognizer) recognizer.stop(); isRecording = false;
-            document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording'));
-        }
+        function stopRekam() { if(recognizer) recognizer.stop(); isRecording = false; document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording')); }
 
         window.bukaModalQA = function() {
             document.getElementById('qa-modal').style.display = 'flex';
-            document.getElementById('qa-chat').innerHTML = '<div class="chat-bubble chat-bot">Halo! Silakan tekan tombol mic dan tanyakan sesuatu.</div>';
+            document.getElementById('qa-chat').innerHTML = '<div class="chat-bubble chat-bot">Halo! Silakan gunakan mikrofon untuk bertanya.</div>';
             window.bicara("Ada yang bisa saya bantu informasikan?");
         }
 
@@ -1086,31 +1036,25 @@
             const chatArea = document.getElementById('qa-chat');
             chatArea.innerHTML += `<div class="chat-bubble chat-user">${pertanyaan}</div>`;
             
-            let jawaban = "Maaf, saya belum mengerti pertanyaan tersebut.";
+            let jawaban = "Maaf, saya belum memahami pertanyaan tersebut.";
             let q = pertanyaan.toLowerCase();
             
-            if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk adalah pukul 10 pagi hingga 12 siang, dan 4 sore hingga 8 malam.";
-            else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet terdekat berada di sudut lorong sebelah kiri.";
-            else if (q.includes("jadwal dokter")) jawaban = "Silakan menuju bagian administrasi di lobi utama.";
+            if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk pasien adalah pukul 10.00 hingga 12.00, dan sore pukul 16.00 hingga 18.00.";
+            else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet umum berada di dekat lobi administrasi dan di ujung lorong poli.";
+            else if (q.includes("jadwal dokter")) jawaban = "Jadwal dokter spesialis dapat dilihat di loket administrasi utama.";
 
             setTimeout(() => {
                 chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`;
                 chatArea.scrollTop = chatArea.scrollHeight;
                 window.bicara(jawaban);
-            }, 500);
+            }, 400);
         }
 
         window.kirimSurveySupabase = async function() {
             const teks = document.getElementById('ulasan-teks').value.trim();
-            if(teks) {
-                await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]);
-            }
-            
-            window.tutupModal('survey-popup');
-            document.getElementById('step-2').classList.remove('active');
-            document.getElementById('step-1').classList.add('active');
-            window.bicara("Terima kasih atas ulasan Anda.");
-            document.getElementById('ulasan-teks').value = ""; 
+            if(teks) { await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]); }
+            window.tutupModal('survey-popup'); document.getElementById('step-2').classList.remove('active'); document.getElementById('step-1').classList.add('active');
+            window.bicara("Terima kasih atas ulasan yang Anda berikan."); document.getElementById('ulasan-teks').value = ""; 
         }
     </script>
 </body>
