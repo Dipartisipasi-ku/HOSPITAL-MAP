@@ -6,24 +6,20 @@
     <title>Denah Digital - RS Atma Husada Mahakam</title>
     <style>
         /* =========================================
-           PALET WARNA TEMA:
-           Maroon : #8B0000 / #5c0000
-           Black  : #111111 / #1A1A1A
-           Silver : #E0E0E0 / #C0C0C0
-           Gold   : #D4AF37 / #FFD700
+           PALET WARNA TEMA: Maroon, Black, Silver, Gold
         ========================================= */
         * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body, html { width: 100vw; height: 100vh; overflow: hidden; background: #111111; color: #111111; }
         
         /* ------------------------------------------- */
-        /* LAYAR LANDING RESMI & ELEGAN */
+        /* LAYAR LANDING RESMI */
         /* ------------------------------------------- */
         #start-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(92, 0, 0, 0.88), rgba(17, 17, 17, 0.95)), 
                         url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 2000; cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s; text-align: center;
+            z-index: 9999; cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s; text-align: center;
         }
         #start-overlay .icon-landing { font-size: 70px; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         #start-overlay .title-landing { font-size: 42px; margin-bottom: 8px; color: #D4AF37; font-weight: 800; letter-spacing: 2px; text-shadow: 0 3px 10px rgba(0,0,0,0.8); }
@@ -34,53 +30,58 @@
         @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
 
         /* ------------------------------------------- */
-        /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
+        /* STRUKTUR UTAMA (SIDEBAR KIRI & PETA KANAN) */
         /* ------------------------------------------- */
         .app-container { display: flex; width: 100%; height: 100%; position: relative; }
         
         .sidebar { 
-            background: #E0E0E0; padding: 25px; flex: 1; max-width: 400px; 
-            display: flex; flex-direction: column; z-index: 10; 
-            box-shadow: 4px 0 20px rgba(0,0,0,0.5); overflow-y: auto; border-right: 4px solid #8B0000;
+            background: #E0E0E0; padding: 25px; flex: 1; max-width: 420px; 
+            display: flex; flex-direction: column; z-index: 100; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.5); border-right: 4px solid #8B0000;
         }
         
-        .header-title { color: #8B0000; font-size: 22px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
-        .step-panel { display: none; flex-direction: column; gap: 15px; animation: fadeIn 0.4s ease; }
-        .step-panel.active { display: flex; }
-        .step-title { font-size: 15px; font-weight: bold; color: #D4AF37; background: #111111; padding: 12px; border-radius: 8px; text-align: center; border-left: 5px solid #8B0000; }
+        .header-title { color: #8B0000; font-size: 24px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
         
-        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #BDC3C7; background: #FFFFFF; color: #111111; border-radius: 8px; font-size: 15px; margin-bottom: 5px; outline: none; transition: 0.3s; }
+        /* Lokasi Asal (Disederhanakan di barisan atas) */
+        .origin-section { background: #FFFFFF; padding: 15px; border-radius: 10px; border: 2px solid #BDC3C7; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+        .origin-section label { display: block; font-size: 13px; font-weight: bold; color: #8B0000; margin-bottom: 8px; text-transform: uppercase;}
+        .origin-select { width: 100%; padding: 10px; border: 2px solid #D4AF37; border-radius: 6px; font-size: 15px; font-weight: bold; color: #111; cursor: pointer; outline: none; background: #F9F9F9;}
+        
+        .search-divider { height: 2px; background: #D4AF37; margin: 10px 0 20px 0; border-radius: 2px; }
+
+        /* Lokasi Tujuan */
+        .target-label { font-size: 14px; font-weight: bold; color: #8B0000; margin-bottom: 8px; text-transform: uppercase; }
+        .search-box { width: 100%; padding: 12px 15px; border: 2px solid #BDC3C7; background: #FFFFFF; color: #111111; border-radius: 8px; font-size: 15px; margin-bottom: 15px; outline: none; transition: 0.3s; }
         .search-box:focus { border-color: #8B0000; box-shadow: 0 0 8px rgba(139, 0, 0, 0.4); }
 
-        /* Tombol Pilihan (Kontras saat hover disesuaikan) */
+        .tujuan-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; flex: 1; }
+        .tujuan-list::-webkit-scrollbar { width: 6px; }
+        .tujuan-list::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 3px; }
+
         .btn-pilihan { 
             background: #FFFFFF; color: #111111; padding: 14px; border: 2px solid #BDC3C7; 
             border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; 
-            transition: all 0.25s ease; text-align: left; display: flex; flex-direction: column; gap: 5px; 
+            transition: all 0.25s ease; text-align: left; display: flex; flex-direction: column; gap: 6px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
         }
         .btn-pilihan .span-nomor { color: #8B0000; font-weight: 900; margin-right: 5px; transition: color 0.25s; }
         .btn-pilihan .nama-tujuan { transition: color 0.25s; }
         
-        .btn-pilihan:hover { 
-            background: #8B0000; color: #FFFFFF; border-color: #D4AF37; 
-            transform: translateY(-2px); box-shadow: 0 6px 14px rgba(139, 0, 0, 0.4); 
-        }
+        .btn-pilihan:hover { background: #8B0000; color: #FFFFFF; border-color: #D4AF37; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(139, 0, 0, 0.4); }
         .btn-pilihan:hover .span-nomor { color: #FFD700; }
         .btn-pilihan:hover .nama-tujuan { color: #FFFFFF; }
         
-        .badge-akses { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; transition: 0.25s; }
+        .badge-akses { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; width: fit-content; transition: 0.25s; text-transform: uppercase;}
         .badge-pengunjung { background: #27ae60; color: #FFFFFF; }
         .badge-non { background: #111111; color: #D4AF37; }
         .btn-pilihan:hover .badge-akses { border: 1px solid #FFFFFF; }
 
         /* ------------------------------------------- */
-        /* AREA PETA & PERBAIKAN ROTASI/SHRINK-WRAP */
+        /* AREA PETA (BRING TO FRONT) */
         /* ------------------------------------------- */
         .map-view { 
             flex: 3; position: relative; display: flex; justify-content: center; align-items: center; 
-            padding: 20px; overflow: hidden;
-            background-color: #1A1A1A; 
+            padding: 20px; overflow: hidden; background-color: #1A1A1A; z-index: 50;
             background-image: 
                 repeating-linear-gradient(to right, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
                 repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(255,255,255,0.02) 80px, rgba(255,255,255,0.02) 81px);
@@ -90,52 +91,42 @@
         .no-map-warning {
             position: absolute; text-align: center; color: #D4AF37; font-weight: bold; font-size: 24px;
             background: rgba(17, 17, 17, 0.92); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            border: 2px dashed #8B0000; z-index: 50; display: none; line-height: 1.5;
+            border: 2px dashed #8B0000; z-index: 150; display: none; line-height: 1.5;
         }
 
-        /* Pembungkus Dinamis (Memeluk persis ukuran piksel gambar) */
         .map-wrapper { 
             position: relative; display: inline-block; line-height: 0;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7); border-radius: 10px; background: transparent;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
-            transform-style: preserve-3d; transform-origin: center center;
+            transform-style: preserve-3d; transform-origin: center center; z-index: 60;
         }
         .map-wrapper img { 
             display: none; max-width: 90vw; max-height: 85vh; width: auto; height: auto; 
-            border-radius: 10px; pointer-events: none; border: 2px solid #D4AF37;
+            border-radius: 10px; pointer-events: none; border: 2px solid #D4AF37; background: #fff;
         }
-        
-        /* ------------------------------------------- */
-        /* ELEMEN HOTSPOT & TOOLTIP */
-        /* ------------------------------------------- */
-        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
+
+        /* Hotspot Overlay */
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 70; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
         #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; }
 
-        .hotspot { 
-            position: absolute; background: rgba(212, 175, 55, 0.35); border: 2px dashed #D4AF37; 
-            cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 10; line-height: normal; 
-        }
-        .hotspot:hover { 
-            background: rgba(139, 0, 0, 0.65); border-color: #FFD700; 
-            transform: scale(1.03); z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.6); 
-        }
+        .hotspot { position: absolute; background: rgba(212, 175, 55, 0.25); border: 2px dashed #D4AF37; cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 75; line-height: normal; }
+        .hotspot:hover { background: rgba(139, 0, 0, 0.5); border-color: #FFD700; transform: scale(1.03); z-index: 80; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+        
+        /* Label Nomor: Hitam Putih */
         .hotspot-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            min-width: 22px; padding: 2px 4px; background: rgba(17,17,17,0.9); color: #D4AF37; 
-            border: 1px solid #D4AF37; border-radius: 4px; font-size: 12px; font-weight: bold; 
+            min-width: 24px; padding: 3px 5px; background: #FFFFFF; color: #000000; 
+            border: 2px solid #000000; border-radius: 4px; font-size: 13px; font-weight: 900; 
             line-height: 1; text-align: center; pointer-events: none; 
         }
+        
         .hotspot-tooltip { 
             position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); 
             background: #111111; color: #E0E0E0; padding: 6px 10px; border-radius: 6px; 
             font-size: 13px; font-weight: bold; white-space: nowrap; pointer-events: none; 
-            opacity: 0; visibility: hidden; transition: 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
-            border: 1px solid #8B0000;
+            opacity: 0; visibility: hidden; transition: 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #8B0000; z-index: 90;
         }
-        .hotspot-tooltip::after { 
-            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; 
-            border-width: 5px; border-style: solid; border-color: #8B0000 transparent transparent transparent; 
-        }
+        .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #8B0000 transparent transparent transparent; }
         .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
 
         /* ------------------------------------------- */
@@ -144,7 +135,7 @@
         .map-controls-hud { 
             position: absolute; bottom: 25px; left: 25px; background: rgba(17, 17, 17, 0.9); 
             padding: 14px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.7); 
-            display: flex; flex-direction: column; gap: 10px; z-index: 900; 
+            display: flex; flex-direction: column; gap: 10px; z-index: 150; 
             backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 220px;
         }
         .map-controls-hud h4 { color: #D4AF37; margin: 0; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
@@ -158,19 +149,20 @@
         .btn-map-control:hover { background: #D4AF37; color: #111111; box-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
         .btn-map-control.active { background: #8B0000; color: #D4AF37; border-color: #D4AF37; }
         .btn-zoom { font-size: 16px; background: #262626; color: #E0E0E0; border-color: #444; }
+        .btn-zoom:hover { background: #D4AF37; color: #111;}
 
-        /* Tombol Top Right Umum */
+        /* Tombol Top Right & Bottom Right Umum */
         .btn-cpanel { 
             position: absolute; top: 20px; right: 20px; background: #1A1A1A; color: #D4AF37; 
             border: 2px solid #555; padding: 10px 22px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; z-index: 900; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer; z-index: 150; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .btn-cpanel:hover { background: #D4AF37; color: #111111; border-color: #111111; }
         
         .btn-hud-tanya { 
             position: absolute; bottom: 25px; right: 25px; background: #8B0000; color: #D4AF37; 
             border: 2px solid #D4AF37; padding: 14px 24px; border-radius: 30px; font-weight: bold; 
-            font-size: 16px; cursor: pointer; z-index: 900; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
+            font-size: 16px; cursor: pointer; z-index: 150; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
             transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
         .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
@@ -179,18 +171,20 @@
         .admin-panel { 
             position: fixed; top: 0; right: -500px; width: 500px; height: 100%; 
             background: #111111; color: #E0E0E0; box-shadow: -5px 0 25px rgba(0,0,0,0.85); 
-            z-index: 2500; transition: right 0.4s ease-in-out; padding: 25px; 
+            z-index: 3500; transition: right 0.4s ease-in-out; padding: 25px; 
             overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;
         }
         .admin-panel.open { right: 0; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
-        .btn-close-admin { background: none; border: none; color: #D4AF37; font-size: 26px; cursor: pointer; }
-        .admin-section { background: #1A1A1A; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #333; }
+        .btn-close-admin { background: none; border: none; color: #D4AF37; font-size: 26px; cursor: pointer; transition: 0.2s;}
+        .btn-close-admin:hover { color: #E0E0E0; transform: scale(1.1);}
+        
+        .admin-section { background: #1A1A1A; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #333;}
         .admin-section h3 { color: #D4AF37; font-size: 15px; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px;}
         .admin-section label { font-size: 13px; color: #C0C0C0; }
         .admin-section input, .admin-section select, .admin-section textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #262626; color: #E0E0E0; font-family: inherit; margin-bottom: 5px;}
         .admin-section input:focus, .admin-section select:focus { outline: none; border-color: #D4AF37; }
-
+        
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
         
@@ -208,34 +202,61 @@
         .data-item:hover { background: #262626; }
         .data-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #E0E0E0;}
         .data-item-actions { display: flex; gap: 5px; }
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 3px; border-radius: 3px; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 3px; border-radius: 3px; transition: 0.2s;}
         .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
-        .sync-loader { font-size: 12px; color: #D4AF37; font-style: italic; display: none; }
 
-        /* Tombol Aksi */
-        .btn-primary { background: #8B0000; color: #E0E0E0; border: 2px solid transparent; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.25s;}
+        /* Tombol Aksi Utama (Popup) */
+        .btn-primary { background: #8B0000; color: #E0E0E0; border: 2px solid transparent; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.25s;}
         .btn-primary:hover { background: #D4AF37; color: #111111; border-color: #8B0000; }
         .btn-danger { background: #111111; color: #D4AF37; border: 2px solid #D4AF37; }
         .btn-danger:hover { background: #D4AF37; color: #111111; }
+        .btn-success { background: #27ae60; color: #111111; border: 2px solid transparent; }
+        .btn-success:hover { background: #D4AF37; color: #111111; border-color: #27ae60;}
+        
+        .btn-evakuasi { background: #e84118; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(232, 65, 24, 0.4); transition: 0.3s;}
+        .btn-evakuasi:hover { background: #c23616; transform: scale(1.02); }
+
+        .btn-group-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-group-row button { flex: 1; margin: 0;}
 
         /* Popups */
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
         .popup-content { background: #F0F0F0; color: #111111; padding: 30px; border-radius: 15px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 3px solid #8B0000; animation: slideDown 0.3s ease; }
+        
         .login-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px;}
         .login-box select, .login-box input { padding: 12px; border-radius: 6px; border: 1.5px solid #BDC3C7; background: #FFFFFF; font-size: 15px; color: #111111; }
+        .login-box select:focus, .login-box input:focus { border-color: #8B0000; outline: none; }
+        
         .sign-image { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin: 15px 0; border: 3px solid #D4AF37; }
-        .instruksi-teks { font-size: 20px; font-weight: bold; color: #8B0000; line-height: 1.4; }
+        .instruksi-teks { font-size: 18px; font-weight: bold; color: #8B0000; line-height: 1.4; padding: 0 10px;}
         
         .chat-area { height: 230px; background: #FFFFFF; border-radius: 8px; padding: 15px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #BDC3C7; }
-        .chat-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .chat-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; font-size: 14px; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
         .chat-user { background: #8B0000; color: #E0E0E0; margin-left: auto; border-bottom-right-radius: 2px; }
         .chat-bot { background: #E0E0E0; color: #111111; border-bottom-left-radius: 2px; font-weight: 600;}
-        .btn-mic { background: #8B0000; color: #D4AF37; border: 2px solid #D4AF37; padding: 15px; border-radius: 50%; cursor: pointer; width: 65px; height: 65px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; transition: 0.3s; }
-        .btn-mic.recording { background: #D4AF37; color: #8B0000; animation: pulseMic 1s infinite; }
+        
+        .btn-mic { background: #8B0000; color: #D4AF37; border: 2px solid #D4AF37; padding: 15px; border-radius: 50%; cursor: pointer; width: 65px; height: 65px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; transition: 0.3s; box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);}
+        .btn-mic.recording { background: #D4AF37; color: #8B0000; border-color: #8B0000; animation: pulseMic 1s infinite; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { transform: scale(1); } }
+
+        /* ------------------------------------------- */
+        /* RESPONSIVE DESIGN (HP & TABLET)             */
+        /* ------------------------------------------- */
+        @media (max-width: 950px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; max-width: 100%; height: 35vh; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
+            .map-view { width: 100%; height: 65vh; padding: 10px; z-index: 50;}
+            
+            .map-controls-hud { bottom: 10px; left: 10px; padding: 10px; width: 160px; }
+            .map-controls-hud h4 { font-size: 10px; }
+            .btn-map-control { padding: 6px; font-size: 11px; }
+            .btn-cpanel { top: 10px; right: 10px; padding: 8px 15px; font-size: 12px; }
+            .btn-hud-tanya { bottom: 10px; right: 10px; padding: 10px 18px; font-size: 14px; }
+            .tujuan-list { max-height: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -249,34 +270,32 @@
     </div>
 
     <div class="app-container">
-        <!-- Panel Kiri (Navigasi Pengunjung) -->
+        <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
         <div class="sidebar">
-            <h2 class="header-title">🏥 Navigasi Digital</h2>
+            <h2 class="header-title">🗺️ Navigasi Pintar</h2>
             
-            <div id="step-1" class="step-panel">
-                <div class="step-title">📍 LOKASI ANDA SAAT INI</div>
-                <div id="container-lokasi-asal" style="display: flex; flex-direction: column; gap: 10px; padding-top: 10px;"></div>
+            <div class="origin-section">
+                <label>📍 LOKASI ANDA SAAT INI:</label>
+                <select id="select-lokasi-asal" class="origin-select" onchange="setLokasiAsal()"></select>
             </div>
+            
+            <div class="search-divider"></div>
 
-            <div id="step-2" class="step-panel">
-                <div class="step-title" style="background:#8B0000; border-left:none; border-bottom: 3px solid #D4AF37;">🎯 LOKASI TUJUAN</div>
-                <div id="lokasi-anda-info" style="margin-bottom: 5px; font-weight: bold; color: #555;">Dari: -</div>
-                
-                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / gedung..." onkeyup="filterTujuan()">
+            <label class="target-label">🎯 CARI RUANGAN TUJUAN:</label>
+            <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Ketik nama ruangan / poli..." onkeyup="filterTujuan()">
 
-                <div id="container-tujuan" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 5px; max-height: 55vh;"></div>
-                <button class="btn-primary btn-danger" onclick="batalPilih()">Batal / Kembali</button>
-            </div>
+            <div id="container-tujuan" class="tujuan-list"></div>
         </div>
 
         <!-- Area Denah Interaktif -->
         <div class="map-view" id="map-container-view">
+            
             <div class="no-map-warning" id="no-map-warning">
                 ⚠️ GAMBAR PETA TIDAK TERSEDIA<br>
-                <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel (Superadmin).</span>
+                <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- HUD Kontrol Tampilan (Zoom & Rotasi Menyatu) -->
+            <!-- HUD Kontrol Tampilan -->
             <div class="map-controls-hud">
                 <h4>Zoom Peta</h4>
                 <div class="control-row">
@@ -305,7 +324,6 @@
             </div>
         </div>
         
-        <!-- Tombol Aksi Mengambang -->
         <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
         <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
     </div>
@@ -321,12 +339,12 @@
                 </select>
                 <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12">
                 <button class="btn-primary" onclick="prosesLogin()">LOGIN</button>
-                <button class="btn-primary btn-danger" style="margin-top:0;" onclick="tutupModal('login-modal')">Batal</button>
+                <button class="btn-primary btn-danger" style="margin-top:10px;" onclick="tutupModal('login-modal')">❌ Batal</button>
             </div>
         </div>
     </div>
 
-    <!-- PANEL C-PANEL -->
+    <!-- PANEL C-PANEL ADMIN -->
     <div class="admin-panel" id="panel-cpanel">
         <div class="admin-header">
             <h2>⚙️ Control Panel</h2>
@@ -428,7 +446,7 @@
         </div>
     </div>
 
-    <!-- MODAL POPUPS -->
+    <!-- MODAL POPUPS PENGUNJUNG -->
     <div class="popup-overlay" id="qa-modal">
         <div class="popup-content" style="max-width: 480px;">
             <h2 style="color: #8B0000; margin-bottom: 10px;">💬 Tanya Jawab Cepat</h2>
@@ -436,34 +454,59 @@
                 <div class="chat-bubble chat-bot">Halo! Ada yang bisa saya bantu informasikan?</div>
             </div>
             <button class="btn-mic" id="btn-qa-rekam" onclick="toggleQARekam()">🎤</button>
-            <button class="btn-primary btn-danger" style="margin-top:15px;" onclick="tutupModal('qa-modal')">Tutup</button>
+            <button class="btn-primary btn-danger" style="margin-top:15px;" onclick="tutupModal('qa-modal')">❌ Tutup</button>
         </div>
     </div>
 
-    <div class="popup-overlay" id="hotspot-info-popup">
-        <div class="popup-content" style="max-width: 440px;">
-            <h2 style="color: #D4AF37; margin-bottom: 5px;">🏢 Informasi Area</h2>
-            <h3 id="hs-info-nama" style="font-size: 22px; color: #8B0000; margin-bottom: 18px; font-weight: 800;">Nama Bangunan</h3>
-            <div id="hs-info-action"></div>
-            <button class="btn-primary btn-danger" style="margin-top:12px;" onclick="tutupModal('hotspot-info-popup')">Tutup</button>
-        </div>
-    </div>
-
+    <!-- POPUP NAVIGASI RUTE UTAMA (Khusus Rute Tujuan) -->
     <div class="popup-overlay" id="nav-popup">
         <div class="popup-content">
-            <h2 style="color: #8B0000; margin-bottom: 12px;">Petunjuk Jalur Evakuasi</h2>
+            <h2 style="color: #8B0000; margin-bottom: 12px; border-bottom: 2px solid #D4AF37; padding-bottom: 10px;">📍 Rute Navigasi Tujuan</h2>
+            
             <div class="instruksi-teks" id="teks-instruksi"></div>
             <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
-            <button class="btn-primary" style="background:#D4AF37; color:#111; font-weight:900;" onclick="telahSampai()">✅ SAYA SUDAH SAMPAI</button>
+            
+            <!-- Tombol Opsional Evakuasi -->
+            <button class="btn-evakuasi" onclick="putarEvakuasi()">🚨 Lihat Instruksi Evakuasi Darurat</button>
+
+            <div class="btn-group-row">
+                <button class="btn-primary btn-success" style="font-weight:900;" onclick="telahSampai()">✅ SAYA SUDAH SAMPAI</button>
+                <button class="btn-primary btn-danger" onclick="tutupModal('nav-popup')">❌ TUTUP</button>
+            </div>
         </div>
     </div>
 
+    <!-- POPUP EVAKUASI DARURAT KHUSUS -->
+    <div class="popup-overlay" id="evakuasi-popup">
+        <div class="popup-content" style="border-color: #e84118;">
+            <h2 style="color: #e84118; margin-bottom: 15px; border-bottom: 2px solid #e84118; padding-bottom: 10px; font-size: 26px;">🚨 INSTRUKSI EVAKUASI DARURAT</h2>
+            
+            <div class="instruksi-teks" style="color: #111; font-weight: 600; font-size: 18px; text-align: left;">
+                <p style="margin-bottom: 10px;">Telah terjadi keadaan darurat. Harap tenang dan jangan panik.</p>
+                <ul style="padding-left: 20px; line-height: 1.6;">
+                    <li>Dari lokasi Anda saat ini, ikuti <b style="color:#27ae60;">jalur evakuasi warna HIJAU</b> menuju Titik Kumpul terdekat.</li>
+                    <li>Jika Anda sedang membawa pasien/korban, ikuti <b style="color:#D4AF37;">jalur evakuasi warna KUNING</b> langsung menuju IGD.</li>
+                    <li>Perhatikan rambu <b style="color:#8B0000;">TITIK KUMPUL</b> dan kotak <b style="color:#8B0000;">APAR</b> di sepanjang dinding lorong.</li>
+                </ul>
+                <p style="margin-top: 10px; color: #8B0000; text-align: center; font-weight: 900; font-size: 20px;">JANGAN BERLARI, SELAMATKAN DIRI ANDA!</p>
+            </div>
+
+            <div class="btn-group-row" style="margin-top: 25px;">
+                <button class="btn-primary btn-danger" onclick="tutupModal('evakuasi-popup')" style="border-color: #e84118; color: #e84118;">❌ TUTUP INSTRUKSI</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP SURVEY -->
     <div class="popup-overlay" id="survey-popup">
         <div class="popup-content">
             <h2 style="color: #D4AF37; margin-bottom: 10px;">Terima Kasih! 🎉</h2>
             <textarea id="ulasan-teks" style="width: 100%; height: 90px; padding: 12px; border-radius: 8px; border: 2px solid #C0C0C0; resize:none; margin-bottom:10px;" placeholder="Tuliskan ulasan Anda atau gunakan suara..."></textarea>
             <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()">🎤</button>
-            <button class="btn-primary" style="margin-top:15px;" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
+            <div class="btn-group-row" style="margin-top: 20px;">
+                <button class="btn-primary" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
+                <button class="btn-primary btn-danger" onclick="tutupModal('survey-popup')">❌ TUTUP</button>
+            </div>
         </div>
     </div>
 
@@ -478,12 +521,26 @@
         let dataHotspots = []; 
         
         let editAsalName = null, editTujuanName = null, editHotspotId = null;
-        let lokasiAsal = "", lokasiTujuan = "";
+        let lokasiAsal = "";
 
         // ==========================================
-        // UTILS
+        // SMART NUMBER EXTRACTOR (Untuk Sorting)
         // ==========================================
-        window.tutupModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        function extractNumber(str) {
+            if (!str) return 9999;
+            const match = str.match(/\d+/);
+            return match ? parseInt(match[0]) : 9999;
+        }
+
+        // ==========================================
+        // UTILS & POPUP CONTROL
+        // ==========================================
+        window.tutupModal = function(id) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none'; 
+            window.speechSynthesis.cancel();
+        }
+        
         window.bicara = function(teks, callback) {
             window.speechSynthesis.cancel();
             let msg = new SpeechSynthesisUtterance(teks);
@@ -491,16 +548,13 @@
             if(callback) msg.onend = callback;
             window.speechSynthesis.speak(msg);
         }
-        window.tesSuara = function() { window.bicara("Tes sistem suara berhasil dijalankan."); }
+        window.tesSuara = function() { window.bicara("Sistem audio navigasi siap digunakan."); }
 
         // ==========================================
         // KONTROL PETA (ZOOM, PAN, ROTATE)
         // ==========================================
-        let modePeta = 'FLAT'; 
-        let rotasiPeta = 0;
-        let currentZoom = 1;
-        let panX = 0, panY = 0;
-        let isPanning = false, startPanX = 0, startPanY = 0;
+        let modePeta = 'FLAT', rotasiPeta = 0, currentZoom = 1;
+        let panX = 0, panY = 0, isPanning = false, startPanX = 0, startPanY = 0;
 
         window.aturModePeta = function(mode) {
             modePeta = mode;
@@ -543,31 +597,23 @@
             isPanning = true;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            startPanX = clientX - panX;
-            startPanY = clientY - panY;
-            mapView.style.cursor = 'grabbing';
-            mapWrapper.style.transition = 'none'; 
+            startPanX = clientX - panX; startPanY = clientY - panY;
+            mapView.style.cursor = 'grabbing'; mapWrapper.style.transition = 'none'; 
         }
         function doPan(e) {
             if(!isPanning) return;
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            panX = clientX - startPanX;
-            panY = clientY - startPanY;
+            panX = clientX - startPanX; panY = clientY - startPanY;
             terapkanTransformasiPeta();
         }
         function endPan() {
-            isPanning = false;
-            mapView.style.cursor = 'grab';
+            isPanning = false; mapView.style.cursor = 'grab';
             mapWrapper.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease';
         }
 
-        mapView.addEventListener('mousedown', startPan);
-        mapView.addEventListener('mousemove', doPan);
-        window.addEventListener('mouseup', endPan);
-        mapView.addEventListener('touchstart', startPan, {passive: true});
-        mapView.addEventListener('touchmove', doPan, {passive: true});
-        window.addEventListener('touchend', endPan);
+        mapView.addEventListener('mousedown', startPan); mapView.addEventListener('mousemove', doPan); window.addEventListener('mouseup', endPan);
+        mapView.addEventListener('touchstart', startPan, {passive: true}); mapView.addEventListener('touchmove', doPan, {passive: true}); window.addEventListener('touchend', endPan);
 
         // ==========================================
         // FETCH DATA SUPABASE
@@ -577,48 +623,55 @@
                 document.getElementById('sync-indicator').style.display = 'block';
 
                 const { data: set } = await supabase.from('app_settings').select('*').eq('id', 1).single();
-                if (set) {
-                    systemPIN = set.pin;
-                    settingTTS.volume = parseFloat(set.tts_volume);
-                    settingTTS.rate = parseFloat(set.tts_rate);
-                }
+                if (set) { systemPIN = set.pin; settingTTS.volume = parseFloat(set.tts_volume); settingTTS.rate = parseFloat(set.tts_rate); }
 
                 const { data: mapData } = await supabase.from('map_image').select('*').eq('id', 1).single();
                 const imgEl = document.getElementById('main-map-image');
                 const warnEl = document.getElementById('no-map-warning');
-                const upCont = document.getElementById('upload-map-container');
-                const btnDel = document.getElementById('btn-hapus-peta');
-                const statusTxt = document.getElementById('map-status');
                 
                 if (mapData && mapData.image_url) {
-                    imgEl.src = mapData.image_url;
-                    imgEl.style.display = 'block';
-                    warnEl.style.display = 'none'; upCont.style.display = 'none'; btnDel.style.display = 'block';
-                    statusTxt.innerText = "Peta cloud aktif digunakan.";
+                    imgEl.src = mapData.image_url; imgEl.style.display = 'block'; warnEl.style.display = 'none';
+                    document.getElementById('upload-map-container').style.display = 'none';
+                    document.getElementById('btn-hapus-peta').style.display = 'block';
+                    document.getElementById('map-status').innerText = "Peta cloud aktif digunakan.";
                 } else {
-                    imgEl.style.display = 'none';
-                    warnEl.style.display = 'block'; upCont.style.display = 'block'; btnDel.style.display = 'none';
-                    statusTxt.innerText = "Peta belum diunggah.";
+                    imgEl.style.display = 'none'; warnEl.style.display = 'block';
+                    document.getElementById('upload-map-container').style.display = 'block';
+                    document.getElementById('btn-hapus-peta').style.display = 'none';
+                    document.getElementById('map-status').innerText = "Peta belum diunggah.";
                 }
 
-                const { data: asal } = await supabase.from('lokasi_asal').select('nama_lokasi').order('created_at', { ascending: true });
-                if (asal) dataLokasiAsal = asal.map(a => a.nama_lokasi);
+                // Ambil Asal
+                const { data: asal } = await supabase.from('lokasi_asal').select('nama_lokasi');
+                if (asal) {
+                    dataLokasiAsal = asal.map(a => a.nama_lokasi);
+                    dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b)); // Urut Cerdas
+                }
 
-                const { data: tujuan } = await supabase.from('lokasi_tujuan').select('*').order('nama_lokasi', { ascending: true });
+                // Ambil Tujuan
+                const { data: tujuan } = await supabase.from('lokasi_tujuan').select('*');
                 if (tujuan) {
                     dataRute = {};
                     tujuan.forEach(t => { dataRute[t.nama_lokasi] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor }; });
                 }
 
-                const { data: hotspots } = await supabase.from('map_hotspots').select('*').order('created_at', { ascending: true });
-                if (hotspots) dataHotspots = hotspots;
+                // Ambil Hotspot
+                const { data: hotspots } = await supabase.from('map_hotspots').select('*');
+                if (hotspots) {
+                    dataHotspots = hotspots;
+                    dataHotspots.sort((a,b) => {
+                        let numA = parseInt(a.nomor) || extractNumber(a.nama_bangunan);
+                        let numB = parseInt(b.nomor) || extractNumber(b.nama_bangunan);
+                        if (numA === numB) return a.nama_bangunan.localeCompare(b.nama_bangunan);
+                        return numA - numB;
+                    });
+                }
 
                 // Update Landing Status
                 document.getElementById('loading-text').innerText = "Data Siap! Sentuh Layar Untuk Memulai";
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
                 
-                renderHotspotsToMap();
-                renderAllAdminLists();
+                renderHotspotsToMap(); renderAllAdminLists();
                 document.getElementById('sync-indicator').style.display = 'none';
             } catch (error) {
                 console.error(error);
@@ -631,278 +684,118 @@
         window.onload = fetchAllDataSupabase;
 
         // ==========================================
-        // C-PANEL: RENDER LISTS
+        // C-PANEL: RENDER LISTS & CRUD (SAMA)
         // ==========================================
         function renderAllAdminLists() {
-            const listAsal = document.getElementById('list-asal');
-            listAsal.innerHTML = '';
+            const listAsal = document.getElementById('list-asal'); listAsal.innerHTML = '';
             dataLokasiAsal.forEach(nama => {
-                listAsal.innerHTML += `
-                    <div class="data-item">
-                        <div class="data-item-name">${nama}</div>
-                        <div class="data-item-actions">
-                            <button class="action-btn" title="Edit" onclick="editFormAsal('${nama}')">✏️</button>
-                            <button class="action-btn" title="Hapus" onclick="hapusAsal('${nama}')">🗑️</button>
-                        </div>
-                    </div>`;
+                listAsal.innerHTML += `<div class="data-item"><div class="data-item-name">${nama}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormAsal('${nama}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusAsal('${nama}')">🗑️</button></div></div>`;
             });
 
-            const listTujuan = document.getElementById('list-tujuan');
-            listTujuan.innerHTML = '';
-            for (let nama in dataRute) {
-                listTujuan.innerHTML += `
-                    <div class="data-item">
-                        <div class="data-item-name">${nama} <span style="font-size:10px; color:#D4AF37;">(${dataRute[nama].akses})</span></div>
-                        <div class="data-item-actions">
-                            <button class="action-btn" title="Edit" onclick="editFormTujuan('${nama}')">✏️</button>
-                            <button class="action-btn" title="Hapus" onclick="hapusTujuan('${nama}')">🗑️</button>
-                        </div>
-                    </div>`;
-            }
+            const listTujuan = document.getElementById('list-tujuan'); listTujuan.innerHTML = '';
+            let tujuanKeys = Object.keys(dataRute);
+            tujuanKeys.sort((a, b) => {
+                let numA = parseInt(dataRute[a].nomor) || extractNumber(a);
+                let numB = parseInt(dataRute[b].nomor) || extractNumber(b);
+                if(numA === numB) return a.localeCompare(b);
+                return numA - numB;
+            });
+            tujuanKeys.forEach(nama => {
+                listTujuan.innerHTML += `<div class="data-item"><div class="data-item-name">${nama} <span style="font-size:10px; color:#D4AF37;">(${dataRute[nama].akses})</span></div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormTujuan('${nama}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusTujuan('${nama}')">🗑️</button></div></div>`;
+            });
 
-            const listHotspot = document.getElementById('list-hotspot');
-            const selectTarget = document.getElementById('hs-target');
-            listHotspot.innerHTML = '';
+            const listHotspot = document.getElementById('list-hotspot'); const selectTarget = document.getElementById('hs-target'); listHotspot.innerHTML = '';
             dataHotspots.forEach(hs => {
-                listHotspot.innerHTML += `
-                    <div class="data-item">
-                        <div class="data-item-name">${hs.nomor ? `[${hs.nomor}] ` : ''}${hs.nama_bangunan}</div>
-                        <div class="data-item-actions">
-                            <button class="action-btn" title="Edit" onclick="editFormHotspot('${hs.id}')">✏️</button>
-                            <button class="action-btn" title="Hapus" onclick="hapusHotspot('${hs.id}')">🗑️</button>
-                        </div>
-                    </div>`;
+                listHotspot.innerHTML += `<div class="data-item"><div class="data-item-name">${hs.nomor ? `[${hs.nomor}] ` : ''}${hs.nama_bangunan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormHotspot('${hs.id}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusHotspot('${hs.id}')">🗑️</button></div></div>`;
             });
-
             selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Label Info) --</option>';
-            for (let nama in dataRute) { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; }
+            tujuanKeys.forEach(nama => { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; });
         }
 
-        // ==========================================
-        // C-PANEL: CRUD LOGIC
-        // ==========================================
-        window.resetFormAsal = function() {
-            editAsalName = null;
-            document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]";
-            document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru";
-            document.getElementById('admin-nama-asal').value = "";
-        }
-        window.editFormAsal = function(nama) {
-            editAsalName = nama;
-            document.getElementById('label-mode-asal').innerText = "Mode: [ EDIT DATA ]";
-            document.getElementById('btn-save-asal').innerText = "💾 Update Data";
-            document.getElementById('admin-nama-asal').value = nama;
-        }
+        window.resetFormAsal = function() { editAsalName = null; document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru"; document.getElementById('admin-nama-asal').value = ""; }
+        window.editFormAsal = function(nama) { editAsalName = nama; document.getElementById('label-mode-asal').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-asal').innerText = "💾 Update Data"; document.getElementById('admin-nama-asal').value = nama; }
         window.simpanDataAsalSupabase = async function() {
-            const namaBaru = document.getElementById('admin-nama-asal').value.trim();
-            if (!namaBaru) return alert("Nama tidak boleh kosong!");
-            if (editAsalName) await supabase.from('lokasi_asal').update({ nama_lokasi: namaBaru }).eq('nama_lokasi', editAsalName);
-            else await supabase.from('lokasi_asal').insert([{ nama_lokasi: namaBaru }]);
+            const n = document.getElementById('admin-nama-asal').value.trim(); if (!n) return alert("Kosong!");
+            if (editAsalName) await supabase.from('lokasi_asal').update({ nama_lokasi: n }).eq('nama_lokasi', editAsalName);
+            else await supabase.from('lokasi_asal').insert([{ nama_lokasi: n }]);
             window.resetFormAsal(); await fetchAllDataSupabase();
         }
-        window.hapusAsal = async function(nama) {
-            if(confirm(`Hapus lokasi asal "${nama}"?`)) { await supabase.from('lokasi_asal').delete().eq('nama_lokasi', nama); await fetchAllDataSupabase(); }
-        }
+        window.hapusAsal = async function(n) { if(confirm(`Hapus ${n}?`)) { await supabase.from('lokasi_asal').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
 
-        window.resetFormTujuan = function() {
-            editTujuanName = null;
-            document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]";
-            document.getElementById('btn-save-tujuan').innerText = "➕ Tambah Rute Baru";
-            document.getElementById('admin-nama-lokasi').value = "";
-            document.getElementById('admin-rute').value = "";
-            document.getElementById('admin-tanda').value = "";
-        }
-        window.editFormTujuan = function(nama) {
-            editTujuanName = nama; const data = dataRute[nama];
-            document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]";
-            document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute";
-            document.getElementById('admin-nama-lokasi').value = nama;
-            document.getElementById('admin-akses').value = data.akses;
-            document.getElementById('admin-rute').value = data.instruksi;
-            document.getElementById('admin-tanda').value = data.gambarTanda;
-        }
+        window.resetFormTujuan = function() { editTujuanName = null; document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-tujuan').innerText = "➕ Simpan Rute"; document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = ""; }
+        window.editFormTujuan = function(nama) { editTujuanName = nama; const d = dataRute[nama]; document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute"; document.getElementById('admin-nama-lokasi').value = nama; document.getElementById('admin-akses').value = d.akses; document.getElementById('admin-rute').value = d.instruksi; document.getElementById('admin-tanda').value = d.gambarTanda; }
         window.simpanDataRuteSupabase = async function() {
-            const nama = document.getElementById('admin-nama-lokasi').value.trim();
-            const akses = document.getElementById('admin-akses').value;
-            const rute = document.getElementById('admin-rute').value.trim();
-            const tanda = document.getElementById('admin-tanda').value.trim();
-
-            if (!nama || !rute || !tanda) return alert("Lengkapi data form!");
-            const payload = { nama_lokasi: nama, akses: akses, instruksi: rute, gambar_tanda: tanda };
-
-            if (editTujuanName && editTujuanName !== nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            else if (editTujuanName === nama) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            const n = document.getElementById('admin-nama-lokasi').value.trim(); const a = document.getElementById('admin-akses').value; const r = document.getElementById('admin-rute').value.trim(); const t = document.getElementById('admin-tanda').value.trim();
+            if (!n || !r || !t) return alert("Lengkapi data!"); const payload = { nama_lokasi: n, akses: a, instruksi: r, gambar_tanda: t };
+            if (editTujuanName && editTujuanName !== n) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else if (editTujuanName === n) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
             else await supabase.from('lokasi_tujuan').insert([payload]);
             window.resetFormTujuan(); await fetchAllDataSupabase();
         }
-        window.hapusTujuan = async function(nama) {
-            if(confirm(`Hapus lokasi tujuan "${nama}"?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', nama); await fetchAllDataSupabase(); }
-        }
+        window.hapusTujuan = async function(n) { if(confirm(`Hapus tujuan ${n}?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
 
         window.uploadPeta = async function() {
-            const fileInput = document.getElementById('map-file');
-            if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih berkas gambar denah terlebih dahulu!");
-            const file = fileInput.files[0]; const fileExt = file.name.split('.').pop();
-            const fileName = `map_${Date.now()}.${fileExt}`;
-            document.getElementById('map-status').innerText = "Mengunggah ke Cloud...";
-
-            const { error: uploadError } = await supabase.storage.from('maps').upload(fileName, file);
-            if(uploadError) { document.getElementById('map-status').innerText = "Gagal unggah!"; return alert("Gagal upload! Periksa Storage Policy Supabase."); }
-            const publicUrl = supabase.storage.from('maps').getPublicUrl(fileName).data.publicUrl;
-            await supabase.from('map_image').update({ image_url: publicUrl, file_path: fileName }).eq('id', 1);
+            const fi = document.getElementById('map-file'); if(!fi.files || fi.files.length === 0) return alert("Pilih berkas peta!");
+            const f = fi.files[0]; const ext = f.name.split('.').pop(); const fn = `map_${Date.now()}.${ext}`;
+            document.getElementById('map-status').innerText = "Mengunggah...";
+            const { error: e } = await supabase.storage.from('maps').upload(fn, f);
+            if(e) { document.getElementById('map-status').innerText = "Gagal!"; return alert("Gagal upload! Periksa Storage Policy."); }
+            const u = supabase.storage.from('maps').getPublicUrl(fn).data.publicUrl;
+            await supabase.from('map_image').update({ image_url: u, file_path: fn }).eq('id', 1);
             alert("Peta berhasil diunggah!"); fetchAllDataSupabase();
         }
-
         window.hapusPeta = async function() {
-            if(!confirm("Hapus berkas peta ini dari server?")) return;
+            if(!confirm("Hapus peta ini dari server?")) return;
             const { data } = await supabase.from('map_image').select('file_path').eq('id', 1).single();
             if(data && data.file_path) { await supabase.storage.from('maps').remove([data.file_path]); }
             await supabase.from('map_image').update({ image_url: null, file_path: null }).eq('id', 1);
-            alert("Peta berhasil dihapus!"); fetchAllDataSupabase();
+            alert("Peta dihapus!"); fetchAllDataSupabase();
         }
 
-        // ==========================================
-        // C-PANEL: GAMBAR AREA HOTSPOT
-        // ==========================================
-        let isDrawingArea = false, drawStartX = 0, drawStartY = 0;
-        let drawOverlay, drawBox, mapImg;
-
-        window.resetFormHotspot = function() {
-            editHotspotId = null;
-            document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]";
-            document.getElementById('btn-save-hs').innerText = "➕ Simpan";
-            document.getElementById('hs-nama').value = ""; document.getElementById('hs-target').value = "";
-            document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = "";
-            document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = "";
-            const preview = document.getElementById('hotspot-preview'); if(preview) preview.remove();
-        }
+        let isDrawingArea = false, drawStartX = 0, drawStartY = 0; let drawOverlay, drawBox, mapImg;
+        window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hs').innerText = "➕ Simpan"; document.getElementById('hs-nama').value = ""; document.getElementById('hs-target').value = ""; document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = ""; document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = ""; const p = document.getElementById('hotspot-preview'); if(p) p.remove(); }
         window.editFormHotspot = function(id) {
             editHotspotId = id; const hs = dataHotspots.find(h => h.id === id);
-            if(hs) {
-                document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]";
-                document.getElementById('btn-save-hs').innerText = "💾 Update";
-                document.getElementById('hs-nama').value = hs.nama_bangunan;
-                document.getElementById('hs-target').value = hs.target_lokasi || "";
-                document.getElementById('hs-top').value = hs.pos_top; document.getElementById('hs-left').value = hs.pos_left;
-                document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height;
-                window.previewHotspot();
-            }
+            if(hs) { document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hs').innerText = "💾 Update"; document.getElementById('hs-nama').value = hs.nama_bangunan; document.getElementById('hs-target').value = hs.target_lokasi || ""; document.getElementById('hs-top').value = hs.pos_top; document.getElementById('hs-left').value = hs.pos_left; document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height; window.previewHotspot(); }
         }
         window.simpanHotspotSupabase = async function() {
-            const nama = document.getElementById('hs-nama').value.trim();
-            const target = document.getElementById('hs-target').value;
-            const top = parseFloat(document.getElementById('hs-top').value);
-            const left = parseFloat(document.getElementById('hs-left').value);
-            const width = parseFloat(document.getElementById('hs-width').value);
-            const height = parseFloat(document.getElementById('hs-height').value);
-
-            if(!nama || isNaN(top) || isNaN(left) || isNaN(width) || isNaN(height)) return alert("Lengkapi form koordinat area!");
-            const payload = { nama_bangunan: nama, target_lokasi: target || null, pos_top: top, pos_left: left, width: width, height: height };
-            
-            if (editHotspotId) await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
-            else await supabase.from('map_hotspots').insert([payload]);
+            const n = document.getElementById('hs-nama').value.trim(); const t = document.getElementById('hs-target').value; const top = parseFloat(document.getElementById('hs-top').value); const left = parseFloat(document.getElementById('hs-left').value); const w = parseFloat(document.getElementById('hs-width').value); const h = parseFloat(document.getElementById('hs-height').value);
+            if(!n || isNaN(top) || isNaN(left) || isNaN(w) || isNaN(h)) return alert("Lengkapi form & koordinat!");
+            const p = { nama_bangunan: n, target_lokasi: t || null, pos_top: top, pos_left: left, width: w, height: h };
+            if (editHotspotId) await supabase.from('map_hotspots').update(p).eq('id', editHotspotId); else await supabase.from('map_hotspots').insert([p]);
             window.resetFormHotspot(); await fetchAllDataSupabase();
         }
-        window.hapusHotspot = async function(id) {
-            if(confirm("Hapus kotak area hotspot ini?")) { await supabase.from('map_hotspots').delete().eq('id', id); await fetchAllDataSupabase(); }
-        }
+        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot ini?")) { await supabase.from('map_hotspots').delete().eq('id', id); await fetchAllDataSupabase(); } }
 
         window.mulaiGambarHotspot = function() {
-            window.resetPosisiPeta(); 
-            drawOverlay = document.getElementById('draw-overlay');
-            drawBox = document.getElementById('draw-box');
-            mapImg = document.querySelector('.map-wrapper img');
-            
-            document.getElementById('panel-cpanel').classList.remove('open');
-            drawOverlay.style.display = 'block'; drawBox.style.display = 'none';
-            alert("Tarik kursor (klik & geser) di atas denah untuk membuat kotak batas area hotspot.");
+            window.resetPosisiPeta(); drawOverlay = document.getElementById('draw-overlay'); drawBox = document.getElementById('draw-box'); mapImg = document.querySelector('.map-wrapper img');
+            document.getElementById('panel-cpanel').classList.remove('open'); drawOverlay.style.display = 'block'; drawBox.style.display = 'none';
+            alert("Tarik kursor (klik & geser) di atas denah untuk mencetak area hotspot.");
         };
 
         window.previewHotspot = function() {
-            const top = document.getElementById('hs-top').value || 0;
-            const left = document.getElementById('hs-left').value || 0;
-            const width = document.getElementById('hs-width').value || 10;
-            const height = document.getElementById('hs-height').value || 10;
-
-            let previewDiv = document.getElementById('hotspot-preview');
-            if(!previewDiv) {
-                previewDiv = document.createElement('div');
-                previewDiv.id = 'hotspot-preview';
-                previewDiv.style.position = 'absolute';
-                previewDiv.style.background = 'rgba(212, 175, 55, 0.45)'; 
-                previewDiv.style.border = '2px solid #8B0000';
-                previewDiv.style.zIndex = '999';
-                document.getElementById('interactive-map').appendChild(previewDiv);
-            }
-            previewDiv.style.top = `${top}%`; previewDiv.style.left = `${left}%`;
-            previewDiv.style.width = `${width}%`; previewDiv.style.height = `${height}%`;
+            const top = document.getElementById('hs-top').value || 0; const left = document.getElementById('hs-left').value || 0; const w = document.getElementById('hs-width').value || 10; const h = document.getElementById('hs-height').value || 10;
+            let p = document.getElementById('hotspot-preview');
+            if(!p) { p = document.createElement('div'); p.id = 'hotspot-preview'; p.style.position = 'absolute'; p.style.background = 'rgba(212, 175, 55, 0.45)'; p.style.border = '2px solid #8B0000'; p.style.zIndex = '999'; document.getElementById('interactive-map').appendChild(p); }
+            p.style.top = `${top}%`; p.style.left = `${left}%`; p.style.width = `${w}%`; p.style.height = `${h}%`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('draw-overlay'); const box = document.getElementById('draw-box');
             function getEventPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
-
-            function sDraw(e) {
-                isDrawingArea = true; const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
-                drawStartX = ((pos.x - rect.left) / rect.width) * 100;
-                drawStartY = ((pos.y - rect.top) / rect.height) * 100;
-                drawStartX = Math.max(0, Math.min(100, drawStartX)); drawStartY = Math.max(0, Math.min(100, drawStartY));
-                box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%'; box.style.width = '0%'; box.style.height = '0%'; box.style.display = 'block';
-            }
-            function mDraw(e) {
-                if(!isDrawingArea) return; e.preventDefault(); 
-                const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect();
-                let currentX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100));
-                let currentY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100));
-                let left = Math.min(drawStartX, currentX); let top = Math.min(drawStartY, currentY);
-                let width = Math.abs(currentX - drawStartX); let height = Math.abs(currentY - drawStartY);
-                box.style.left = left + '%'; box.style.top = top + '%'; box.style.width = width + '%'; box.style.height = height + '%';
-            }
-            function eDraw(e) {
-                if(!isDrawingArea) return; isDrawingArea = false; overlay.style.display = 'none';
-                const finalWidth = parseFloat(box.style.width); const finalHeight = parseFloat(box.style.height);
-                if(finalWidth < 1 || finalHeight < 1) { document.getElementById('panel-cpanel').classList.add('open'); return; }
-                
-                document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2);
-                document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2);
-                document.getElementById('hs-width').value = finalWidth.toFixed(2);
-                document.getElementById('hs-height').value = finalHeight.toFixed(2);
-                
-                document.getElementById('panel-cpanel').classList.add('open'); window.previewHotspot();
-            }
-            overlay.addEventListener('mousedown', sDraw); overlay.addEventListener('mousemove', mDraw); overlay.addEventListener('mouseup', eDraw);
-            overlay.addEventListener('touchstart', sDraw, {passive: false}); overlay.addEventListener('touchmove', mDraw, {passive: false}); overlay.addEventListener('touchend', eDraw);
+            function sDraw(e) { isDrawingArea = true; const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect(); drawStartX = ((pos.x - rect.left) / rect.width) * 100; drawStartY = ((pos.y - rect.top) / rect.height) * 100; drawStartX = Math.max(0, Math.min(100, drawStartX)); drawStartY = Math.max(0, Math.min(100, drawStartY)); box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%'; box.style.width = '0%'; box.style.height = '0%'; box.style.display = 'block'; }
+            function mDraw(e) { if(!isDrawingArea) return; e.preventDefault(); const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect(); let cX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100)); let cY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100)); let left = Math.min(drawStartX, cX); let top = Math.min(drawStartY, cY); let w = Math.abs(cX - drawStartX); let h = Math.abs(cY - drawStartY); box.style.left = left + '%'; box.style.top = top + '%'; box.style.width = w + '%'; box.style.height = h + '%'; }
+            function eDraw(e) { if(!isDrawingArea) return; isDrawingArea = false; overlay.style.display = 'none'; const fW = parseFloat(box.style.width); const fH = parseFloat(box.style.height); if(fW < 1 || fH < 1) { document.getElementById('panel-cpanel').classList.add('open'); return; } document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2); document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2); document.getElementById('hs-width').value = fW.toFixed(2); document.getElementById('hs-height').value = fH.toFixed(2); document.getElementById('panel-cpanel').classList.add('open'); window.previewHotspot(); }
+            overlay.addEventListener('mousedown', sDraw); overlay.addEventListener('mousemove', mDraw); overlay.addEventListener('mouseup', eDraw); overlay.addEventListener('touchstart', sDraw, {passive: false}); overlay.addEventListener('touchmove', mDraw, {passive: false}); overlay.addEventListener('touchend', eDraw);
         });
 
-        // ==========================================
-        // C-PANEL UTILS & LOGIN
-        // ==========================================
         window.syncDataAdmin = function() { fetchAllDataSupabase(); }
         window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
-        window.prosesLogin = function() {
-            if (document.getElementById('login-pin').value === systemPIN) {
-                window.tutupModal('login-modal'); document.getElementById('panel-cpanel').classList.add('open');
-                document.getElementById('tts-volume').value = settingTTS.volume; document.getElementById('val-vol').innerText = settingTTS.volume;
-                document.getElementById('tts-rate').value = settingTTS.rate; document.getElementById('val-rate').innerText = settingTTS.rate;
-                renderAllAdminLists(); 
-            } else { alert("PIN Akses Salah!"); }
-        }
+        window.prosesLogin = function() { if (document.getElementById('login-pin').value === systemPIN) { window.tutupModal('login-modal'); document.getElementById('panel-cpanel').classList.add('open'); document.getElementById('tts-volume').value = settingTTS.volume; document.getElementById('val-vol').innerText = settingTTS.volume; document.getElementById('tts-rate').value = settingTTS.rate; document.getElementById('val-rate').innerText = settingTTS.rate; renderAllAdminLists(); } else { alert("PIN Akses Salah!"); } }
         window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
-        window.updateTTSUI = function() {
-            document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value;
-            document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value;
-        }
-        window.simpanPengaturanSupabase = async function() {
-            const vol = parseFloat(document.getElementById('tts-volume').value); const r = parseFloat(document.getElementById('tts-rate').value);
-            const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1);
-            if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan TTS Disimpan!"); }
-        }
-        window.resetPINSupabase = async function() {
-            const lama = document.getElementById('pin-lama').value; const baru = document.getElementById('pin-baru').value;
-            if (lama !== systemPIN) return alert("PIN Lama tidak sesuai!"); if (baru.length !== 12) return alert("PIN Baru wajib 12 karakter!");
-            const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
-            if(!error) { systemPIN = baru; alert("PIN berhasil diperbarui!"); document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = ""; }
-        }
+        window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
+        window.simpanPengaturanSupabase = async function() { const vol = parseFloat(document.getElementById('tts-volume').value); const r = parseFloat(document.getElementById('tts-rate').value); const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1); if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan TTS Disimpan!"); } }
+        window.resetPINSupabase = async function() { const lama = document.getElementById('pin-lama').value; const baru = document.getElementById('pin-baru').value; if (lama !== systemPIN) return alert("PIN Lama tidak sesuai!"); if (baru.length !== 12) return alert("PIN Baru wajib 12 karakter!"); const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1); if(!error) { systemPIN = baru; alert("PIN berhasil diperbarui!"); document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = ""; } }
 
         // ==========================================
         // APLIKASI PENGUNJUNG (NAVIGASI & UI)
@@ -912,26 +805,28 @@
             container.querySelectorAll('.hotspot').forEach(el => el.remove());
 
             dataHotspots.forEach(hs => {
-                const div = document.createElement('div');
-                div.className = 'hotspot';
+                const div = document.createElement('div'); div.className = 'hotspot';
                 div.style.top = `${hs.pos_top}%`; div.style.left = `${hs.pos_left}%`;
                 div.style.width = `${hs.width}%`; div.style.height = `${hs.height}%`;
                 div.id = `hs-${hs.id}`;
 
                 const tooltip = document.createElement('div'); tooltip.className = 'hotspot-tooltip'; tooltip.innerText = hs.nama_bangunan; div.appendChild(tooltip);
-                const label = document.createElement('div'); label.className = 'hotspot-label'; label.innerText = hs.nomor ?? '-'; div.appendChild(label);
+                
+                let namaTujuanTerkait = hs.target_lokasi;
+                let nomorTampil = hs.nomor || (namaTujuanTerkait && dataRute[namaTujuanTerkait] ? dataRute[namaTujuanTerkait].nomor : null);
+                
+                if(nomorTampil) {
+                    const label = document.createElement('div'); label.className = 'hotspot-label'; label.innerText = nomorTampil; div.appendChild(label);
+                }
 
                 div.onclick = () => {
-                    document.getElementById('hs-info-nama').innerText = hs.nama_bangunan;
-                    const actionContainer = document.getElementById('hs-info-action'); actionContainer.innerHTML = '';
-                    
+                    document.getElementById('route-svg').style.display = 'none'; // Sembunyikan garis animasi
+                    // Set Navigasi
                     if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
-                        window.bicara(`Area ${hs.nama_bangunan}. Tersedia petunjuk rute.`);
-                        const btnNav = document.createElement('button'); btnNav.className = 'btn-primary'; btnNav.innerText = '🗺️ Tunjukkan Rute ke Sini';
-                        btnNav.onclick = () => { window.tutupModal('hotspot-info-popup'); window.pilihTujuan(hs.target_lokasi); };
-                        actionContainer.appendChild(btnNav);
-                    } else { window.bicara(`Area ${hs.nama_bangunan}.`); }
-                    document.getElementById('hotspot-info-popup').style.display = 'flex';
+                        window.pilihTujuan(hs.target_lokasi);
+                    } else { 
+                        window.bicara(`Ini adalah area ${hs.nama_bangunan}.`); 
+                    }
                 };
                 container.insertBefore(div, document.getElementById('draw-overlay'));
             });
@@ -941,35 +836,43 @@
             document.getElementById('start-overlay').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('start-overlay').style.display = 'none';
-                document.getElementById('step-1').classList.add('active');
-                renderTombolLokasiAsal(); renderTombolTujuan();
-                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan pilih lokasi Anda saat ini.");
+                renderTombolLokasiAsal(); 
+                renderTombolTujuan();
+                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan cari ruangan tujuan Anda di menu navigasi.");
             }, 600);
         }
 
         function renderTombolLokasiAsal() {
-            const container = document.getElementById('container-lokasi-asal'); container.innerHTML = "";
+            const select = document.getElementById('select-lokasi-asal'); select.innerHTML = "";
             dataLokasiAsal.forEach(nama => {
-                const btn = document.createElement('button'); btn.className = 'btn-pilihan'; btn.innerHTML = `<span>${nama}</span>`;
-                btn.onclick = () => window.pilihLokasiSekarang(nama); container.appendChild(btn);
+                select.innerHTML += `<option value="${nama}">${nama}</option>`;
             });
+            if(dataLokasiAsal.length > 0) lokasiAsal = dataLokasiAsal[0];
         }
 
-        window.pilihLokasiSekarang = function(lokasi) {
-            lokasiAsal = lokasi;
-            document.getElementById('step-1').classList.remove('active'); document.getElementById('step-2').classList.add('active');
-            document.getElementById('lokasi-anda-info').innerText = "Dari: " + lokasiAsal; document.getElementById('search-tujuan').value = "";
-            window.filterTujuan(); window.bicara("Silakan pilih ruangan tujuan Anda.");
+        window.setLokasiAsal = function() {
+            lokasiAsal = document.getElementById('select-lokasi-asal').value;
+            window.bicara(`Titik awal Anda sekarang berada di ${lokasiAsal}.`);
         }
 
         function renderTombolTujuan() {
             const container = document.getElementById('container-tujuan'); container.innerHTML = "";
-            for (let nama in dataRute) {
-                const lokasi = dataRute[nama]; const badgeClass = lokasi.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
+            let tujuanArr = [];
+            for (let nama in dataRute) { tujuanArr.push({ nama: nama, data: dataRute[nama] }); }
+            
+            tujuanArr.sort((a, b) => {
+                let numA = parseInt(a.data.nomor) || extractNumber(a.nama);
+                let numB = parseInt(b.data.nomor) || extractNumber(b.nama);
+                if (numA === numB) return a.nama.localeCompare(b.nama);
+                return numA - numB;
+            });
+
+            tujuanArr.forEach(item => {
+                const badgeClass = item.data.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
                 const btn = document.createElement('button'); btn.className = 'btn-pilihan tujuan-item';
-                btn.innerHTML = `<span class="nama-tujuan"><span class="span-nomor">${lokasi.nomor ? `[${lokasi.nomor}]` : ''}</span>${nama}</span> <span class="badge-akses ${badgeClass}">${lokasi.akses}</span>`;
-                btn.onclick = () => window.pilihTujuan(nama); container.appendChild(btn);
-            }
+                btn.innerHTML = `<span class="nama-tujuan"><span class="span-nomor">${item.data.nomor ? `[${item.data.nomor}]` : ''}</span> ${item.nama}</span> <span class="badge-akses ${badgeClass}">${item.data.akses}</span>`;
+                btn.onclick = () => window.pilihTujuan(item.nama); container.appendChild(btn);
+            });
         }
 
         window.filterTujuan = function() {
@@ -983,20 +886,30 @@
 
         window.pilihTujuan = function(tujuan) {
             lokasiTujuan = tujuan; const rute = dataRute[tujuan];
-            const teksArahan = `Silahkan ${rute.instruksi} sampai menemukan tanda seperti ini.`;
+            
+            const teksArahan = `Silakan ikuti rute menuju ${tujuan}. ${rute.instruksi}. Di akhir rute, Anda akan menemukan tanda patokan seperti pada foto di layar.`;
             document.getElementById('teks-instruksi').innerText = teksArahan;
             document.getElementById('gambar-tanda').src = rute.gambarTanda;
-            document.getElementById('nav-popup').style.display = 'flex'; window.bicara(teksArahan);
+            
+            document.getElementById('nav-popup').style.display = 'flex'; 
+            window.bicara(teksArahan);
+        }
+
+        window.putarEvakuasi = function() {
+            document.getElementById('nav-popup').style.display = 'none'; 
+            document.getElementById('evakuasi-popup').style.display = 'flex'; 
+            
+            window.bicara("Perhatian! Ini adalah instruksi evakuasi darurat. Dari lokasi Anda saat ini, ikuti jalur evakuasi hijau menuju titik kumpul. Jika membawa pasien atau korban, ikuti jalur kuning menuju I G D. Perhatikan rambu APAR di sekitar gedung. Harap tetap tenang dan jangan berlari.");
         }
 
         window.telahSampai = function() {
-            document.getElementById('nav-popup').style.display = 'none';
-            window.bicara(`Anda sudah sampai di tujuan. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
+            window.tutupModal('nav-popup');
+            window.bicara(`Anda telah menyelesaikan rute. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
         }
 
         window.batalPilih = function() {
-            document.getElementById('step-2').classList.remove('active'); document.getElementById('step-1').classList.add('active');
-            window.speechSynthesis.cancel();
+            document.getElementById('search-tujuan').value = ""; window.filterTujuan();
+            window.tutupModal('nav-popup');
         }
 
         // ==========================================
@@ -1035,25 +948,19 @@
         function prosesPertanyaanQA(pertanyaan) {
             const chatArea = document.getElementById('qa-chat');
             chatArea.innerHTML += `<div class="chat-bubble chat-user">${pertanyaan}</div>`;
-            
-            let jawaban = "Maaf, saya belum memahami pertanyaan tersebut.";
-            let q = pertanyaan.toLowerCase();
+            let jawaban = "Maaf, saya belum memahami pertanyaan tersebut."; let q = pertanyaan.toLowerCase();
             
             if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk pasien adalah pukul 10.00 hingga 12.00, dan sore pukul 16.00 hingga 18.00.";
             else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet umum berada di dekat lobi administrasi dan di ujung lorong poli.";
             else if (q.includes("jadwal dokter")) jawaban = "Jadwal dokter spesialis dapat dilihat di loket administrasi utama.";
 
-            setTimeout(() => {
-                chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`;
-                chatArea.scrollTop = chatArea.scrollHeight;
-                window.bicara(jawaban);
-            }, 400);
+            setTimeout(() => { chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`; chatArea.scrollTop = chatArea.scrollHeight; window.bicara(jawaban); }, 400);
         }
 
         window.kirimSurveySupabase = async function() {
             const teks = document.getElementById('ulasan-teks').value.trim();
             if(teks) { await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]); }
-            window.tutupModal('survey-popup'); document.getElementById('step-2').classList.remove('active'); document.getElementById('step-1').classList.add('active');
+            window.tutupModal('survey-popup');
             window.bicara("Terima kasih atas ulasan yang Anda berikan."); document.getElementById('ulasan-teks').value = ""; 
         }
     </script>
