@@ -340,7 +340,7 @@
         <div id="front-form-container" style="display: none; background: #181818; padding: 20px; border-radius: 10px; margin-top: 15px; border: 1px solid #D4AF37; width: 85%; max-width: 320px; text-align: left;">
 
             <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">NAMA ANDA:</label>
-            <input type="text" id="front-nama" placeholder="Masukkan nama..." style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 15px; box-sizing: border-box; font-size: 14px;">
+            <input type="text" id="front-nama" placeholder="Masukkan nama..." onkeydown="if(event.key === 'Enter') mulaiAplikasi()" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 15px; box-sizing: border-box; font-size: 14px;">
             
             <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">AKSES SEBAGAI:</label>
             <select id="front-akses" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 20px; box-sizing: border-box; font-size: 14px;">
@@ -632,7 +632,7 @@
             <input type="text" id="matrix-tanda" placeholder="Kosongkan untuk memakai foto patokan ruangan tujuan">
 
             <div style="display:flex; gap:8px; margin-top:4px;">
-                <button class="btn-save-admin" id="btn-save-matrix" onclick="simpanMatrixSupabase()">💾 Simpan ke Matriks</button>
+                <button class="btn-save-admin" id="btn-save-matrix" onclick="simpanDataMatrix()">💾 Simpan ke Matriks</button>
                 <button type="button" class="btn-save-admin" style="background:#2c3e50; color:#ecf0f1; border-color:#34495e; flex:0.6;" onclick="ujiMatrixRute()">🧪 Tes Suara</button>
             </div>
         </div>
@@ -767,10 +767,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDocs, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
         
 
-        let app, auth, db, timeoutHint; let systemPIN = '123456789012';
+        let app, auth, db, storage, timeoutHint; let systemPIN = '123456789012';
         let settingTTS = { volume: 1.0, rate: 0.9 };
         let dataLokasiAsal = []; 
         let dataRute = {}; 
@@ -1066,7 +1067,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
             selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Label Info) --</option>';
             tujuanKeys.forEach(nama => { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; });
 
-            renderMatrixAdminList();
+            if(window.renderMatrixAdminList) window.renderMatrixAdminList();
         }
 
         window.resetFormAsal = function() { editAsalName = null; document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru"; document.getElementById('admin-nama-asal').value = ""; }
@@ -1101,7 +1102,55 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
         }
         window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await deleteDoc(doc(db, 'map_hotspots', id.toString())); await fetchAllDataSupabase(); } }
 
-        window.simpanPetaUtama = async function() { alert("Fitur Peta Dinonaktifkan sementara."); }
+        
+        window.uploadPeta = async function() {
+            const fileInput = document.getElementById('map-file');
+            if(!fileInput.files || fileInput.files.length === 0) {
+                alert("Pilih file gambar peta terlebih dahulu!");
+                return;
+            }
+            const file = fileInput.files[0];
+            const btn = document.querySelector('#upload-map-container .btn-save-admin');
+            const oriText = btn.innerText;
+            btn.innerText = "⏳ Mengunggah...";
+            btn.disabled = true;
+
+            try {
+                const storageRef = ref(storage, 'maps/' + file.name);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+                
+                await setDoc(doc(db, 'settings', 'general'), { map_url: url }, { merge: true });
+                alert("Peta berhasil diunggah!");
+                await window.fetchAllDataFirebase();
+            } catch(e) {
+                alert("Gagal mengunggah peta: " + e.message);
+            }
+            
+            btn.innerText = oriText;
+            btn.disabled = false;
+            fileInput.value = '';
+        }
+        
+        window.hapusPeta = async function() {
+            if(!confirm("Yakin ingin menghapus gambar peta saat ini?")) return;
+            const btn = document.getElementById('btn-hapus-peta');
+            const oriText = btn.innerText;
+            btn.innerText = "⏳ Menghapus...";
+            btn.disabled = true;
+            
+            try {
+                await updateDoc(doc(db, 'settings', 'general'), { map_url: null });
+                alert("Peta berhasil dihapus!");
+                await window.fetchAllDataFirebase();
+            } catch(e) {
+                alert("Gagal menghapus peta: " + e.message);
+            }
+            
+            btn.innerText = oriText;
+            btn.disabled = false;
+        }
+
         
         window.resetFormMatrix = function() { editMatrixId = null; document.getElementById('matrix-asal').value = ""; document.getElementById('matrix-tujuan').value = ""; document.getElementById('matrix-instruksi').value = ""; document.getElementById('matrix-tanda').value = ""; }
         window.editFormMatrix = function(id) { editMatrixId = id; const d = dataMatrixRute.find(m => m.id == id); if(!d) return; document.getElementById('matrix-asal').value = d.lokasi_asal; document.getElementById('matrix-tujuan').value = d.lokasi_tujuan; document.getElementById('matrix-instruksi').value = d.instruksi; document.getElementById('matrix-tanda').value = d.gambar_tanda || ""; }
@@ -1117,7 +1166,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
         window.renderMatrixAdminList = function() {
             const list = document.getElementById('list-matrix'); if(!list) return; list.innerHTML = '';
             dataMatrixRute.forEach(d => {
-                list.innerHTML += `<div class="data-item"><div class="data-item-name">${d.lokasi_asal} ➔ ${d.lokasi_tujuan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormMatrix(${d.id})">✏️</button><button class="action-btn" title="Hapus" onclick="hapusMatrix(${d.id})">🗑️</button></div></div>`;
+                list.innerHTML += `<div class="data-item"><div class="data-item-name">${d.lokasi_asal} ➔ ${d.lokasi_tujuan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormMatrix('${d.id}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusMatrix('${d.id}')">🗑️</button></div></div>`;
             });
         }
         
@@ -1427,6 +1476,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
               app = initializeApp(config);
               auth = getAuth(app);
               db = getFirestore(app, config.firestoreDatabaseId);
+              storage = getStorage(app);
               
               // Expose for CRUD
               window.auth = auth;
