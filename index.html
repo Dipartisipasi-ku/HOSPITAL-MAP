@@ -357,6 +357,7 @@
         .btn-chip-edit:hover { background: #444; color: #fff; }
 
         /* Running Text Pengembang (Marquee Bergerak Lebih Lambat & Terpusat Center) */
+        /* Running Text Pengembang (Hanya 1 Teks Aktif, Berulang Hanya Setelah Tulisan Lewat Utuh, Tidak Beruntun) */
         .bottom-running-marquee {
             position: fixed;
             bottom: 0;
@@ -375,10 +376,11 @@
         }
         .running-marquee-track {
             display: flex;
+            align-items: center;
             width: max-content;
             white-space: nowrap;
             will-change: transform;
-            animation: runningTextMarquee 65s linear infinite;
+            animation: runningTextSingle 38s linear infinite;
         }
         .running-marquee-item {
             display: inline-flex;
@@ -386,7 +388,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding-right: 180px;
+            padding: 0 10px;
             line-height: 1.25;
             user-select: none;
         }
@@ -407,12 +409,35 @@
             text-align: center;
             width: 100%;
         }
-        @keyframes runningTextMarquee {
+        @keyframes runningTextSingle {
             0% {
-                transform: translateX(100vw);
+                transform: translate3d(100vw, 0, 0);
+            }
+            92% {
+                transform: translate3d(calc(-100% - 25px), 0, 0);
             }
             100% {
-                transform: translateX(-100%);
+                transform: translate3d(calc(-100% - 25px), 0, 0);
+            }
+        }
+        @media (max-width: 600px) {
+            .running-marquee-track {
+                animation-duration: 25s;
+            }
+        }
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .running-marquee-track {
+                animation-duration: 33s;
+            }
+        }
+        @media (min-width: 1025px) and (max-width: 1600px) {
+            .running-marquee-track {
+                animation-duration: 40s;
+            }
+        }
+        @media (min-width: 1601px) {
+            .running-marquee-track {
+                animation-duration: 48s;
             }
         }
 /* ------------------------------------------- */
@@ -792,9 +817,9 @@
                     <span class="chip-badge-tujuan" id="chip-tujuan-text">Poli</span>
                 </div>
                 <div class="route-chip-btns">
-                    <button type="button" class="btn-chip-origin" id="btn-chip-ubah-asal" onclick="ubahTitikAwal()" title="Ganti Titik Awal Anda">📍 Ubah Asal</button>
+                    <button type="button" class="btn-chip-origin" id="btn-chip-ubah-asal" onclick="ubahTitikAwal()" title="Reset dan kembali memilih Titik Awal">↺ Ubah Asal</button>
                     <button type="button" class="btn-chip-guide" onclick="bukaModalNavigasiAktif()">🧭 Panduan</button>
-                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">✏️ Tujuan</button>
+                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">🎯 Tujuan</button>
                 </div>
             </div>
 
@@ -806,7 +831,7 @@
                 <div id="container-titik-awal" style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
                         <label class="target-label" style="color:#D4AF37; margin:0; display: block; font-size: 12px;">📍 TITIK AWAL ANDA:</label>
-                        <button type="button" id="btn-kembali-asal" onclick="kembaliPilihAsal()" style="background:transparent; border:none; color:#bbb; font-size:11px; cursor:pointer; text-decoration:underline;">↺ Kosongkan</button>
+                        <button type="button" id="btn-reset-asal" onclick="ubahTitikAwal()" style="background:rgba(212, 175, 55, 0.15); border:1px solid #D4AF37; color:#D4AF37; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:4px; cursor:pointer;" title="Reset dan kembali ke memilih titik awal">↺ Ubah / Reset</button>
                     </div>
                     <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 8px 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 13px; font-weight: bold; cursor: pointer;">
                         <option value="">-- Pilih Titik Awal --</option>
@@ -1126,9 +1151,9 @@
             
             <!-- Badge Relasi Rute Asal ➔ Tujuan -->
             <div id="popup-rute-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid #D4AF37; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:bold; color:#8B0000; margin-bottom:12px; flex-wrap:wrap; justify-content:center;">
-                <span onclick="ubahTitikAwalDariPopup()" style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Klik untuk ubah titik awal">
+                <span onclick="ubahTitikAwalDariPopup()" style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Klik untuk reset dan pilih kembali titik awal">
                     📍 <span id="popup-badge-asal">Titik Awal</span>
-                    <span style="font-size:11px; text-decoration:underline; color:#D4AF37; margin-left:2px;">(Ubah)</span>
+                    <span style="font-size:11px; text-decoration:underline; color:#D4AF37; margin-left:2px;">(↺ Ubah/Reset)</span>
                 </span>
                 <span style="color:#D4AF37; font-size:16px;">➔</span>
                 <span>🎯 <span id="popup-badge-tujuan">Lokasi Tujuan</span></span>
@@ -1141,7 +1166,7 @@
                 <button type="button" class="btn-primary" style="background:#D4AF37; color:#111; margin-bottom:5px;" onclick="promptEditSign()">✏️ Admin: Ubah Foto Tanda</button>
             </div>
             
-            <button type="button" class="btn-primary" style="background:#1e1e1e; color:#D4AF37; border:1.5px solid #D4AF37; margin-top:5px; padding:10px; font-size:14px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="ubahTitikAwalDariPopup()">📍 Ubah Titik Awal Anda</button>
+            <button type="button" class="btn-primary" style="background:#1e1e1e; color:#D4AF37; border:1.5px solid #D4AF37; margin-top:5px; padding:10px; font-size:14px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="ubahTitikAwalDariPopup()">↺ Reset & Pilih Kembali Titik Awal</button>
             <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
             <button type="button" class="btn-primary" style="background:#181818; color:#bbb; border-color:#333; margin-top:5px; padding:10px; font-size:14px;" onclick="panduanBalikKeAsal()">🔙 Baca Panduan Kembali ke Titik Awal</button>
 
@@ -2655,11 +2680,25 @@
         };
 
         window.ubahTitikAwal = function() {
+            // 1. Pastikan sidebar terbuka dan area titik awal terlihat
             window.expandSidebarPanel();
+
+            // 2. Reset variabel state titik awal
+            lokasiAsal = '';
+
+            // 3. Reset dropdown pilihan titik awal ke default kosong
             const selectAsal = document.getElementById('select-asal-dropdown');
             if (selectAsal) {
+                // Pastikan opsi default tersedia
+                if (!selectAsal.querySelector('option[value=""]')) {
+                    const optDefault = document.createElement('option');
+                    optDefault.value = '';
+                    optDefault.innerText = '-- Pilih Titik Awal --';
+                    selectAsal.prepend(optDefault);
+                }
+                selectAsal.value = '';
                 selectAsal.focus();
-                selectAsal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                selectAsal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 selectAsal.style.transition = 'all 0.3s ease';
                 selectAsal.style.boxShadow = '0 0 16px #D4AF37';
                 selectAsal.style.borderColor = '#FFD700';
@@ -2668,11 +2707,25 @@
                     selectAsal.style.borderColor = '#444';
                 }, 2500);
             }
+
+            // 4. Reset teks label dan indikator chip
+            const lbl = document.getElementById('lbl-titik-awal-aktif');
+            if (lbl) lbl.innerText = "-";
+            const chipAsal = document.getElementById('chip-asal-text');
+            if (chipAsal) chipAsal.innerText = "Pilih Asal";
+            const popupAsal = document.getElementById('popup-badge-asal');
+            if (popupAsal) popupAsal.innerText = "Belum dipilih";
+
+            // 5. Sembunyikan garis rute denah karena titik awal telah dikosongkan
+            const routeSvg = document.getElementById('route-svg');
+            if (routeSvg) routeSvg.style.display = 'none';
+
+            // 6. Notifikasi umpan balik suara & visual
             if (window.tampilkanToast) {
-                window.tampilkanToast("📍 Silakan pilih titik awal baru pada pilihan");
+                window.tampilkanToast("↺ Titik awal telah direset. Silakan pilih kembali titik awal Anda.");
             }
             if (window.bicara) {
-                window.bicara("Silakan pilih titik awal Anda yang baru pada pilihan di atas.");
+                window.bicara("Titik awal telah direset. Silakan pilih kembali titik awal Anda.");
             }
         };
 
@@ -2682,17 +2735,7 @@
         };
 
         window.kembaliPilihAsal = function() {
-            const selectAsal = document.getElementById('select-asal-dropdown');
-            if (selectAsal) {
-                selectAsal.innerHTML = '<option value="" selected>-- Pilih Titik Awal --</option>';
-                dataLokasiAsal.forEach((nama) => {
-                    const opt = document.createElement('option');
-                    opt.value = nama;
-                    opt.innerText = nama;
-                    selectAsal.appendChild(opt);
-                });
-                window.pilihLokasiSekarang('', false);
-            }
+            window.ubahTitikAwal();
         };
 
         // ==========================================
@@ -2979,21 +3022,9 @@
         fetchAllDataSupabase();
     </script>
 
-    <!-- Running Text Pengembang (Marquee Bergerak Lambat dari Kanan ke Kiri di Bagian Bawah Layar) -->
+    <!-- Running Text Pengembang (Hanya 1 teks aktif, mengalir utuh dari kanan ke kiri, berulang setelah keluar penuh) -->
     <div id="bottom-running-marquee" class="bottom-running-marquee" aria-hidden="true">
         <div class="running-marquee-track">
-            <div class="running-marquee-item">
-                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
-                <span class="marquee-line2">Riandy, S.Kep</span>
-            </div>
-            <div class="running-marquee-item">
-                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
-                <span class="marquee-line2">Riandy, S.Kep</span>
-            </div>
-            <div class="running-marquee-item">
-                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
-                <span class="marquee-line2">Riandy, S.Kep</span>
-            </div>
             <div class="running-marquee-item">
                 <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
                 <span class="marquee-line2">Riandy, S.Kep</span>
