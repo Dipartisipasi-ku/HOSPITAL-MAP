@@ -28,13 +28,13 @@
         @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
 
         /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
-        .app-container { display: flex; width: 100%; height: 100%; position: relative; }
+        .app-container { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; }
         
         /* Sidebar Pengunjung */
         .sidebar { 
-            background: #E0E0E0; padding: 25px; flex: 1; max-width: 400px; 
-            display: flex; flex-direction: column; z-index: 100; 
-            box-shadow: 4px 0 20px rgba(0,0,0,0.5); border-right: 4px solid #8B0000;
+            background: #E0E0E0; padding: 15px 25px; width: 100%; max-width: 100%; flex: none;
+            display: flex; flex-direction: column; z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-bottom: 4px solid #8B0000;
         }
         
         .header-title { color: #8B0000; font-size: 22px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
@@ -72,6 +72,20 @@
         .badge-pengunjung { background: #27ae60; color: #FFFFFF; }
         .badge-non { background: #111111; color: #D4AF37; }
         .btn-pilihan:hover .badge-akses { border: 1px solid #FFFFFF; }
+
+        .custom-select-btn { width: 100%; padding: 12px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .custom-select-btn::after { content: '▼'; font-size: 10px; }
+        .custom-options-container { display: none; position: relative; width: 100%; background: #FFFFFF; border: 2px solid #BDC3C7; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-top: 5px; flex-direction: column; gap: 0; padding: 0; }
+        .custom-options-container.show { display: flex; }
+        
+        .tujuan-item-option {
+            background: #FFFFFF; color: #111111; padding: 12px 15px; border-bottom: 1px solid #eee;
+            cursor: pointer; font-weight: bold; font-size: 14px; 
+            transition: all 0.2s ease; text-align: left; display: flex; justify-content: space-between; align-items: center;
+        }
+        .tujuan-item-option:last-child { border-bottom: none; }
+        .tujuan-item-option:hover { background: #f8f9fa; }
+        .tujuan-item-option .span-nomor { color: #8B0000; font-weight: 900; margin-right: 5px; }
 
         /* ------------------------------------------- */
         /* AREA PETA (BRING TO FRONT & SHRINK-WRAP) */
@@ -243,6 +257,17 @@
         .chat-bubble { padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; max-width: 80%; font-size: 14px; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
         .chat-user { background: #8B0000; color: #E0E0E0; margin-left: auto; border-bottom-right-radius: 2px; }
         .chat-bot { background: #E0E0E0; color: #111111; border-bottom-left-radius: 2px; font-weight: 600;}
+
+        /* Survey Styling */
+        .star-rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 8px; margin-bottom: 15px; }
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 45px; color: #C0C0C0; cursor: pointer; transition: 0.2s; line-height: 1; margin: 0; }
+        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #D4AF37; }
+        
+        .survey-checklist { text-align: left; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid #BDC3C7; }
+        .survey-checklist label { font-size: 14px; color: #111111; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; margin: 0; }
+        .survey-checklist input[type="checkbox"] { width: 20px; height: 20px; accent-color: #8B0000; cursor: pointer; }
+
         .btn-mic { background: #8B0000; color: #D4AF37; border: 2px solid #D4AF37; padding: 15px; border-radius: 50%; cursor: pointer; width: 65px; height: 65px; font-size: 24px; display: flex; justify-content: center; align-items: center; margin: 0 auto; transition: 0.3s; box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);}
         .btn-mic.recording { background: #D4AF37; color: #8B0000; border-color: #8B0000; animation: pulseMic 1s infinite; }
 
@@ -255,7 +280,7 @@
         /* ------------------------------------------- */
         @media (max-width: 950px) {
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
+            .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 60vh; overflow-y: auto; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
             .map-view { width: 100%; flex: 1; padding: 10px; z-index: 50;}
             
             .map-controls-hud { top: 10px; right: 10px; bottom: auto; left: auto; padding: 10px; width: 160px; transform: scale(0.9); transform-origin: top right;}
@@ -305,7 +330,7 @@
             </div>
 
             <!-- VIEW 2: Pilih Tujuan -->
-            <div id="view-tujuan" style="display: none;">
+            <div id="view-tujuan" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
                 <div style="background:#181818; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #D4AF37;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
@@ -317,11 +342,14 @@
                 </div>
                 
                 <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
-                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan()" style="padding: 10px; margin-bottom: 8px;">
+                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
 
-                <!-- Dropdown Select untuk Tujuan -->
-                <select id="select-tujuan-dropdown" onchange="if(this.value) window.pilihTujuan(this.value);" style="width: 100%; padding: 12px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; appearance: none;">
-                </select>
+                <!-- Custom Dropdown untuk Tujuan -->
+                <div style="position: relative;">
+                    <div id="custom-tujuan-btn" class="custom-select-btn" onclick="toggleDropdownTujuan()">-- Sentuh untuk Pilih Ruangan --</div>
+                    <div id="list-tujuan-container" class="custom-options-container">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -334,7 +362,7 @@
             </div>
 
             <!-- HUD Kontrol Tampilan (Pojok Kanan Atas) -->
-            <div class="map-controls-hud" id="hud-panel">
+            <div class="map-controls-hud" id="hud-panel" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                     <h4 style="margin:0; text-align:left;">Kontrol Peta</h4>
                     <button class="btn-map-control" style="width: auto; padding: 4px 8px; font-size: 11px; flex: none; background: transparent; color: #D4AF37;" onclick="toggleHud()">▼ Tutup</button>
@@ -360,7 +388,7 @@
                 </div>
             </div>
             
-            <button id="btn-hud-expand" onclick="toggleHud()" class="btn-map-control" style="position: absolute; top: 15px; right: 15px; z-index: 140; display: none; background: rgba(17,17,17,0.9); color: #D4AF37; border: 1.5px solid #D4AF37; box-shadow: 0 4px 10px rgba(0,0,0,0.5); padding: 8px 12px; width: auto; font-size: 18px; border-radius: 50%; width: 45px; height: 45px;">⚙️</button>
+            <button id="btn-hud-expand" onclick="toggleHud()" class="btn-map-control" style="position: absolute; top: 15px; right: 15px; z-index: 140; display: flex; align-items: center; justify-content: center; background: rgba(17,17,17,0.9); color: #D4AF37; border: 1.5px solid #D4AF37; box-shadow: 0 4px 10px rgba(0,0,0,0.5); padding: 8px 12px; width: auto; font-size: 18px; border-radius: 50%; width: 45px; height: 45px;">⚙️</button>
 
             <!-- Wrapper Pembungkus Gambar & Hotspot -->
             <div class="map-wrapper" id="interactive-map">
@@ -636,11 +664,28 @@
 
     <!-- POPUP SURVEY -->
     <div class="popup-overlay" id="survey-popup">
-        <div class="popup-content">
-            <h2 style="color: #D4AF37; margin-bottom: 10px;">Terima Kasih! 🎉</h2>
-            <textarea id="ulasan-teks" style="width: 100%; height: 90px; padding: 12px; border-radius: 8px; border: 2px solid #C0C0C0; resize:none; margin-bottom:10px;" placeholder="Tuliskan ulasan Anda atau gunakan suara..."></textarea>
-            <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()">🎤</button>
-            <div class="btn-group-row" style="margin-top: 20px;">
+        <div class="popup-content" style="max-width: 500px;">
+            <h2 style="color: #D4AF37; margin-bottom: 5px;">Terima Kasih! 🎉</h2>
+            <p style="font-size: 15px; font-weight: bold; color: #8B0000; margin-bottom: 15px;">Silakan berikan penilaian pelayanan kami</p>
+            
+            <div class="star-rating" id="survey-rating">
+                <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 Bintang">★</label>
+                <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 Bintang">★</label>
+                <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 Bintang">★</label>
+                <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 Bintang">★</label>
+                <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 Bintang">★</label>
+            </div>
+
+            <div class="survey-checklist">
+                <label><input type="checkbox" id="chk-informatif"> Informasi rute sangat membantu (Informatif)</label>
+                <label><input type="checkbox" id="chk-kemudahan"> Aplikasi ini mudah digunakan (Kemudahan)</label>
+                <label><input type="checkbox" id="chk-pelayanan"> Pelayanan Petugas yang ditemui memuaskan</label>
+            </div>
+
+            <textarea id="ulasan-teks" style="width: 100%; height: 80px; padding: 12px; border-radius: 8px; border: 2px solid #C0C0C0; resize:none; margin-bottom:10px; font-family: inherit;" placeholder="Ketik saran atau ulasan tambahan Anda, atau rekam dengan suara..."></textarea>
+            
+            <button class="btn-mic" id="btn-survey-rekam" onclick="toggleSurveyRekam()" title="Gunakan Suara">🎤</button>
+            <div class="btn-group-row" style="margin-top: 15px;">
                 <button class="btn-primary" onclick="kirimSurveySupabase()">KIRIM ULASAN</button>
                 <button class="btn-primary btn-danger" onclick="tutupModal('survey-popup')">❌ TUTUP</button>
             </div>
@@ -687,7 +732,8 @@
         
         window.bicara = function(teks, callback) {
             window.speechSynthesis.cancel();
-            let msg = new SpeechSynthesisUtterance(teks);
+            // Konversi menjadi lowercase agar tidak mengeja kata yg huruf besar semua
+            let msg = new SpeechSynthesisUtterance(teks.toLowerCase());
             msg.lang = 'id-ID'; msg.volume = settingTTS.volume; msg.rate = settingTTS.rate;
             if(callback) msg.onend = callback;
             window.speechSynthesis.speak(msg);
@@ -1464,7 +1510,7 @@
             lokasiAsal = nama;
             document.getElementById('lbl-titik-awal-aktif').innerText = lokasiAsal;
             document.getElementById('view-asal').style.display = 'none';
-            document.getElementById('view-tujuan').style.display = 'block';
+            document.getElementById('view-tujuan').style.display = 'flex';
             document.getElementById('search-tujuan').value = "";
             window.filterTujuan(); 
             if(mainSuara) { window.bicara(`Titik awal diatur ke ${lokasiAsal}. Silakan cari ruangan tujuan Anda.`); }
@@ -1473,14 +1519,14 @@
         window.kembaliPilihAsal = function() {
             document.getElementById('view-tujuan').style.display = 'none';
             document.getElementById('view-asal').style.display = 'block';
-            document.getElementById('select-asal-dropdown').value = ""; // Reset dropdown visual
+            document.getElementById('select-asal-dropdown').value = ""; document.getElementById('custom-tujuan-btn').innerText = "-- Sentuh untuk Pilih Ruangan --"; // Reset dropdown visual
             window.bicara(`Silakan pilih kembali titik awal Anda.`);
         }
 
         function renderTombolTujuan() {
-            const selectEl = document.getElementById('select-tujuan-dropdown'); 
-            if(!selectEl) return;
-            selectEl.innerHTML = '<option value="">-- Sentuh untuk Pilih Ruangan --</option>';
+            const listContainer = document.getElementById('list-tujuan-container'); 
+            if(!listContainer) return;
+            listContainer.innerHTML = '';
             
             let tujuanArr = [];
             for (let nama in dataRute) { tujuanArr.push({ nama: nama, data: dataRute[nama] }); }
@@ -1493,36 +1539,36 @@
             });
 
             tujuanArr.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.nama;
-                opt.className = 'tujuan-item'; // Menambahkan class agar bisa difilter
-                const nomor = item.data.nomor ? `[${item.data.nomor}] ` : '';
-                opt.innerText = `${nomor}${item.nama} (${item.data.akses})`;
-                selectEl.appendChild(opt);
+                const btn = document.createElement('button');
+                btn.className = 'tujuan-item-option tujuan-item';
+                btn.onclick = () => window.pilihTujuan(item.nama);
+                
+                const nomor = item.data.nomor ? `<span class="span-nomor">[${item.data.nomor}]</span>` : '';
+                const roleClass = (item.data.akses.toLowerCase() === 'pengunjung') ? 'badge-pengunjung' : 'badge-non';
+                
+                btn.innerHTML = `
+                    <div>
+                        ${nomor} <span class="nama-tujuan">${item.nama}</span>
+                    </div>
+                    <div class="badge-akses ${roleClass}">${item.data.akses}</div>
+                `;
+                listContainer.appendChild(btn);
             });
         }
 
-        window.filterTujuan = function() {
+        window.filterTujuan = function(autoOpen = false) {
+            if (autoOpen) window.bukaDropdownTujuan();
             let input = document.getElementById('search-tujuan').value.toLowerCase();
-            let selectEl = document.getElementById('select-tujuan-dropdown');
-            let options = selectEl.getElementsByClassName('tujuan-item');
+            let listContainer = document.getElementById('list-tujuan-container');
+            let options = listContainer.getElementsByClassName('tujuan-item');
             
-            let firstVisible = null;
             for (let i = 0; i < options.length; i++) {
                 let txtValue = options[i].innerText || options[i].textContent;
                 if (txtValue.toLowerCase().indexOf(input) > -1) {
                     options[i].style.display = "";
-                    if(!firstVisible) firstVisible = options[i].value;
                 } else {
                     options[i].style.display = "none";
                 }
-            }
-            
-            // Set value select ke opsi pertama yang valid bila mencari sesuatu
-            if(input !== "" && firstVisible) {
-                selectEl.value = firstVisible;
-            } else {
-                selectEl.value = "";
             }
         }
 
@@ -1581,13 +1627,27 @@
             return { x: 50, y: 90 };
         }
 
+        window.toggleDropdownTujuan = function() {
+            document.getElementById('list-tujuan-container').classList.toggle('show');
+        }
+
+        window.bukaDropdownTujuan = function() {
+            document.getElementById('list-tujuan-container').classList.add('show');
+        }
+
+        window.tutupDropdownTujuan = function() {
+            document.getElementById('list-tujuan-container').classList.remove('show');
+        }
+
         window.pilihTujuan = function(tujuan) {
+            window.tutupDropdownTujuan();
+            document.getElementById('custom-tujuan-btn').innerText = tujuan;
+
             lokasiTujuan = tujuan; 
             const ruteDefault = dataRute[tujuan] || {};
             
-            // Reset state input dan dropdown supaya rapi kembali setelah modal ditutup
+            // Reset state input supaya rapi kembali setelah rute dipilih
             document.getElementById('search-tujuan').value = "";
-            document.getElementById('select-tujuan-dropdown').value = "";
             window.filterTujuan();
             
             // 1. Cari apakah ada relasi di rute_matrix untuk pasangan (lokasiAsal ➔ tujuan)
@@ -1749,10 +1809,38 @@
 
         window.kirimSurveySupabase = async function() {
             const teks = document.getElementById('ulasan-teks').value.trim();
-            if(teks) { await supabase.from('survey_kepuasan').insert([{ ulasan_teks: teks }]); }
+            const ratingEl = document.querySelector('input[name="rating"]:checked');
+            const rating = ratingEl ? parseInt(ratingEl.value) : null;
+            const informatif = document.getElementById('chk-informatif').checked;
+            const kemudahan = document.getElementById('chk-kemudahan').checked;
+            const pelayanan = document.getElementById('chk-pelayanan').checked;
+
+            if (!rating && !teks && !informatif && !kemudahan && !pelayanan) {
+                return alert("Silakan berikan setidaknya satu penilaian atau ulasan.");
+            }
+
+            // Kemas data dalam satu object JSON payload
+            const payload = {
+                ulasan_teks: teks,
+                rating: rating,
+                informatif: informatif,
+                kemudahan: kemudahan,
+                pelayanan_petugas: pelayanan
+            };
+
+            await supabase.from('survey_kepuasan').insert([payload]);
+            
             window.tutupModal('survey-popup');
-            window.bicara("Terima kasih atas ulasan yang Anda berikan."); document.getElementById('ulasan-teks').value = ""; 
+            window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
+            
+            // Reset Form Survey
+            document.getElementById('ulasan-teks').value = ""; 
+            if(ratingEl) ratingEl.checked = false;
+            document.getElementById('chk-informatif').checked = false;
+            document.getElementById('chk-kemudahan').checked = false;
+            document.getElementById('chk-pelayanan').checked = false;
         }
     </script>
+    <script src="security.js"></script>
 </body>
 </html>
