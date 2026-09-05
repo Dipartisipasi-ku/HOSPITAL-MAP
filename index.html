@@ -584,7 +584,15 @@
             <input type="text" id="filter-matrix" placeholder="🔍 Cari rute asal / tujuan..." oninput="filterMatrixList()" style="margin-bottom:6px; font-size:12px; padding:8px 10px;">
 
             <!-- Daftar Matriks Tersimpan -->
+            
+            <!-- Daftar Matriks Tersimpan -->
+            <div style="display:flex; gap: 6px; margin-bottom: 10px;">
+                <button class="btn-save-admin" style="flex:1; background: #2c3e50; border-color: #34495e; font-size:11px;" onclick="exportMatrixCSV()">📥 Ekspor CSV</button>
+                <input type="file" id="csv-file-matrix" accept=".csv" style="display:none;" onchange="importMatrixCSV(event)">
+                <button class="btn-save-admin" style="flex:1; background: #8B0000; border-color: #5c0000; font-size:11px;" onclick="document.getElementById('csv-file-matrix').click()">📤 Impor CSV</button>
+            </div>
             <div class="data-list" id="list-matrix" style="max-height: 180px;"></div>
+
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
                 <label id="label-mode-matrix" style="color:#D4AF37; font-weight:bold; font-size:12px;">Mode: [ Tambah Baru ]</label>
@@ -699,7 +707,10 @@
                 <button type="button" class="btn-primary" style="background:#D4AF37; color:#111; margin-bottom:5px;" onclick="promptEditSign()">✏️ Admin: Ubah Foto Tanda</button>
             </div>
             
+            
             <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
+            <button type="button" class="btn-primary" style="background:#181818; color:#bbb; border-color:#333; margin-top:5px; padding:10px; font-size:14px;" onclick="panduanBalikKeAsal()">🔙 Baca Panduan Kembali ke Titik Awal</button>
+
 
             <!-- Tombol Opsional Evakuasi -->
             <button class="btn-evakuasi" onclick="putarEvakuasi()">🚨 Lihat Instruksi Evakuasi Darurat</button>
@@ -1103,34 +1114,49 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await deleteDoc(doc(db, 'map_hotspots', id.toString())); await fetchAllDataSupabase(); } }
 
         
+        
         window.uploadPeta = async function() {
             const fileInput = document.getElementById('map-file');
-            if(!fileInput.files || fileInput.files.length === 0) {
-                alert("Pilih file gambar peta terlebih dahulu!");
-                return;
-            }
+            if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih file peta terlebih dahulu!");
+            
             const file = fileInput.files[0];
             const btn = document.querySelector('#upload-map-container .btn-save-admin');
             const oriText = btn.innerText;
-            btn.innerText = "⏳ Mengunggah...";
+            btn.innerText = "⏳ Memproses Peta...";
             btn.disabled = true;
-
-            try {
-                const storageRef = ref(storage, 'maps/' + file.name);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                
-                await setDoc(doc(db, 'settings', 'general'), { map_url: url }, { merge: true });
-                alert("Peta berhasil diunggah!");
-                await window.fetchAllDataFirebase();
-            } catch(e) {
-                alert("Gagal mengunggah peta: " + e.message);
-            }
             
-            btn.innerText = oriText;
-            btn.disabled = false;
-            fileInput.value = '';
+            try {
+                // Konversi file gambar ke Base64 agar bisa disimpan langsung di Firestore
+                // (Mengatasi kendala aturan CORS / Rules Storage yang terkunci)
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async function () {
+                    const base64String = reader.result;
+                    
+                    try {
+                        await setDoc(doc(db, 'settings', 'general'), { map_url: base64String }, { merge: true });
+                        alert("Peta berhasil diunggah!");
+                        await window.fetchAllDataFirebase();
+                    } catch(e) {
+                        alert("Gagal mengunggah peta: " + e.message);
+                    }
+                    
+                    btn.innerText = oriText;
+                    btn.disabled = false;
+                    fileInput.value = '';
+                };
+                reader.onerror = function (error) {
+                    alert("Gagal membaca file: " + error.message);
+                    btn.innerText = oriText;
+                    btn.disabled = false;
+                };
+            } catch(e) {
+                alert("Kesalahan proses: " + e.message);
+                btn.innerText = oriText;
+                btn.disabled = false;
+            }
         }
+
         
         window.hapusPeta = async function() {
             if(!confirm("Yakin ingin menghapus gambar peta saat ini?")) return;
@@ -1152,153 +1178,255 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         }
 
         
-        window.resetFormMatrix = function() { editMatrixId = null; document.getElementById('matrix-asal').value = ""; document.getElementById('matrix-tujuan').value = ""; document.getElementById('matrix-instruksi').value = ""; document.getElementById('matrix-tanda').value = ""; }
-        window.editFormMatrix = function(id) { editMatrixId = id; const d = dataMatrixRute.find(m => m.id == id); if(!d) return; document.getElementById('matrix-asal').value = d.lokasi_asal; document.getElementById('matrix-tujuan').value = d.lokasi_tujuan; document.getElementById('matrix-instruksi').value = d.instruksi; document.getElementById('matrix-tanda').value = d.gambar_tanda || ""; }
-        window.simpanDataMatrix = async function() {
-            const a = document.getElementById('matrix-asal').value; const t = document.getElementById('matrix-tujuan').value; const i = document.getElementById('matrix-instruksi').value.trim(); const g = document.getElementById('matrix-tanda').value.trim();
-            if(!a || !t || !i) return alert("Lengkapi asal, tujuan, dan instruksi!");
-            const payload = { lokasi_asal: a, lokasi_tujuan: t, instruksi: i, gambar_tanda: g };
-            if(editMatrixId) await updateDoc(doc(db, 'route_matrix', editMatrixId.toString()), payload); else await addDoc(collection(db, 'route_matrix'), payload);
-            window.resetFormMatrix(); await fetchAllDataSupabase();
+        
+        window.resetFormMatrix = function() {
+            editMatrixId = null;
+            document.getElementById('label-mode-matrix').innerText = "Mode: [ Tambah Baru ]";
+            document.getElementById('btn-save-matrix').innerText = "💾 Simpan ke Matriks";
+            document.getElementById('matrix-mode').value = "single";
+            document.getElementById('matrix-mode').disabled = false;
+            window.gantiModeMatrix();
+            document.getElementById('matrix-asal-single').value = "";
+            document.getElementById('matrix-tujuan-single').value = "";
+            window.pilihSemuaMatrixAsal(false);
+            window.pilihSemuaMatrixTujuan(false);
+            document.getElementById('matrix-instruksi').value = "";
+            document.getElementById('matrix-tanda').value = "";
         }
+        
+        window.editFormMatrix = function(id) {
+            editMatrixId = id;
+            const d = dataMatrixRute.find(m => m.id == id);
+            if(!d) return;
+            document.getElementById('label-mode-matrix').innerText = "Mode: [ EDIT DATA ]";
+            document.getElementById('btn-save-matrix').innerText = "💾 Update Data";
+            document.getElementById('matrix-mode').value = "single";
+            document.getElementById('matrix-mode').disabled = true; // Kunci mode saat edit
+            window.gantiModeMatrix();
+            document.getElementById('matrix-asal-single').value = d.lokasi_asal;
+            document.getElementById('matrix-tujuan-single').value = d.lokasi_tujuan;
+            document.getElementById('matrix-instruksi').value = d.instruksi;
+            document.getElementById('matrix-tanda').value = d.gambar_tanda || "";
+        }
+        
+        
+        window.ujiMatrixRute = function() {
+            const i = document.getElementById('matrix-instruksi').value.trim();
+            if(!i) return alert("Instruksi arah rute masih kosong.");
+            window.bicara("Tes panduan arah: " + i);
+        }
+
+        window.simpanDataMatrix = async function() {
+            const mode = document.getElementById('matrix-mode').value;
+            const i = document.getElementById('matrix-instruksi').value.trim();
+            const g = document.getElementById('matrix-tanda').value.trim();
+            
+            if (!i) return alert("Instruksi arah rute tidak boleh kosong!");
+            
+            let payloads = [];
+            
+            if (mode === 'single') {
+                const a = document.getElementById('matrix-asal-single').value;
+                const t = document.getElementById('matrix-tujuan-single').value;
+                if(!a || !t) return alert("Pilih Titik Awal dan Lokasi Tujuan!");
+                payloads.push({ lokasi_asal: a, lokasi_tujuan: t, instruksi: i, gambar_tanda: g });
+            } else if (mode === 'one-to-many') {
+                const a = document.getElementById('matrix-asal-single').value;
+                if(!a) return alert("Pilih 1 Titik Awal!");
+                const chk = document.querySelectorAll('.chk-tujuan-multi:checked');
+                if(chk.length === 0) return alert("Pilih minimal 1 Lokasi Tujuan!");
+                chk.forEach(cb => payloads.push({ lokasi_asal: a, lokasi_tujuan: cb.value, instruksi: i, gambar_tanda: g }));
+            } else if (mode === 'many-to-one') {
+                const t = document.getElementById('matrix-tujuan-single').value;
+                if(!t) return alert("Pilih 1 Lokasi Tujuan!");
+                const chk = document.querySelectorAll('.chk-asal-multi:checked');
+                if(chk.length === 0) return alert("Pilih minimal 1 Titik Awal!");
+                chk.forEach(cb => payloads.push({ lokasi_asal: cb.value, lokasi_tujuan: t, instruksi: i, gambar_tanda: g }));
+            }
+            
+            try {
+                const btn = document.getElementById('btn-save-matrix');
+                btn.innerText = "⏳ Menyimpan..."; btn.disabled = true;
+                
+                if (editMatrixId && payloads.length === 1) {
+                    await updateDoc(doc(db, 'route_matrix', editMatrixId.toString()), payloads[0]);
+                } else {
+                    for (const p of payloads) {
+                        // Cek apakah relasi sudah ada
+                        const existing = dataMatrixRute.find(m => m.lokasi_asal === p.lokasi_asal && m.lokasi_tujuan === p.lokasi_tujuan);
+                        if (existing) {
+                            await updateDoc(doc(db, 'route_matrix', existing.id), p);
+                        } else {
+                            await addDoc(collection(db, 'route_matrix'), p);
+                        }
+                    }
+                }
+                
+                alert(`Berhasil menyimpan ${payloads.length} rute ke dalam matriks!`);
+                window.resetFormMatrix();
+                await fetchAllDataSupabase();
+                
+                btn.innerText = "💾 Simpan ke Matriks"; btn.disabled = false;
+            } catch (err) {
+                alert("Gagal menyimpan: " + err.message);
+                document.getElementById('btn-save-matrix').disabled = false;
+            }
+        }
+
         window.hapusMatrix = async function(id) { if(confirm("Hapus relasi rute?")) { await deleteDoc(doc(db, 'route_matrix', id.toString())); await fetchAllDataSupabase(); } }
 
+        window.exportMatrixCSV = function() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "id,lokasi_asal,lokasi_tujuan,instruksi,gambar_tanda\n";
+            dataMatrixRute.forEach(function(rowArray) {
+                let id = rowArray.id || "";
+                let asal = (rowArray.lokasi_asal || "").replace(/"/g, '""');
+                let tujuan = (rowArray.lokasi_tujuan || "").replace(/"/g, '""');
+                let instruksi = (rowArray.instruksi || "").replace(/"/g, '""');
+                let tanda = (rowArray.gambar_tanda || "").replace(/"/g, '""');
+                csvContent += `"${id}","${asal}","${tujuan}","${instruksi}","${tanda}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data_matrix_rute.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.importMatrixCSV = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const rows = text.split("\n");
+                
+                if (rows.length < 2) return alert("File CSV kosong atau tidak valid.");
+                
+                if(!confirm(`Ditemukan ${rows.length - 1} baris data. Proses impor akan menambahkan / memperbarui data. Lanjutkan?`)) {
+                    document.getElementById('csv-file-matrix').value = "";
+                    return;
+                }
+                
+                document.getElementById('sync-indicator').style.display = 'block';
+                
+                let successCount = 0;
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if (!row) continue;
+                    
+                    let cols = [];
+                    let inQuote = false;
+                    let currentVal = '';
+                    for (let j = 0; j < row.length; j++) {
+                        let char = row[j];
+                        if (char === '"' && row[j+1] === '"') {
+                            currentVal += '"'; j++;
+                        } else if (char === '"') {
+                            inQuote = !inQuote;
+                        } else if (char === ',' && !inQuote) {
+                            cols.push(currentVal); currentVal = '';
+                        } else {
+                            currentVal += char;
+                        }
+                    }
+                    cols.push(currentVal);
+                    
+                    if(cols.length >= 4) {
+                        const id = cols[0];
+                        const asal = cols[1];
+                        const tujuan = cols[2];
+                        const instruksi = cols[3];
+                        const tanda = cols[4] || "";
+                        
+                        if(asal && tujuan) {
+                            const payload = { lokasi_asal: asal, lokasi_tujuan: tujuan, instruksi: instruksi, gambar_tanda: tanda };
+                            try {
+                                if(id) {
+                                    await setDoc(doc(db, 'route_matrix', id), payload, {merge: true});
+                                } else {
+                                    await addDoc(collection(db, 'route_matrix'), payload);
+                                }
+                                successCount++;
+                            } catch(err) {
+                                console.error(err);
+                            }
+                        }
+                    }
+                }
+                document.getElementById('sync-indicator').style.display = 'none';
+                document.getElementById('csv-file-matrix').value = "";
+                alert(`Impor selesai! Berhasil memproses ${successCount} data matriks.`);
+                if(typeof window.fetchAllDataFirebase === 'function') await window.fetchAllDataFirebase();
+            };
+            reader.readAsText(file);
+        }
+
+
+        
         window.renderMatrixAdminList = function() {
             const list = document.getElementById('list-matrix'); if(!list) return; list.innerHTML = '';
+            
+            // Render select options for single/multi
+            const selAsalSingle = document.getElementById('matrix-asal-single');
+            const divAsalMulti = document.getElementById('matrix-asal-multi');
+            const selTujuanSingle = document.getElementById('matrix-tujuan-single');
+            const divTujuanMulti = document.getElementById('matrix-tujuan-multi');
+            
+            if(selAsalSingle) selAsalSingle.innerHTML = '<option value="">-- Pilih Titik Awal --</option>';
+            if(divAsalMulti) divAsalMulti.innerHTML = '';
+            dataLokasiAsal.forEach(nama => {
+                if(selAsalSingle) selAsalSingle.innerHTML += `<option value="${nama}">${nama}</option>`;
+                if(divAsalMulti) divAsalMulti.innerHTML += `<label style="display:block; padding:4px; font-size:12px; border-bottom:1px solid #333;"><input type="checkbox" value="${nama}" class="chk-asal-multi"> ${nama}</label>`;
+            });
+            
+            let tujuanKeys = Object.keys(dataRute).sort((a,b) => a.localeCompare(b));
+            if(selTujuanSingle) selTujuanSingle.innerHTML = '<option value="">-- Pilih Lokasi Tujuan --</option>';
+            if(divTujuanMulti) divTujuanMulti.innerHTML = '';
+            tujuanKeys.forEach(nama => {
+                if(selTujuanSingle) selTujuanSingle.innerHTML += `<option value="${nama}">${nama}</option>`;
+                if(divTujuanMulti) divTujuanMulti.innerHTML += `<label style="display:block; padding:4px; font-size:12px; border-bottom:1px solid #333;"><input type="checkbox" value="${nama}" class="chk-tujuan-multi"> ${nama}</label>`;
+            });
+            
+            // Render list
             dataMatrixRute.forEach(d => {
                 list.innerHTML += `<div class="data-item"><div class="data-item-name">${d.lokasi_asal} ➔ ${d.lokasi_tujuan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormMatrix('${d.id}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusMatrix('${d.id}')">🗑️</button></div></div>`;
             });
         }
         
-        
-        window.prosesLogin = function() { 
-            if (document.getElementById('login-pin').value === systemPIN) { 
-                window.tutupModal('login-modal'); 
-                document.getElementById('panel-cpanel').classList.add('open'); 
-                
-                const rolePanel = document.getElementById('login-role').value;
-                window.currentUserRole = rolePanel;
-                
-                if(rolePanel === 'administrator') {
-                    // Sembunyikan tab selain Data Tujuan (Tanda Lokasi)
-                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'none';
-                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'none';
-                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'none';
-                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'none';
-                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'none';
-                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'none';
-                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'none';
-                    
-                    // Sembunyikan tombol hapus
-                    setTimeout(() => {
-                        const deleteBtns = document.querySelectorAll('.action-btn[title="Hapus"]');
-                        deleteBtns.forEach(btn => btn.style.display = 'none');
-                    }, 500);
-                } else {
-                    // Tampilkan semua
-                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'flex';
-                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'flex';
-                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'flex';
-                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'flex';
-                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'flex';
-                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'flex';
-                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'flex';
-                }
-
-                document.getElementById('tts-volume').value = settingTTS.volume; 
-                document.getElementById('val-vol').innerText = settingTTS.volume; 
-                document.getElementById('tts-rate').value = settingTTS.rate; 
-                document.getElementById('val-rate').innerText = settingTTS.rate; 
-                renderAllAdminLists(); 
-                
-            } else { 
-                alert("PIN Akses Salah!"); 
-            } 
-        }
-        window.bukaModalQA = function() {
- document.getElementById('qa-modal').style.display = 'flex'; }
-        window.bukaModalLogin = function() { 
-        document.getElementById('login-pin').value = '';
-        document.getElementById('login-modal').style.display = 'flex'; 
-    }
-        window.tutupModal = function(id) { document.getElementById(id).style.display = 'none'; }
-        window.tutupCPanel = function() { 
-        document.getElementById('panel-cpanel').classList.remove('open'); 
-        window.currentUserRole = document.getElementById('front-akses') ? document.getElementById('front-akses').value : 'pengunjung';
-    }
-        window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
-        window.simpanPengaturanSupabase = function() { alert("Pengaturan TTS Disimpan (Lokal)"); }
-        window.resetPINSupabase = async function() {
-        const p1 = document.getElementById('pin-lama').value;
-        const p2 = document.getElementById('pin-baru').value;
-        if(p1 === systemPIN && p2.length >= 4) {
-            await setDoc(doc(db, 'settings', 'general'), { pin: p2 }, { merge: true });
-            document.getElementById('pin-lama').value = '';
-            document.getElementById('pin-baru').value = '';
-            alert("PIN Berhasil Diubah!");
-            window.fetchAllDataFirebase();
-        } else { alert("PIN Lama Salah atau PIN Baru terlalu pendek!"); }
-    }
-        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
-
-        window.tampilkanInfoHotspot = function(nama, target) {
-            alert(`Lokasi: ${nama}`);
-        }
-
-        window.bukaDropdownTujuan = function() {
-            document.getElementById('search-tujuan').style.display = 'block';
-            document.getElementById('list-tujuan-container').style.display = 'block';
-            document.getElementById('search-tujuan').focus();
-        }
-        window.toggleDropdownTujuan = function() {
-            const lst = document.getElementById('list-tujuan-container');
-            if(lst.style.display === 'block') window.tutupDropdownTujuan();
-            else window.bukaDropdownTujuan();
-        }
-        window.tutupDropdownTujuan = function() {
-            document.getElementById('search-tujuan').style.display = 'none';
-            document.getElementById('list-tujuan-container').style.display = 'none';
-        }
-
-        window.inisialisasiDaftarTujuan = function() {
-            window.renderTombolTujuan();
-        }
-        
-        window.renderTombolTujuan = function() {
-            const listContainer = document.getElementById('list-tujuan-container'); 
-            if(!listContainer) return;
-            listContainer.innerHTML = '';
+        window.gantiModeMatrix = function() {
+            const mode = document.getElementById('matrix-mode').value;
+            const singleAsal = document.getElementById('matrix-asal-single');
+            const multiAsal = document.getElementById('matrix-asal-multi');
+            const toolAsal = document.getElementById('asal-multi-tools');
             
-            let tujuanArr = [];
-            for (let nama in dataRute) { 
-                let routeAkses = dataRute[nama].akses ? dataRute[nama].akses.toLowerCase() : "pengunjung";
-                if (routeAkses === 'staff' && window.currentUserRole === 'pengunjung') {
-                    continue; 
-                }
-                tujuanArr.push({ nama: nama, data: dataRute[nama] }); 
-            }
-            tujuanArr.sort((a,b) => a.nama.localeCompare(b.nama));
+            const singleTujuan = document.getElementById('matrix-tujuan-single');
+            const multiTujuan = document.getElementById('matrix-tujuan-multi');
+            const toolTujuan = document.getElementById('tujuan-multi-tools');
             
-            tujuanArr.forEach(item => {
-                let roleClass = item.data.akses === 'Staff' ? 'akses-staff' : 'akses-umum';
-                let btn = document.createElement('div');
-                btn.className = 'tujuan-item-option';
-                btn.innerHTML = `<span>${item.nama}</span> <span style="font-size:10px; padding:2px 5px; border-radius:4px; background:#D4AF37; color:#111;">${item.data.akses || 'Pengunjung'}</span>`;
-                btn.onclick = () => window.pilihTujuan(item.nama);
-                listContainer.appendChild(btn);
-            });
-        }
-        
-        window.filterTujuan = function(autoOpen = false) {
-            if(autoOpen) window.bukaDropdownTujuan();
-            let input = document.getElementById('search-tujuan').value.toLowerCase();
-            let listContainer = document.getElementById('list-tujuan-container');
-            let options = listContainer.getElementsByClassName('tujuan-item-option');
-            for(let i=0; i<options.length; i++) {
-                let txtValue = options[i].textContent || options[i].innerText;
-                options[i].style.display = txtValue.toLowerCase().indexOf(input) > -1 ? "" : "none";
+            if (mode === 'single') {
+                singleAsal.style.display = 'block'; multiAsal.style.display = 'none'; toolAsal.style.display = 'none';
+                singleTujuan.style.display = 'block'; multiTujuan.style.display = 'none'; toolTujuan.style.display = 'none';
+            } else if (mode === 'one-to-many') {
+                singleAsal.style.display = 'block'; multiAsal.style.display = 'none'; toolAsal.style.display = 'none';
+                singleTujuan.style.display = 'none'; multiTujuan.style.display = 'block'; toolTujuan.style.display = 'flex';
+            } else if (mode === 'many-to-one') {
+                singleAsal.style.display = 'none'; multiAsal.style.display = 'block'; toolAsal.style.display = 'flex';
+                singleTujuan.style.display = 'block'; multiTujuan.style.display = 'none'; toolTujuan.style.display = 'none';
             }
         }
+        
+        window.pilihSemuaMatrixAsal = function(isCheck) {
+            document.querySelectorAll('.chk-asal-multi').forEach(cb => cb.checked = isCheck);
+        }
+        
+        window.pilihSemuaMatrixTujuan = function(isCheck) {
+            document.querySelectorAll('.chk-tujuan-multi').forEach(cb => cb.checked = isCheck);
+        }
+
 
         window.pilihLokasiSekarang = function(asal) {
             lokasiAsal = asal;
@@ -1306,10 +1434,30 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             document.getElementById('view-tujuan').style.display = 'block';
             window.inisialisasiDaftarTujuan();
         }
+        
         window.kembaliPilihAsal = function() {
             document.getElementById('view-tujuan').style.display = 'none';
             document.getElementById('view-asal').style.display = 'block';
+            
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (selectAsal) {
+                selectAsal.innerHTML = '';
+                let opt = document.createElement('option');
+                opt.value = "";
+                opt.innerText = "-- Sentuh dan Pilih Titik Awal --";
+                selectAsal.appendChild(opt);
+                
+                // Hapus duplikat dari dataLokasiAsal
+                let uniqueAsal = [...new Set(dataLokasiAsal)];
+                uniqueAsal.forEach(nama => {
+                    let o = document.createElement('option');
+                    o.value = nama;
+                    o.innerText = nama;
+                    selectAsal.appendChild(o);
+                });
+            }
         }
+
         
         window.getCoordinatesForLokasi = function(nama) {
             const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama);
@@ -1379,17 +1527,43 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             window.bicara(instruksiFinal);
         }
 
-        window.bicara = function(text) {
+        
+        window.bicara = function(text, callback) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const msg = new SpeechSynthesisUtterance(text);
+                // Perbaiki ejaan singkatan RS
+                let safeText = text.toLowerCase();
+                safeText = safeText.replace(/i g d/g, "i ge de")
+                                   .replace(/m c u/g, "em ce u")
+                                   .replace(/igd/g, "i ge de")
+                                   .replace(/mcu/g, "em ce u");
+                const msg = new SpeechSynthesisUtterance(safeText);
                 msg.lang = 'id-ID';
                 msg.volume = settingTTS.volume;
                 msg.rate = settingTTS.rate;
+                if(callback) msg.onend = callback;
                 window.speechSynthesis.speak(msg);
             }
         }
+
         window.ulangSuaraRute = function() { window.bicara(lastNavSpeechText); }
+
+        window.panduanBalikKeAsal = function() {
+            // Mencari rute balik dari lokasiTujuan (A) ke lokasiAsal (B)
+            let matchMatrix = dataMatrixRute.find(m => m.lokasi_asal === lokasiTujuan && m.lokasi_tujuan === lokasiAsal);
+            
+            let instruksiBalik = "";
+            if (matchMatrix && matchMatrix.instruksi) {
+                instruksiBalik = matchMatrix.instruksi;
+            } else {
+                instruksiBalik = `Panduan otomatis belum tersedia untuk rute kembali dari ${lokasiTujuan} menuju ${lokasiAsal}. Silakan ikuti jalur evakuasi atau ikuti petunjuk panah yang ada.`;
+            }
+            
+            window.bicara("Panduan kembali ke titik awal. " + instruksiBalik);
+            document.getElementById('teks-instruksi').innerHTML = "<b>[Panduan Kembali]</b><br>" + instruksiBalik;
+            lastNavSpeechText = "Panduan kembali ke titik awal. " + instruksiBalik;
+        }
+
         
         window.mulaiAplikasi = function() {
             const nama = document.getElementById('front-nama').value.trim();
