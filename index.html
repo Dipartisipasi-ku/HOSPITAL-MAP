@@ -1341,6 +1341,20 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
             }
         }
         window.ulangSuaraRute = function() { window.bicara(lastNavSpeechText); }
+        
+        window.mulaiAplikasi = function() {
+            const nama = document.getElementById('front-nama').value.trim();
+            if(!nama) {
+                alert("Mohon masukkan nama Anda terlebih dahulu.");
+                return;
+            }
+            window.currentUserName = nama;
+            document.getElementById('start-overlay').style.display = 'none';
+            if(window.bicara) {
+                window.bicara("Selamat datang di RS Atma Husada Mahakam, " + nama + ". Silakan pilih lokasi tujuan Anda.");
+            }
+        };
+
         window.telahSampai = function() {
             window.tutupModal('nav-popup');
             document.getElementById('route-svg').style.display = 'none';
