@@ -28,15 +28,16 @@
         @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
 
         /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
-        .app-container { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; }
+        .app-container { display: flex; flex-direction: row; width: 100%; height: 100%; position: relative; overflow: hidden; }
         
         /* Sidebar Pengunjung */
         .sidebar { 
-            background: #E0E0E0; padding: 15px 25px; width: 100%; max-width: 100%; flex: none;
+            background: #E0E0E0; padding: 16px 20px; width: 380px; min-width: 340px; max-width: 420px; height: 100%;
             display: flex; flex-direction: column; z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-bottom: 4px solid #8B0000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-right: 4px solid #8B0000; border-bottom: none;
+            overflow-y: auto; transition: max-height 0.3s ease, padding 0.3s ease;
         }
-        
+
         .header-title { color: #8B0000; font-size: 22px; text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800; }
         
         /* Lokasi Asal (Row Atas) */
@@ -147,13 +148,35 @@
         .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
 
         /* ------------------------------------------- */
-        /* HUD KONTROL PETA (Pojok KANAN ATAS) */
+        /* HUD KONTROL PETA & QUICK TOOLBAR */
         /* ------------------------------------------- */
+        .map-quick-toolbar {
+            position: absolute; top: 20px; right: 20px; z-index: 140;
+            display: flex; flex-direction: column; gap: 8px;
+            background: rgba(17, 17, 17, 0.88); padding: 8px 6px; border-radius: 24px;
+            border: 1.5px solid #D4AF37; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+        }
+        .btn-quick-ctrl {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #222222; color: #E0E0E0; border: 1.5px solid #444;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+            transition: all 0.2s ease; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .btn-quick-ctrl:hover, .btn-quick-ctrl:active {
+            background: #8B0000; color: #D4AF37; border-color: #D4AF37;
+            transform: scale(1.08); box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .btn-quick-ctrl.active {
+            background: #8B0000; color: #D4AF37; border-color: #D4AF37;
+        }
+
         .map-controls-hud { 
-            position: absolute; top: 25px; right: 25px; background: rgba(17, 17, 17, 0.9); 
-            padding: 14px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.7); 
+            position: absolute; top: 25px; right: 70px; background: rgba(17, 17, 17, 0.94); 
+            padding: 14px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.8); 
             display: flex; flex-direction: column; gap: 10px; z-index: 150; 
-            backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 200px;
+            backdrop-filter: blur(8px); border: 1.5px solid #D4AF37; width: 210px;
         }
         .map-controls-hud h4 { color: #D4AF37; margin: 0; font-size: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
         .control-row { display: flex; gap: 8px; justify-content: center; }
@@ -164,7 +187,65 @@
         .btn-zoom { font-size: 16px; background: #262626; color: #E0E0E0; border-color: #444; }
         .btn-zoom:hover { background: #D4AF37; color: #111;}
 
-        /* Tombol Bottom Right Umum */
+        /* Header Bar & Utility Buttons di Sidebar */
+        .sidebar-header-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 8px; margin-bottom: 12px; width: 100%;
+        }
+        .sidebar-header-row .header-title {
+            margin: 0; padding: 0; border: none; font-size: 18px; line-height: 1.2;
+            color: #8B0000; font-weight: 800; white-space: nowrap;
+        }
+        .sidebar-top-actions {
+            display: flex; gap: 6px; align-items: center;
+        }
+        .btn-top-hud {
+            background: #1A1A1A; color: #D4AF37; border: 1.5px solid #D4AF37;
+            padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-top-hud:hover {
+            background: #D4AF37; color: #111;
+        }
+        .btn-top-hud.btn-top-toggle {
+            background: #8B0000; color: #FFF; border-color: #D4AF37; display: none;
+        }
+        .btn-top-hud.btn-top-toggle:hover {
+            background: #a00; color: #FFF;
+        }
+
+        /* Active Route Chip (Compact Bar) */
+        .active-route-chip {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #181818; border: 1.5px solid #D4AF37; border-radius: 8px;
+            padding: 8px 12px; margin-bottom: 10px; gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .route-chip-info {
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; cursor: pointer;
+        }
+        .chip-badge-asal {
+            background: #333; color: #DDD; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .chip-arrow {
+            color: #D4AF37; font-weight: bold; font-size: 12px;
+        }
+        .chip-badge-tujuan {
+            background: #8B0000; color: #FFF; font-size: 12px; padding: 2px 7px; border-radius: 4px; font-weight: 800; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .route-chip-btns {
+            display: flex; gap: 6px; align-items: center; flex: none;
+        }
+        .btn-chip-guide {
+            background: #D4AF37; color: #111; border: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-chip-guide:hover { background: #b89628; }
+        .btn-chip-edit {
+            background: #2a2a2a; color: #ccc; border: 1px solid #555; padding: 5px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-chip-edit:hover { background: #444; color: #fff; }
+
+        /* Tombol Bottom Right Desktop Umum */
         .btn-cpanel { 
             position: absolute; bottom: 25px; right: 25px; background: #1A1A1A; color: #D4AF37; 
             border: 2px solid #555; padding: 12px 22px; border-radius: 8px; font-weight: bold; 
@@ -179,8 +260,7 @@
             transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
         .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
-
-        /* ------------------------------------------- */
+/* ------------------------------------------- */
         /* ADMIN PANEL & POPUPS */
         /* ------------------------------------------- */
         .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #111111; color: #E0E0E0; box-shadow: -5px 0 35px rgba(0,0,0,0.9); z-index: 10010; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;}
@@ -279,25 +359,107 @@
         /* RESPONSIVE DESIGN (HP & TABLET)             */
         /* ------------------------------------------- */
         @media (max-width: 950px) {
-            .app-container { flex-direction: column; }
-            .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 60vh; overflow-y: auto; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
-            .map-view { width: 100%; flex: 1; padding: 10px; z-index: 50;}
+            .app-container { 
+                flex-direction: column; 
+                height: 100vh;
+                height: 100dvh;
+                overflow: hidden;
+            }
+            .sidebar { 
+                width: 100%; 
+                max-width: 100%; 
+                height: auto; 
+                max-height: 48vh; 
+                overflow-y: auto; 
+                border-right: none; 
+                border-bottom: 3px solid #8B0000; 
+                padding: 10px 12px; 
+                z-index: 100;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            }
             
-            .map-controls-hud { top: 10px; right: 10px; bottom: auto; left: auto; padding: 10px; width: 160px; transform: scale(0.9); transform-origin: top right;}
-            .map-controls-hud h4 { font-size: 10px; }
+            /* Tampilkan tombol toggle panel pada mobile */
+            .btn-top-hud.btn-top-toggle {
+                display: inline-flex;
+            }
+            
+            /* Saat sidebar disembunyikan / compact mode di mobile */
+            .sidebar.is-collapsed {
+                max-height: none !important;
+                padding-bottom: 6px;
+            }
+            .sidebar.is-collapsed .sidebar-body {
+                display: none !important;
+            }
+            
+            .map-view { 
+                width: 100%; 
+                flex: 1; 
+                padding: 5px; 
+                z-index: 50;
+                position: relative;
+            }
+            
+            /* Map Quick Toolbar di Mobile: Posisi rapi di kanan atas, tidak menghalangi rute & denah */
+            .map-quick-toolbar {
+                top: 10px;
+                right: 10px;
+                padding: 6px 4px;
+                gap: 6px;
+                transform: scale(0.92);
+                transform-origin: top right;
+            }
+            .btn-quick-ctrl {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+            
+            /* Sembunyikan tombol melayang bawah pada mobile agar TIDAK menghalangi tombol navigasi & peta */
+            .btn-cpanel, .btn-hud-tanya {
+                display: none !important;
+            }
+            
+            /* HUD Kontrol Peta Lanjutan di Mobile */
+            .map-controls-hud { 
+                top: 55px; 
+                right: 10px; 
+                width: 185px; 
+                padding: 10px; 
+                border-radius: 10px;
+                z-index: 160;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.9);
+            }
+            .map-controls-hud h4 { font-size: 11px; }
             .btn-map-control { padding: 6px; font-size: 11px; }
-            .btn-cpanel { bottom: 10px; right: 10px; top: auto; padding: 8px 15px; font-size: 12px; z-index: 10001; }
-            .btn-hud-tanya { bottom: 10px; right: 120px; padding: 10px 18px; font-size: 14px; z-index: 10001; }
-            .tujuan-list { max-height: 100%; }
+            
+            .custom-options-container {
+                max-height: 35vh;
+            }
+            .tujuan-item-option {
+                padding: 11px 12px;
+                font-size: 13px;
+                min-height: 44px;
+            }
             
             /* Perbaikan Popup di Mobile (HP) */
-            .popup-content { padding: 20px 15px; max-height: 90vh; overflow-y: auto; }
-            .popup-content h2 { font-size: 20px; }
+            .popup-content { 
+                padding: 18px 14px; 
+                max-height: 88vh; 
+                max-height: 88dvh; 
+                overflow-y: auto; 
+                width: 95%;
+                max-width: 440px;
+                border-radius: 14px;
+            }
+            .popup-content h2 { font-size: 18px; }
             .instruksi-teks { font-size: 15px; }
-            .sign-image { max-height: 180px; }
+            .sign-image { max-height: 150px; }
+            .btn-primary { padding: 12px; font-size: 14px; }
+            .btn-group-row button { min-height: 44px; }
 
             /* Perbaikan C-Panel di Mobile (HP) */
-            .admin-panel { width: 100%; right: -100%; padding: 20px 15px; z-index: 10010; }
+            .admin-panel { width: 100%; right: -100%; padding: 20px 14px; z-index: 10010; }
             .admin-header h2 { font-size: 20px; }
             .admin-section { padding: 10px; gap: 8px; }
             .admin-section h3 { font-size: 14px; }
@@ -308,7 +470,7 @@
         .toast-msg {
             visibility: hidden; min-width: 250px; background-color: #333; color: #D4AF37; 
             text-align: center; border-radius: 8px; padding: 16px; position: fixed; 
-            z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%);
+            z-index: 10020; left: 50%; bottom: 30px; transform: translateX(-50%);
             font-size: 15px; font-weight: bold; border: 1px solid #D4AF37;
         }
         .toast-msg.show {
@@ -360,38 +522,49 @@
 
     <div class="app-container">
         <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
-        <div class="sidebar">
-            <h2 class="header-title">🗺️ Navigasi Pintar</h2>
-            <div id="auth-panel" style="display: none !important;">
-                <div id="logged-out-view" style="display: flex; align-items: center;">
-                    <button onclick="loginWithGoogle()" style="background:#D4AF37; color:#111; padding: 6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Masuk / Login</button>
-                    <span style="margin-left: 10px; font-size: 11px;">Akses default: Pengunjung</span>
+        <div class="sidebar" id="main-sidebar">
+            <div class="sidebar-header-row">
+                <h2 class="header-title">🗺️ Navigasi Pintar</h2>
+                <div class="sidebar-top-actions">
+                    <button type="button" class="btn-top-hud" onclick="bukaModalQA()" title="Tanya Jawab Seputar RS">💬 Tanya</button>
+                    <button type="button" class="btn-top-hud" onclick="bukaModalLogin()" title="Akses C-Panel Admin">⚙️ C-Panel</button>
+                    <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Kecilkan / Buka Pilihan">▲ Tutup</button>
                 </div>
-                <div id="logged-in-view" style="display: none; justify-content: space-between; align-items: center;">
-                    <div>
-                        Halo, <b id="user-email-lbl"></b><br>
-                        Peran: <span id="user-role-badge" style="background:#8B0000; padding:2px 6px; border-radius:4px; color:#D4AF37; font-size:10px;">Pengunjung</span>
+            </div>
+
+            <!-- Ringkasan Rute Aktif (Compact Chip saat rute berjalan atau panel tertutup) -->
+            <div id="active-route-chip" class="active-route-chip" style="display: none;">
+                <div class="route-chip-info" onclick="bukaModalNavigasiAktif()" title="Klik untuk membuka panduan rute">
+                    <span class="chip-badge-asal" id="chip-asal-text">Lobi</span>
+                    <span class="chip-arrow">➔</span>
+                    <span class="chip-badge-tujuan" id="chip-tujuan-text">Poli</span>
+                </div>
+                <div class="route-chip-btns">
+                    <button type="button" class="btn-chip-guide" onclick="bukaModalNavigasiAktif()">🧭 Panduan</button>
+                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">✏️ Ubah</button>
+                </div>
+            </div>
+
+            <div id="auth-panel" style="display: none !important;"></div>
+
+            <!-- Konten Pemilihan Rute (Dapat di-collapse di mobile) -->
+            <div id="sidebar-collapsible-body" class="sidebar-body" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                <!-- PILIHAN TITIK AWAL -->
+                <div style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 10px;">
+                    <label class="target-label" style="color:#D4AF37; margin-bottom: 5px; display: block; font-size: 12px;">📍 TITIK AWAL ANDA:</label>
+                    <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 8px 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 13px; font-weight: bold; cursor: pointer;"></select>
+                </div>
+
+                <!-- PILIHAN TUJUAN -->
+                <div id="view-tujuan" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                    <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
+                    <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
+
+                    <!-- Custom Dropdown untuk Tujuan -->
+                    <div style="position: relative;">
+                        <div id="custom-tujuan-btn" class="custom-select-btn" onclick="toggleDropdownTujuan()">-- Sentuh untuk Pilih Ruangan --</div>
+                        <div id="list-tujuan-container" class="custom-options-container"></div>
                     </div>
-                    <button onclick="logout()" style="background:#444; color:#fff; padding: 4px 8px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size: 11px;">Keluar</button>
-                </div>
-            </div>
-
-            
-            <!-- PILIHAN TITIK AWAL & TUJUAN -->
-            <div style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 12px;">
-                <label class="target-label" style="color:#D4AF37; margin-bottom: 6px; display: block; font-size: 13px;">📍 TITIK AWAL ANDA:</label>
-                <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; cursor: pointer;"></select>
-            </div>
-
-            <!-- PILIHAN TUJUAN -->
-            <div id="view-tujuan" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-                <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
-                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
-
-                <!-- Custom Dropdown untuk Tujuan -->
-                <div style="position: relative;">
-                    <div id="custom-tujuan-btn" class="custom-select-btn" onclick="toggleDropdownTujuan()">-- Sentuh untuk Pilih Ruangan --</div>
-                    <div id="list-tujuan-container" class="custom-options-container"></div>
                 </div>
             </div>
         </div>
@@ -404,16 +577,25 @@
                 <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- HUD Kontrol Tampilan (Pojok Kanan Atas) -->
+            <!-- MAP QUICK TOOLBAR (Kompak, Elegan, Tidak Menghalangi Peta) -->
+            <div class="map-quick-toolbar" id="map-quick-toolbar">
+                <button type="button" class="btn-quick-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah">➕</button>
+                <button type="button" class="btn-quick-ctrl" onclick="zoomPeta(-0.2)" title="Perkecil Denah">➖</button>
+                <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
+                <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
+                <button type="button" class="btn-quick-ctrl" id="btn-hud-expand" onclick="toggleHud()" title="Rotasi & Opsi Lanjutan">🧭</button>
+            </div>
+
+            <!-- HUD Kontrol Tampilan Popout (Advanced options) -->
             <div class="map-controls-hud" id="hud-panel" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <h4 style="margin:0; text-align:left;">Kontrol Peta</h4>
-                    <button class="btn-map-control" style="width: auto; padding: 4px 8px; font-size: 11px; flex: none; background: transparent; color: #D4AF37;" onclick="toggleHud()">▼ Tutup</button>
+                    <h4 style="margin:0; text-align:left;">Kontrol Denah</h4>
+                    <button class="btn-map-control" style="width: auto; padding: 4px 8px; font-size: 11px; flex: none; background: transparent; color: #D4AF37;" onclick="toggleHud()">✖ Tutup</button>
                 </div>
                 <div id="hud-collapsible">
                     <div class="control-row" style="margin-bottom: 8px;">
-                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕ Zoom In</button>
-                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖ Zoom Out</button>
+                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕ Zoom</button>
+                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖ Zoom</button>
                     </div>
                     
                     <h4 style="margin-top: 4px;">Mode Tampilan</h4>
@@ -422,16 +604,14 @@
                         <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D</button>
                     </div>
                     
-                    <h4 style="margin-top: 4px;">Rotasi</h4>
+                    <h4 style="margin-top: 4px;">Rotasi Denah</h4>
                     <div class="control-row">
                         <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
                         <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
                     </div>
-                    <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset Peta</button>
+                    <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset Denah</button>
                 </div>
             </div>
-            
-            <button id="btn-hud-expand" onclick="toggleHud()" class="btn-map-control" style="position: absolute; top: 15px; right: 15px; z-index: 140; display: flex; align-items: center; justify-content: center; background: rgba(17,17,17,0.9); color: #D4AF37; border: 1.5px solid #D4AF37; box-shadow: 0 4px 10px rgba(0,0,0,0.5); padding: 8px 12px; width: auto; font-size: 18px; border-radius: 50%; width: 45px; height: 45px;">⚙️</button>
 
             <!-- Wrapper Pembungkus Gambar & Hotspot -->
             <div class="map-wrapper" id="interactive-map">
@@ -735,7 +915,10 @@
     <div class="popup-overlay" id="survey-popup">
         <div class="popup-content" style="max-width: 500px;">
             <h2 style="color: #D4AF37; margin-bottom: 5px;">Terima Kasih! 🎉</h2>
-            <p style="font-size: 15px; font-weight: bold; color: #8B0000; margin-bottom: 15px;">Silakan berikan penilaian pelayanan kami</p>
+            <p id="survey-arrival-subtitle" style="font-size: 15px; font-weight: bold; color: #8B0000; margin-bottom: 8px;">Selamat, Anda telah sampai di lokasi tujuan!</p>
+            <div style="text-align: center; margin-bottom: 12px;">
+                <button type="button" onclick="ulangUcapanSampai()" style="background: #181818; border: 1.5px solid #D4AF37; color: #D4AF37; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">🔊 Ulangi Ucapan Sampai</button>
+            </div>
             
             <div class="star-rating" id="survey-rating">
                 <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 Bintang">★</label>
@@ -820,10 +1003,59 @@
         let modePeta = 'FLAT', rotasiPeta = 0, currentZoom = 1;
         let panX = 0, panY = 0, isPanning = false, startPanX = 0, startPanY = 0;
 
+        
+        // ==========================================
+        // MOBILE ADAPTIVE SIDEBAR & QUICK HUD
+        // ==========================================
+        window.toggleSidebarPanel = function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const btn = document.getElementById('btn-toggle-sidebar');
+            if (!sidebar) return;
+            
+            const isCollapsed = sidebar.classList.toggle('is-collapsed');
+            if (btn) {
+                btn.innerText = isCollapsed ? '▼ Pilihan' : '▲ Tutup';
+            }
+        };
+
+        window.expandSidebarPanel = function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const btn = document.getElementById('btn-toggle-sidebar');
+            if (sidebar) sidebar.classList.remove('is-collapsed');
+            if (btn) btn.innerText = '▲ Tutup';
+            const searchInput = document.getElementById('search-tujuan');
+            if (searchInput) searchInput.focus();
+        };
+
+        window.collapseSidebarPanel = function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const btn = document.getElementById('btn-toggle-sidebar');
+            if (sidebar) sidebar.classList.add('is-collapsed');
+            if (btn) btn.innerText = '▼ Pilihan';
+        };
+
+        window.bukaModalNavigasiAktif = function() {
+            if (window.lokasiTujuanTerakhir || lokasiTujuan) {
+                document.getElementById('nav-popup').style.display = 'flex';
+            } else {
+                window.expandSidebarPanel();
+                window.bukaDropdownTujuan();
+            }
+        };
+
+        window.toggleModePetaQuick = function() {
+            const nextMode = (modePeta === '3D') ? 'FLAT' : '3D';
+            window.aturModePeta(nextMode);
+            const btn = document.getElementById('btn-quick-view-mode');
+            if (btn) btn.innerText = (nextMode === '3D') ? '🟦' : '🧊';
+        };
+
         window.aturModePeta = function(mode) {
             modePeta = mode;
             document.getElementById('btn-flat').classList.toggle('active', mode === 'FLAT');
             document.getElementById('btn-waze').classList.toggle('active', mode === '3D');
+            const quickModeBtn = document.getElementById('btn-quick-view-mode');
+            if (quickModeBtn) quickModeBtn.innerText = (mode === '3D') ? '🟦' : '🧊';
             terapkanTransformasiPeta();
         }
         window.putarPeta = function(derajat) { rotasiPeta += derajat; terapkanTransformasiPeta(); }
@@ -833,14 +1065,13 @@
         window.toggleHud = function() {
             const panel = document.getElementById('hud-panel');
             const expandBtn = document.getElementById('btn-hud-expand');
-            if (panel.style.display === 'none') {
+            if (!panel) return;
+            if (panel.style.display === 'none' || !panel.style.display) {
                 panel.style.display = 'flex';
-                expandBtn.style.display = 'none';
+                if (expandBtn) expandBtn.classList.add('active');
             } else {
                 panel.style.display = 'none';
-                expandBtn.style.display = 'flex'; // Use flex to center the icon properly
-                expandBtn.style.alignItems = 'center';
-                expandBtn.style.justifyContent = 'center';
+                if (expandBtn) expandBtn.classList.remove('active');
             }
         }
 
@@ -1513,6 +1744,21 @@
             const elTuj = document.getElementById('popup-badge-tujuan');
             if (elTuj) elTuj.innerText = tujuan;
             
+            // Update Active Route Chip
+            const chip = document.getElementById('active-route-chip');
+            if (chip) {
+                chip.style.display = 'flex';
+                const chipAsal = document.getElementById('chip-asal-text');
+                if (chipAsal) chipAsal.innerText = lokasiAsal || "Titik Awal";
+                const chipTuj = document.getElementById('chip-tujuan-text');
+                if (chipTuj) chipTuj.innerText = tujuan;
+            }
+            
+            // Pada layar mobile, perkecil panel agar peta terlihat jelas tanpa terhalang
+            if (window.innerWidth <= 950) {
+                window.collapseSidebarPanel();
+            }
+            
             let matchMatrix = dataMatrixRute.find(m => m.lokasi_asal === lokasiAsal && m.lokasi_tujuan === tujuan);
             let ruteDefault = dataRute[tujuan] || {};
             
@@ -1621,11 +1867,52 @@
             }
         };
 
+        window.tampilkanToast = function(pesan) {
+            const toast = document.getElementById('toast-snackbar');
+            if (toast) {
+                toast.innerText = pesan;
+                toast.className = 'toast-msg show';
+                setTimeout(() => {
+                    toast.className = toast.className.replace('show', '').trim();
+                }, 3500);
+            }
+        };
+
+        let lastArrivalSpeechText = "";
         window.telahSampai = function() {
-            window.tutupModal('nav-popup');
-            document.getElementById('route-svg').style.display = 'none';
-            document.getElementById('survey-popup').style.display = 'flex';
-        }
+            // Tutup dialog navigasi tanpa membatalkan audio bicara
+            const navPopup = document.getElementById('nav-popup');
+            if (navPopup) navPopup.style.display = 'none';
+            const routeSvg = document.getElementById('route-svg');
+            if (routeSvg) routeSvg.style.display = 'none';
+
+            const tujuan = window.lokasiTujuanTerakhir || lokasiTujuan || "lokasi tujuan Anda";
+            const nama = window.currentUserName ? `, ${window.currentUserName}` : "";
+            const ucapan = `Selamat${nama}, Anda telah sampai di lokasi tujuan: ${tujuan}. Terima kasih telah menggunakan panduan navigasi RSJD Atma Husada Mahakam. Semoga lekas pulih dan sehat selalu. Silakan berikan ulasan Anda.`;
+            lastArrivalSpeechText = ucapan;
+
+            // Suarakan ucapan sampai di lokasi tujuan
+            if (window.bicara) {
+                window.bicara(ucapan);
+            }
+
+            if (window.tampilkanToast) {
+                window.tampilkanToast(`🎉 Selamat! Anda telah sampai di ${tujuan}`);
+            }
+
+            const sub = document.getElementById('survey-arrival-subtitle');
+            if (sub) sub.innerText = `Selamat${nama}, Anda telah sampai di ${tujuan}!`;
+
+            // Buka popup survey penilaian
+            const surveyPopup = document.getElementById('survey-popup');
+            if (surveyPopup) surveyPopup.style.display = 'flex';
+        };
+
+        window.ulangUcapanSampai = function() {
+            if (window.bicara && lastArrivalSpeechText) {
+                window.bicara(lastArrivalSpeechText);
+            }
+        };
         window.putarEvakuasi = function() { window.bicara("Perhatian, ini adalah jalur evakuasi darurat. Ikuti petunjuk panah berwarna hijau menyala di lantai menuju titik kumpul terdekat."); }
         window.renderHotspotsToMap = function() {
             document.querySelectorAll('.hotspot, .hotspot-dot').forEach(el => el.remove());
@@ -1942,10 +2229,18 @@
             });
         };
 
-        // Close dropdown when clicking outside
+        // Close dropdown & HUD when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#custom-tujuan-btn') && !e.target.closest('#search-tujuan') && !e.target.closest('#list-tujuan-container')) {
                 window.tutupDropdownTujuan();
+            }
+            if (!e.target.closest('#hud-panel') && !e.target.closest('#btn-hud-expand')) {
+                const panel = document.getElementById('hud-panel');
+                if (panel && panel.style.display === 'flex') {
+                    panel.style.display = 'none';
+                    const expandBtn = document.getElementById('btn-hud-expand');
+                    if (expandBtn) expandBtn.classList.remove('active');
+                }
             }
         });
 
