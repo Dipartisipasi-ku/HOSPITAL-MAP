@@ -764,9 +764,13 @@
 
     <!-- SCRIPT UTAMA MODULE -->
     <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDocs, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
         
 
-        let systemPIN = '123456789012';
+        let app, auth, db, timeoutHint; let systemPIN = '123456789012';
         let settingTTS = { volume: 1.0, rate: 0.9 };
         let dataLokasiAsal = []; 
         let dataRute = {}; 
@@ -937,10 +941,12 @@
         
         
         window.fetchAllDataFirebase = async function() {
+            
+
             try {
                 document.getElementById('sync-indicator').style.display = 'block';
                 
-                let timeoutHint = setTimeout(() => {
+                timeoutHint = setTimeout(() => {
                     const textEl = document.getElementById('loading-text');
                     if (textEl && textEl.style.display !== 'none') {
                         textEl.innerText = "⏳ Sedang memuat database... (Memastikan koneksi)";
@@ -1030,7 +1036,7 @@
         }
         window.fetchAllDataSupabase = window.fetchAllDataFirebase; // Alias for backward compatibility
 
-        window.onload = fetchAllDataFirebase;
+        
 
         // ==========================================
         // C-PANEL: RENDER LISTS & CRUD
@@ -1387,13 +1393,14 @@
             document.getElementById('chk-kemudahan').checked = false;
             document.getElementById('chk-pelayanan').checked = false;
         }
-    </script>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-      import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDocs, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    
+// -- merged scripts --
+
       
-      let app, auth, db;
+      
+      
+      
+      
       
       window.currentUserRole = "pengunjung"; 
       window.customSigns = {};
@@ -1408,26 +1415,16 @@
               db = getFirestore(app, config.firestoreDatabaseId);
               
               // Expose for CRUD
-              window.db = db;
               window.auth = auth;
-              window.doc = doc;
-              window.getDoc = getDoc;
-              window.setDoc = setDoc;
-              window.collection = collection;
-              window.onSnapshot = onSnapshot;
-              window.query = query;
-              window.getDocs = getDocs;
-              window.updateDoc = updateDoc;
-              window.deleteDoc = deleteDoc;
-              window.addDoc = addDoc;
+              if (typeof window.fetchAllDataFirebase === 'function') window.fetchAllDataFirebase();
 
               loadLogoFirebase();
 
               onAuthStateChanged(auth, async (user) => {
                   if (user) {
-                      const userDoc = await getDoc(doc(db, "users", user.uid));
+                      const userDoc = await getDoc(doc(db, 'users', user.uid));
                       if (!userDoc.exists()) {
-                          await setDoc(doc(db, "users", user.uid), {
+                          await setDoc(doc(db, 'users', user.uid), {
                               role: 'pengunjung',
                               email: user.email
                           });
