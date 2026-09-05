@@ -8,16 +8,26 @@
         /* =========================================
            PALET WARNA TEMA: Maroon, Black, Silver, Gold
         ========================================= */
-        * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body, html { width: 100vw; height: 100vh; overflow: hidden; background: #111111; color: #111111; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body, html { 
+            width: 100%; 
+            max-width: 100vw; 
+            height: 100%; 
+            overflow-x: hidden; 
+            overflow-y: hidden; 
+            background: #111111; 
+            color: #111111; 
+            -webkit-text-size-adjust: 100%;
+        }
         
         /* LAYAR LANDING RESMI */
         #start-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            position: fixed; top: 0; left: 0; width: 100%; max-width: 100vw; height: 100%; 
             background: linear-gradient(rgba(92, 0, 0, 0.88), rgba(17, 17, 17, 0.95)), 
                         url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 9999; cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s; text-align: center;
+            z-index: 10000; cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s; text-align: center;
+            overflow-y: auto; overflow-x: hidden; padding: 25px 15px 50px 15px; box-sizing: border-box;
         }
         #start-overlay .icon-landing { font-size: 70px; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
         #start-overlay .title-landing { font-size: 42px; margin-bottom: 8px; color: #D4AF37; font-weight: 800; letter-spacing: 2px; text-shadow: 0 3px 10px rgba(0,0,0,0.8); }
@@ -28,7 +38,17 @@
         @keyframes pulseAnim { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
 
         /* STRUKTUR UTAMA (SIDEBAR & MAP VIEW) */
-        .app-container { display: flex; flex-direction: row; width: 100%; height: 100%; position: relative; overflow: hidden; }
+        .app-container { 
+            display: flex; 
+            flex-direction: row; 
+            width: 100%; 
+            max-width: 100%; 
+            height: calc(100% - 38px); 
+            position: relative; 
+            overflow-x: hidden; 
+            overflow-y: hidden; 
+            box-sizing: border-box;
+        }
         
         /* Sidebar Pengunjung */
         .sidebar { 
@@ -97,7 +117,15 @@
             background-image: 
                 repeating-linear-gradient(to right, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
                 repeating-linear-gradient(to bottom, transparent, transparent 80px, rgba(255,255,255,0.02) 80px, rgba(255,255,255,0.02) 81px);
-            perspective: 1200px; cursor: grab; 
+            perspective: 1200px; cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            overscroll-behavior: none;
+        }
+        .map-view:active {
+            cursor: grabbing;
         }
         
         .no-map-warning {
@@ -109,8 +137,15 @@
         .map-wrapper { 
             position: relative; display: inline-block; line-height: 0;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7); border-radius: 10px; background: transparent;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
             transform-style: preserve-3d; transform-origin: center center; z-index: 60;
+            will-change: transform;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: none;
+        }
+        .map-wrapper.smooth-transition {
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease !important;
         }
         .map-wrapper img { 
             display: none; max-width: 100%; max-height: 85vh; width: auto; height: auto; 
@@ -150,6 +185,36 @@
         /* ------------------------------------------- */
         /* HUD KONTROL PETA & QUICK TOOLBAR */
         /* ------------------------------------------- */
+        .map-zoom-controls {
+            position: absolute; top: 20px; right: 20px; z-index: 140;
+            display: flex; flex-direction: column; align-items: center;
+            background: rgba(17, 17, 17, 0.92); padding: 4px; border-radius: 24px;
+            border: 1.5px solid #D4AF37; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+        }
+        .btn-zoom-ctrl {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #222222; color: #E0E0E0; border: none;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            transition: all 0.2s ease; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            user-select: none;
+        }
+        .btn-zoom-ctrl:hover, .btn-zoom-ctrl:active {
+            background: #8B0000; color: #D4AF37; transform: scale(1.08);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .zoom-divider {
+            width: 24px; height: 1px; background: rgba(212, 175, 55, 0.35); margin: 3px 0;
+        }
+
+        .map-aux-controls {
+            position: absolute; top: 125px; right: 20px; z-index: 140;
+            display: flex; flex-direction: column; gap: 8px;
+            background: rgba(17, 17, 17, 0.92); padding: 6px; border-radius: 24px;
+            border: 1.5px solid #D4AF37; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+        }
         .map-quick-toolbar {
             position: absolute; top: 20px; right: 20px; z-index: 140;
             display: flex; flex-direction: column; gap: 8px;
@@ -163,6 +228,7 @@
             display: flex; justify-content: center; align-items: center;
             font-size: 14px; font-weight: bold; cursor: pointer;
             transition: all 0.2s ease; outline: none; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            user-select: none;
         }
         .btn-quick-ctrl:hover, .btn-quick-ctrl:active {
             background: #8B0000; color: #D4AF37; border-color: #D4AF37;
@@ -208,10 +274,50 @@
             background: #D4AF37; color: #111;
         }
         .btn-top-hud.btn-top-toggle {
-            background: #8B0000; color: #FFF; border-color: #D4AF37; display: none;
+            background: #8B0000; color: #FFF; border-color: #D4AF37; display: inline-flex;
         }
         .btn-top-hud.btn-top-toggle:hover {
             background: #a00; color: #FFF;
+        }
+
+        /* Tombol Cepat Buka Pilihan Tujuan saat Toolbar Tutup */
+        .btn-prompt-expand {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 4px;
+            background: #222;
+            color: #D4AF37;
+            border: 1.5px dashed rgba(212, 175, 55, 0.65);
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .btn-prompt-expand:hover {
+            background: #8B0000;
+            color: #FFF;
+            border-color: #D4AF37;
+            border-style: solid;
+        }
+
+        /* Toolbar / Sidebar Ditutup Default: Hanya menyisakan Titik Awal */
+        .sidebar.is-collapsed #view-tujuan {
+            display: none !important;
+        }
+        .sidebar.is-collapsed #container-titik-awal {
+            display: block !important;
+        }
+        .sidebar.is-collapsed #btn-buka-tujuan-prompt {
+            display: flex !important;
+        }
+        .sidebar:not(.is-collapsed) #btn-buka-tujuan-prompt {
+            display: none !important;
         }
 
         /* Active Route Chip (Compact Bar) */
@@ -225,41 +331,90 @@
             display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; cursor: pointer;
         }
         .chip-badge-asal {
-            background: #333; color: #DDD; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            background: #252525; color: #DDD; font-size: 11px; padding: 3px 7px; border-radius: 4px; font-weight: bold; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; border: 1px dashed rgba(212,175,55,0.45); transition: 0.2s;
         }
+        .chip-badge-asal:hover { background: #383838; border-color: #D4AF37; color: #D4AF37; }
         .chip-arrow {
             color: #D4AF37; font-weight: bold; font-size: 12px;
         }
         .chip-badge-tujuan {
-            background: #8B0000; color: #FFF; font-size: 12px; padding: 2px 7px; border-radius: 4px; font-weight: 800; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            background: #8B0000; color: #FFF; font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: 800; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .route-chip-btns {
-            display: flex; gap: 6px; align-items: center; flex: none;
+            display: flex; gap: 5px; align-items: center; flex: none;
         }
+        .btn-chip-origin {
+            background: #1f1f1f; color: #D4AF37; border: 1.5px solid #D4AF37; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;
+        }
+        .btn-chip-origin:hover { background: #8B0000; color: #fff; border-color: #8B0000; }
         .btn-chip-guide {
-            background: #D4AF37; color: #111; border: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            background: #D4AF37; color: #111; border: none; padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap;
         }
         .btn-chip-guide:hover { background: #b89628; }
         .btn-chip-edit {
-            background: #2a2a2a; color: #ccc; border: 1px solid #555; padding: 5px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s;
+            background: #2a2a2a; color: #ccc; border: 1px solid #555; padding: 5px 7px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; white-space: nowrap;
         }
         .btn-chip-edit:hover { background: #444; color: #fff; }
 
-        /* Tombol Bottom Right Desktop Umum */
-        .btn-cpanel { 
-            position: absolute; bottom: 25px; right: 25px; background: #1A1A1A; color: #D4AF37; 
-            border: 2px solid #555; padding: 12px 22px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; z-index: 10001; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        /* Running Text Pengembang (Marquee Bergerak Lebih Lambat & Terpusat Center) */
+        .bottom-running-marquee {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 38px;
+            background: rgba(14, 14, 14, 0.95);
+            border-top: 1.5px solid rgba(212, 175, 55, 0.45);
+            z-index: 10001;
+            overflow: hidden;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -3px 12px rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
         }
-        .btn-cpanel:hover { background: #D4AF37; color: #111111; border-color: #111111; }
-        
-        .btn-hud-tanya { 
-            position: absolute; bottom: 25px; right: 160px; background: #8B0000; color: #D4AF37; 
-            border: 2px solid #D4AF37; padding: 12px 24px; border-radius: 30px; font-weight: bold; 
-            font-size: 15px; cursor: pointer; z-index: 10001; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
-            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        .running-marquee-track {
+            display: flex;
+            width: max-content;
+            white-space: nowrap;
+            will-change: transform;
+            animation: runningTextMarquee 65s linear infinite;
         }
-        .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
+        .running-marquee-item {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-right: 180px;
+            line-height: 1.25;
+            user-select: none;
+        }
+        .marquee-line1 {
+            font-size: 11px;
+            color: #C8C8C8;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+            text-align: center;
+            width: 100%;
+        }
+        .marquee-line2 {
+            font-size: 12.5px;
+            color: #D4AF37;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 100%;
+        }
+        @keyframes runningTextMarquee {
+            0% {
+                transform: translateX(100vw);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
 /* ------------------------------------------- */
         /* ADMIN PANEL & POPUPS */
         /* ------------------------------------------- */
@@ -361,23 +516,58 @@
         @media (max-width: 950px) {
             .app-container { 
                 flex-direction: column; 
-                height: 100vh;
-                height: 100dvh;
-                overflow: hidden;
+                width: 100%;
+                max-width: 100%;
+                height: calc(100vh - 38px);
+                height: calc(100dvh - 38px);
+                overflow-x: hidden;
+                overflow-y: hidden;
+                box-sizing: border-box;
             }
             .sidebar { 
-                width: 100%; 
-                max-width: 100%; 
+                width: 100% !important; 
+                max-width: 100% !important; 
+                min-width: 0 !important;
                 height: auto; 
                 max-height: 48vh; 
+                overflow-x: hidden;
                 overflow-y: auto; 
                 border-right: none; 
                 border-bottom: 3px solid #8B0000; 
                 padding: 10px 12px; 
                 z-index: 100;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+                box-sizing: border-box;
             }
             
+            .sidebar-header-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 8px;
+            }
+            .sidebar-header-row .header-title {
+                font-size: 16px;
+                margin: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+            .sidebar-top-actions {
+                display: flex;
+                gap: 4px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            .btn-top-hud {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
             /* Tampilkan tombol toggle panel pada mobile */
             .btn-top-hud.btn-top-toggle {
                 display: inline-flex;
@@ -388,19 +578,67 @@
                 max-height: none !important;
                 padding-bottom: 6px;
             }
-            .sidebar.is-collapsed .sidebar-body {
+            .sidebar.is-collapsed #view-tujuan {
                 display: none !important;
             }
-            
-            .map-view { 
-                width: 100%; 
-                flex: 1; 
-                padding: 5px; 
-                z-index: 50;
-                position: relative;
+            .sidebar.is-collapsed #container-titik-awal {
+                display: block !important;
             }
             
-            /* Map Quick Toolbar di Mobile: Posisi rapi di kanan atas, tidak menghalangi rute & denah */
+            .active-route-chip {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .map-view { 
+                width: 100% !important; 
+                max-width: 100% !important;
+                flex: 1; 
+                padding: 0 !important; 
+                z-index: 50;
+                position: relative;
+                overflow: hidden !important;
+                box-sizing: border-box;
+            }
+            
+            /* Penempatan Tombol Zoom Adaptif di Mobile (Aman di atas Marquee Running Text) */
+            .map-zoom-controls {
+                top: auto;
+                bottom: 46px !important;
+                right: 12px;
+                padding: 5px;
+                border-radius: 30px;
+                box-shadow: 0 8px 26px rgba(0,0,0,0.85);
+                border: 1.5px solid #D4AF37;
+                background: rgba(18, 18, 18, 0.94);
+                z-index: 140;
+            }
+            .btn-zoom-ctrl {
+                width: 44px;
+                height: 44px;
+                font-size: 19px;
+            }
+            .zoom-divider {
+                width: 28px;
+                margin: 2px 0;
+            }
+
+            /* Toolbar Opsi & Mode (3D, Reset, Rotasi) Menempati Kanan Atas Secara Horizontal & Ramping */
+            .map-aux-controls {
+                top: 10px;
+                right: 10px;
+                flex-direction: row;
+                gap: 6px;
+                padding: 5px 8px;
+                border-radius: 20px;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+                border: 1.5px solid #D4AF37;
+                background: rgba(18, 18, 18, 0.94);
+                z-index: 140;
+            }
             .map-quick-toolbar {
                 top: 10px;
                 right: 10px;
@@ -413,11 +651,6 @@
                 width: 36px;
                 height: 36px;
                 font-size: 13px;
-            }
-            
-            /* Sembunyikan tombol melayang bawah pada mobile agar TIDAK menghalangi tombol navigasi & peta */
-            .btn-cpanel, .btn-hud-tanya {
-                display: none !important;
             }
             
             /* HUD Kontrol Peta Lanjutan di Mobile */
@@ -435,22 +668,35 @@
             
             .custom-options-container {
                 max-height: 35vh;
+                max-width: 100%;
+                overflow-x: hidden;
             }
             .tujuan-item-option {
                 padding: 11px 12px;
                 font-size: 13px;
                 min-height: 44px;
+                white-space: normal;
+                word-break: break-word;
             }
             
             /* Perbaikan Popup di Mobile (HP) */
+            .popup-overlay {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+                box-sizing: border-box;
+                padding: 10px;
+            }
             .popup-content { 
                 padding: 18px 14px; 
                 max-height: 88vh; 
                 max-height: 88dvh; 
                 overflow-y: auto; 
-                width: 95%;
-                max-width: 440px;
+                overflow-x: hidden;
+                width: 95% !important;
+                max-width: 95vw !important;
                 border-radius: 14px;
+                box-sizing: border-box;
             }
             .popup-content h2 { font-size: 18px; }
             .instruksi-teks { font-size: 15px; }
@@ -459,11 +705,19 @@
             .btn-group-row button { min-height: 44px; }
 
             /* Perbaikan C-Panel di Mobile (HP) */
-            .admin-panel { width: 100%; right: -100%; padding: 20px 14px; z-index: 10010; }
+            .admin-panel { 
+                width: 100% !important; 
+                max-width: 100vw !important; 
+                right: -100%; 
+                padding: 20px 14px; 
+                z-index: 10010; 
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
             .admin-header h2 { font-size: 20px; }
-            .admin-section { padding: 10px; gap: 8px; }
+            .admin-section { padding: 10px; gap: 8px; max-width: 100%; box-sizing: border-box; }
             .admin-section h3 { font-size: 14px; }
-            .admin-section input, .admin-section select, .admin-section textarea { padding: 8px; font-size: 14px; }
+            .admin-section input, .admin-section select, .admin-section textarea { padding: 8px; font-size: 14px; max-width: 100%; box-sizing: border-box; }
             .flex-row { flex-direction: column; align-items: stretch; gap: 5px; }
         }
     
@@ -488,7 +742,6 @@
     
     <!-- LAYAR LANDING -->
     <div id="start-overlay">
-        <button id="btn-landing-cpanel" onclick="bukaModalLogin()" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: #D4AF37; border: 1.5px solid #D4AF37; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: bold; z-index: 10001; display: flex; align-items: center; gap: 6px;">⚙️ Akses C-Panel</button>
         <div id="logo-container" style="margin-bottom: 10px;">
             <img id="landing-logo-img" src="" style="display: none; max-width: 120px; max-height: 120px; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.6));" alt="Logo">
             <h1 class="icon-landing" id="landing-logo-emoji">🏥</h1>
@@ -515,47 +768,55 @@
         </div>
         
         <p id="loading-text" class="badge-status" style="margin-top: 20px;">⏳ Menghubungkan ke Server Database...</p>
-        <div style="position: absolute; bottom: 15px; font-size: 12px; color: #D4AF37; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-weight: bold; letter-spacing: 0.5px;">Didesain dan dikembangkan oleh: Riandy, S.Kep</div>
     </div>
 
 
 
     <div class="app-container">
         <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
-        <div class="sidebar" id="main-sidebar">
+        <div class="sidebar is-collapsed" id="main-sidebar">
             <div class="sidebar-header-row">
-                <h2 class="header-title">🗺️ Navigasi Pintar</h2>
+                <h2 class="header-title">🗺️ SMART NAV</h2>
                 <div class="sidebar-top-actions">
                     <button type="button" class="btn-top-hud" onclick="bukaModalQA()" title="Tanya Jawab Seputar RS">💬 Tanya</button>
                     <button type="button" class="btn-top-hud" onclick="bukaModalLogin()" title="Akses C-Panel Admin">⚙️ C-Panel</button>
-                    <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Kecilkan / Buka Pilihan">▲ Tutup</button>
+                    <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Buka / Tutup Pilihan Tujuan">▼ Tujuan</button>
                 </div>
             </div>
 
             <!-- Ringkasan Rute Aktif (Compact Chip saat rute berjalan atau panel tertutup) -->
             <div id="active-route-chip" class="active-route-chip" style="display: none;">
                 <div class="route-chip-info" onclick="bukaModalNavigasiAktif()" title="Klik untuk membuka panduan rute">
-                    <span class="chip-badge-asal" id="chip-asal-text">Lobi</span>
+                    <span class="chip-badge-asal" id="chip-asal-text" onclick="event.stopPropagation(); ubahTitikAwal();" title="Klik untuk ubah titik awal">Pilih Asal</span>
                     <span class="chip-arrow">➔</span>
                     <span class="chip-badge-tujuan" id="chip-tujuan-text">Poli</span>
                 </div>
                 <div class="route-chip-btns">
+                    <button type="button" class="btn-chip-origin" id="btn-chip-ubah-asal" onclick="ubahTitikAwal()" title="Ganti Titik Awal Anda">📍 Ubah Asal</button>
                     <button type="button" class="btn-chip-guide" onclick="bukaModalNavigasiAktif()">🧭 Panduan</button>
-                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">✏️ Ubah</button>
+                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">✏️ Tujuan</button>
                 </div>
             </div>
 
             <div id="auth-panel" style="display: none !important;"></div>
 
-            <!-- Konten Pemilihan Rute (Dapat di-collapse di mobile) -->
+            <!-- Konten Pemilihan Rute (Dapat di-collapse di mobile dan desktop) -->
             <div id="sidebar-collapsible-body" class="sidebar-body" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-                <!-- PILIHAN TITIK AWAL -->
-                <div style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 10px;">
-                    <label class="target-label" style="color:#D4AF37; margin-bottom: 5px; display: block; font-size: 12px;">📍 TITIK AWAL ANDA:</label>
-                    <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 8px 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 13px; font-weight: bold; cursor: pointer;"></select>
+                <!-- PILIHAN TITIK AWAL (Tetap tampil saat toolbar tutup) -->
+                <div id="container-titik-awal" style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                        <label class="target-label" style="color:#D4AF37; margin:0; display: block; font-size: 12px;">📍 TITIK AWAL ANDA:</label>
+                        <button type="button" id="btn-kembali-asal" onclick="kembaliPilihAsal()" style="background:transparent; border:none; color:#bbb; font-size:11px; cursor:pointer; text-decoration:underline;">↺ Kosongkan</button>
+                    </div>
+                    <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 8px 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 13px; font-weight: bold; cursor: pointer;">
+                        <option value="">-- Pilih Titik Awal --</option>
+                    </select>
                 </div>
 
-                <!-- PILIHAN TUJUAN -->
+                <!-- Tombol Cepat Buka Pilihan Tujuan saat Toolbar Tutup -->
+                <button type="button" id="btn-buka-tujuan-prompt" class="btn-prompt-expand" onclick="expandSidebarPanel()">🎯 Pilih Tujuan / Ruangan ▼</button>
+
+                <!-- PILIHAN TUJUAN (Disembunyikan saat toolbar tutup) -->
                 <div id="view-tujuan" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
                     <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
                     <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
@@ -577,10 +838,15 @@
                 <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- MAP QUICK TOOLBAR (Kompak, Elegan, Tidak Menghalangi Peta) -->
-            <div class="map-quick-toolbar" id="map-quick-toolbar">
-                <button type="button" class="btn-quick-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah">➕</button>
-                <button type="button" class="btn-quick-ctrl" onclick="zoomPeta(-0.2)" title="Perkecil Denah">➖</button>
+            <!-- MAP ZOOM CONTROLS (Adaptif: di Mobile berada di sudut kanan bawah yang nyaman bagi jempol) -->
+            <div class="map-zoom-controls" id="map-zoom-toolbar">
+                <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah" aria-label="Perbesar Denah">➕</button>
+                <div class="zoom-divider"></div>
+                <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(-0.2)" title="Perkecil Denah" aria-label="Perkecil Denah">➖</button>
+            </div>
+
+            <!-- MAP AUX TOOLBAR (Mode 3D, Reset, & Opsi Lanjutan di kanan atas) -->
+            <div class="map-aux-controls" id="map-aux-toolbar">
                 <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
                 <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
                 <button type="button" class="btn-quick-ctrl" id="btn-hud-expand" onclick="toggleHud()" title="Rotasi & Opsi Lanjutan">🧭</button>
@@ -627,9 +893,6 @@
                 <div id="draw-overlay"><div id="draw-box"></div></div>
             </div>
         </div>
-        
-        <button class="btn-cpanel" onclick="bukaModalLogin()">⚙️ C-Panel</button>
-        <button class="btn-hud-tanya" onclick="bukaModalQA()">💬 Tanya Jawab</button>
     </div>
 
     <!-- MODAL LOGIN C-PANEL -->
@@ -863,7 +1126,10 @@
             
             <!-- Badge Relasi Rute Asal ➔ Tujuan -->
             <div id="popup-rute-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid #D4AF37; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:bold; color:#8B0000; margin-bottom:12px; flex-wrap:wrap; justify-content:center;">
-                <span>📍 <span id="popup-badge-asal">Titik Awal</span></span>
+                <span onclick="ubahTitikAwalDariPopup()" style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Klik untuk ubah titik awal">
+                    📍 <span id="popup-badge-asal">Titik Awal</span>
+                    <span style="font-size:11px; text-decoration:underline; color:#D4AF37; margin-left:2px;">(Ubah)</span>
+                </span>
                 <span style="color:#D4AF37; font-size:16px;">➔</span>
                 <span>🎯 <span id="popup-badge-tujuan">Lokasi Tujuan</span></span>
                 <span id="popup-badge-status" style="font-size:11px; background:#8B0000; color:#FFF; padding:2px 6px; border-radius:10px; margin-left:4px;">Panduan Aktif</span>
@@ -875,7 +1141,7 @@
                 <button type="button" class="btn-primary" style="background:#D4AF37; color:#111; margin-bottom:5px;" onclick="promptEditSign()">✏️ Admin: Ubah Foto Tanda</button>
             </div>
             
-            
+            <button type="button" class="btn-primary" style="background:#1e1e1e; color:#D4AF37; border:1.5px solid #D4AF37; margin-top:5px; padding:10px; font-size:14px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="ubahTitikAwalDariPopup()">📍 Ubah Titik Awal Anda</button>
             <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
             <button type="button" class="btn-primary" style="background:#181818; color:#bbb; border-color:#333; margin-top:5px; padding:10px; font-size:14px;" onclick="panduanBalikKeAsal()">🔙 Baca Panduan Kembali ke Titik Awal</button>
 
@@ -987,15 +1253,41 @@
             }
         }
         
+        window.normalisasiTeksTTS = function(teks) {
+            if (!teks) return "";
+            let s = " " + String(teks) + " ";
+            
+            // Singkatan khusus rumah sakit untuk pelafalan TTS yang jernih & akurat
+            s = s.replace(/\b(simrs|sim-rs|sim\s*rs)\b/gi, " SIM er es ");
+            s = s.replace(/\b(rsjd|r\.s\.j\.d)\b/gi, " er es je de ");
+            s = s.replace(/\b(rs|r\.s)\b/gi, " er es ");
+            s = s.replace(/\b(cssd|c\.s\.s\.d)\b/gi, " ce es es de ");
+            s = s.replace(/\b(igd|i\.g\.d)\b/gi, " i ge de ");
+            s = s.replace(/\b(mcu|m\.c\.u)\b/gi, " em ce u ");
+            s = s.replace(/\bi\s*g\s*d\b/gi, " i ge de ");
+            s = s.replace(/\bm\s*c\s*u\b/gi, " em ce u ");
+            s = s.replace(/\b(spi|s\.p\.i)\b/gi, " es pe i ");
+            s = s.replace(/\b(jpk|j\.p\.k)\b/gi, " je pe ka ");
+            s = s.replace(/\b(ipk|i\.p\.k)\b/gi, " i pe ka ");
+            s = s.replace(/\b(tps|t\.p\.s)\b/gi, " te pe es ");
+            s = s.replace(/\b(b3|b-3|b\s*3)\b/gi, " be 3 ");
+            
+            return s.replace(/\s+/g, ' ').trim().toLowerCase();
+        };
+
         window.bicara = function(teks, callback) {
-            window.speechSynthesis.cancel();
-            // Konversi menjadi lowercase agar tidak mengeja kata yg huruf besar semua
-            let msg = new SpeechSynthesisUtterance(teks.toLowerCase());
-            msg.lang = 'id-ID'; msg.volume = settingTTS.volume; msg.rate = settingTTS.rate;
-            if(callback) msg.onend = callback;
-            window.speechSynthesis.speak(msg);
-        }
-        window.tesSuara = function() { window.bicara("Sistem audio dan navigasi siap digunakan."); }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let safeText = window.normalisasiTeksTTS(teks);
+                let msg = new SpeechSynthesisUtterance(safeText);
+                msg.lang = 'id-ID';
+                msg.volume = settingTTS.volume;
+                msg.rate = settingTTS.rate;
+                if(callback) msg.onend = callback;
+                window.speechSynthesis.speak(msg);
+            }
+        };
+        window.tesSuara = function() { window.bicara("Sistem audio dan navigasi RS Atma Husada siap digunakan."); }
 
         // ==========================================
         // KONTROL PETA (ZOOM, PAN, ROTATE)
@@ -1014,7 +1306,7 @@
             
             const isCollapsed = sidebar.classList.toggle('is-collapsed');
             if (btn) {
-                btn.innerText = isCollapsed ? '▼ Pilihan' : '▲ Tutup';
+                btn.innerText = isCollapsed ? '▼ Tujuan' : '▲ Tutup';
             }
         };
 
@@ -1031,7 +1323,7 @@
             const sidebar = document.getElementById('main-sidebar');
             const btn = document.getElementById('btn-toggle-sidebar');
             if (sidebar) sidebar.classList.add('is-collapsed');
-            if (btn) btn.innerText = '▼ Pilihan';
+            if (btn) btn.innerText = '▼ Tujuan';
         };
 
         window.bukaModalNavigasiAktif = function() {
@@ -1056,9 +1348,14 @@
             document.getElementById('btn-waze').classList.toggle('active', mode === '3D');
             const quickModeBtn = document.getElementById('btn-quick-view-mode');
             if (quickModeBtn) quickModeBtn.innerText = (mode === '3D') ? '🟦' : '🧊';
-            terapkanTransformasiPeta();
-        }
-        window.putarPeta = function(derajat) { rotasiPeta += derajat; terapkanTransformasiPeta(); }
+            terapkanTransformasiPeta(true);
+        };
+
+        window.putarPeta = function(derajat) { 
+            rotasiPeta += derajat; 
+            terapkanTransformasiPeta(true); 
+        };
+
         // ==========================================
         // FITUR KONTROL PETA (HUD & GESTURE)
         // ==========================================
@@ -1073,98 +1370,169 @@
                 panel.style.display = 'none';
                 if (expandBtn) expandBtn.classList.remove('active');
             }
-        }
-
-        // Variabel untuk pinch zoom
-        let initialDistance = 0;
-        let initialScale = 1;
-
-        // Mencegah scroll / pan default browser di atas peta saat multitouch dan implementasi pinch zoom
-        const mapAreaTouch = document.getElementById('interactive-map');
-        if(mapAreaTouch) {
-            mapAreaTouch.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    e.preventDefault(); 
-                    initialDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    initialScale = currentZoom;
-                }
-            }, { passive: false });
-
-            mapAreaTouch.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2) {
-                    e.preventDefault(); 
-                    const currentDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    // Hitung rasio zoom
-                    const ratio = currentDistance / initialDistance;
-                    let targetZoom = initialScale * ratio;
-                    
-                    // Batasi zoom sama seperti tombol
-                    if (targetZoom < 0.5) targetZoom = 0.5;
-                    if (targetZoom > 4.5) targetZoom = 4.5;
-                    
-                    currentZoom = targetZoom;
-                    terapkanTransformasiPeta();
-                }
-            }, { passive: false });
-        }
+        };
 
         window.zoomPeta = function(factor) {
             currentZoom += factor;
             if(currentZoom < 0.5) currentZoom = 0.5; 
             if(currentZoom > 4.5) currentZoom = 4.5;     
-            terapkanTransformasiPeta();
-        }
+            terapkanTransformasiPeta(true);
+        };
+
         window.resetPosisiPeta = function() {
             modePeta = 'FLAT'; rotasiPeta = 0; currentZoom = 1; panX = 0; panY = 0;
             document.getElementById('btn-flat').classList.add('active');
             document.getElementById('btn-waze').classList.remove('active');
-            terapkanTransformasiPeta();
-        }
+            const quickModeBtn = document.getElementById('btn-quick-view-mode');
+            if (quickModeBtn) quickModeBtn.innerText = '🧊';
+            terapkanTransformasiPeta(true);
+        };
 
-        function terapkanTransformasiPeta() {
+        // ==========================================
+        // ENGINE TRANSFORMASI & HARDWARE ACCELERATION
+        // ==========================================
+        let isPinching = false;
+        let initialPinchDist = 0;
+        let initialPinchZoom = 1;
+        let rAFPanId = null;
+
+        function terapkanTransformasiPeta(withSmoothTransition = false) {
             const wadahPeta = document.getElementById('interactive-map');
+            if (!wadahPeta) return;
+            
+            if (withSmoothTransition) {
+                wadahPeta.classList.add('smooth-transition');
+            } else {
+                wadahPeta.classList.remove('smooth-transition');
+            }
+
+            // Gunakan translate3d untuk komposit GPU hardware acceleration
             if (modePeta === '3D') {
-                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(55deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom * 1.25})`;
+                wadahPeta.style.transform = `translate3d(${panX.toFixed(2)}px, ${panY.toFixed(2)}px, 0) rotateX(55deg) rotateZ(${rotasiPeta}deg) scale(${(currentZoom * 1.25).toFixed(3)})`;
                 wadahPeta.style.boxShadow = `0 30px 60px rgba(0,0,0,0.85)`;
             } else {
-                wadahPeta.style.transform = `translate(${panX}px, ${panY}px) rotateX(0deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom})`;
+                wadahPeta.style.transform = `translate3d(${panX.toFixed(2)}px, ${panY.toFixed(2)}px, 0) rotateX(0deg) rotateZ(${rotasiPeta}deg) scale(${currentZoom.toFixed(3)})`;
                 wadahPeta.style.boxShadow = `0 15px 40px rgba(0,0,0,0.6)`;
             }
+        }
+
+        function jadwalTransformasiPeta() {
+            if (rAFPanId) return;
+            rAFPanId = requestAnimationFrame(() => {
+                terapkanTransformasiPeta(false);
+                rAFPanId = null;
+            });
         }
 
         const mapView = document.getElementById('map-container-view');
         const mapWrapper = document.getElementById('interactive-map');
 
-        function startPan(e) {
-            if(isDrawingArea) return; 
-            if(e.target.closest('.map-controls-hud') || e.target.closest('.btn-cpanel') || e.target.closest('.btn-hud-tanya')) return;
+        // MOUSE PANNING & TRACKING (Window-level agar tidak tersendat)
+        function startMousePan(e) {
+            if (isDrawingArea) return;
+            if (e.button !== 0) return; // Hanya klik kiri
+            if (e.target.closest('.map-controls-hud') || e.target.closest('.map-zoom-controls') || 
+                e.target.closest('.map-quick-toolbar') || e.target.closest('.credit-dev-badge')) return;
             
             isPanning = true;
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            startPanX = clientX - panX; startPanY = clientY - panY;
-            mapView.style.cursor = 'grabbing'; mapWrapper.style.transition = 'none'; 
-        }
-        function doPan(e) {
-            if(!isPanning) return;
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            panX = clientX - startPanX; panY = clientY - startPanY;
-            terapkanTransformasiPeta();
-        }
-        function endPan() {
-            isPanning = false; mapView.style.cursor = 'grab';
-            mapWrapper.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease';
+            startPanX = e.clientX - panX;
+            startPanY = e.clientY - panY;
+            if (mapView) mapView.style.cursor = 'grabbing';
+            if (mapWrapper) mapWrapper.classList.remove('smooth-transition');
         }
 
-        mapView.addEventListener('mousedown', startPan); mapView.addEventListener('mousemove', doPan); window.addEventListener('mouseup', endPan);
-        mapView.addEventListener('touchstart', startPan, {passive: true}); mapView.addEventListener('touchmove', doPan, {passive: true}); window.addEventListener('touchend', endPan);
+        function doMousePan(e) {
+            if (!isPanning) return;
+            panX = e.clientX - startPanX;
+            panY = e.clientY - startPanY;
+            jadwalTransformasiPeta();
+        }
+
+        function endMousePan() {
+            if (!isPanning) return;
+            isPanning = false;
+            if (mapView) mapView.style.cursor = 'grab';
+        }
+
+        if (mapView) {
+            mapView.addEventListener('mousedown', startMousePan);
+            window.addEventListener('mousemove', doMousePan);
+            window.addEventListener('mouseup', endMousePan);
+
+            // MOUSE WHEEL ZOOM (Responsif & mulus pada mouse/laptop trackpad)
+            mapView.addEventListener('wheel', (e) => {
+                if (isDrawingArea) return;
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.12 : -0.12;
+                currentZoom = Math.max(0.5, Math.min(4.5, currentZoom + delta));
+                jadwalTransformasiPeta();
+            }, { passive: false });
+        }
+
+        // TOUCH GESTURE (Pinch-to-zoom dan 1-finger pan terkoordinasi rapi tanpa jeda)
+        if (mapView) {
+            mapView.addEventListener('touchstart', (e) => {
+                if (isDrawingArea) return;
+                if (e.target.closest('.map-controls-hud') || e.target.closest('.map-zoom-controls') || 
+                    e.target.closest('.map-quick-toolbar') || e.target.closest('.credit-dev-badge')) return;
+
+                if (e.touches.length === 1) {
+                    isPanning = true;
+                    isPinching = false;
+                    startPanX = e.touches[0].clientX - panX;
+                    startPanY = e.touches[0].clientY - panY;
+                    if (mapWrapper) mapWrapper.classList.remove('smooth-transition');
+                } else if (e.touches.length === 2) {
+                    isPanning = false;
+                    isPinching = true;
+                    initialPinchDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    initialPinchZoom = currentZoom;
+                    if (mapWrapper) mapWrapper.classList.remove('smooth-transition');
+                }
+            }, { passive: true });
+
+            mapView.addEventListener('touchmove', (e) => {
+                if (isDrawingArea) return;
+                if (e.touches.length === 1 && isPanning) {
+                    if (e.cancelable) e.preventDefault();
+                    panX = e.touches[0].clientX - startPanX;
+                    panY = e.touches[0].clientY - startPanY;
+                    jadwalTransformasiPeta();
+                } else if (e.touches.length === 2 && isPinching && initialPinchDist > 0) {
+                    if (e.cancelable) e.preventDefault();
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const ratio = dist / initialPinchDist;
+                    let targetZoom = initialPinchZoom * ratio;
+                    if (targetZoom < 0.5) targetZoom = 0.5;
+                    if (targetZoom > 4.5) targetZoom = 4.5;
+                    currentZoom = targetZoom;
+                    jadwalTransformasiPeta();
+                }
+            }, { passive: false });
+
+            const endTouch = (e) => {
+                if (e.touches.length === 1) {
+                    // Transisi mulus jika salah satu jari dilepas saat pinch
+                    isPanning = true;
+                    isPinching = false;
+                    startPanX = e.touches[0].clientX - panX;
+                    startPanY = e.touches[0].clientY - panY;
+                } else if (e.touches.length === 0) {
+                    isPanning = false;
+                    isPinching = false;
+                    initialPinchDist = 0;
+                }
+            };
+
+            mapView.addEventListener('touchend', endTouch, { passive: true });
+            mapView.addEventListener('touchcancel', endTouch, { passive: true });
+        }
 
         // ==========================================
         // FETCH DATA SUPABASE
@@ -1735,7 +2103,7 @@
             return null;
         }
 
-        window.pilihTujuan = function(tujuan) {
+        window.pilihTujuan = function(tujuan, bukaModal = true, bacaSuara = true) {
             window.tutupDropdownTujuan();
             lokasiTujuan = tujuan;
             document.getElementById('custom-tujuan-btn').innerHTML = `${tujuan} <span style="float:right; font-size:10px; margin-top:2px;">▼</span>`;
@@ -1754,8 +2122,8 @@
                 if (chipTuj) chipTuj.innerText = tujuan;
             }
             
-            // Pada layar mobile, perkecil panel agar peta terlihat jelas tanpa terhalang
-            if (window.innerWidth <= 950) {
+            // Pada layar mobile, perkecil panel bila membuka modal navigasi agar denah tidak terhalang
+            if (window.innerWidth <= 950 && bukaModal) {
                 window.collapseSidebarPanel();
             }
             
@@ -1811,30 +2179,16 @@
                 document.getElementById('route-svg').style.display = 'none';
             }
             
-            document.getElementById('nav-popup').style.display = 'flex';
             lastNavSpeechText = instruksiFinal;
-            window.bicara(instruksiFinal);
-        }
+            if (bukaModal) {
+                document.getElementById('nav-popup').style.display = 'flex';
+            }
+            if (bacaSuara && window.bicara) {
+                window.bicara(instruksiFinal);
+            }
+        };
 
         
-        window.bicara = function(text, callback) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                // Perbaiki ejaan singkatan RS
-                let safeText = text.toLowerCase();
-                safeText = safeText.replace(/i g d/g, "i ge de")
-                                   .replace(/m c u/g, "em ce u")
-                                   .replace(/igd/g, "i ge de")
-                                   .replace(/mcu/g, "em ce u");
-                const msg = new SpeechSynthesisUtterance(safeText);
-                msg.lang = 'id-ID';
-                msg.volume = settingTTS.volume;
-                msg.rate = settingTTS.rate;
-                if(callback) msg.onend = callback;
-                window.speechSynthesis.speak(msg);
-            }
-        }
-
         window.ulangSuaraRute = function() { window.bicara(lastNavSpeechText); }
 
         window.panduanBalikKeAsal = function() {
@@ -1887,30 +2241,41 @@
             if (routeSvg) routeSvg.style.display = 'none';
 
             const tujuan = window.lokasiTujuanTerakhir || lokasiTujuan || "lokasi tujuan Anda";
-            const nama = window.currentUserName ? `, ${window.currentUserName}` : "";
-            const ucapan = `Selamat${nama}, Anda telah sampai di lokasi tujuan: ${tujuan}. Terima kasih telah menggunakan panduan navigasi RSJD Atma Husada Mahakam. Semoga lekas pulih dan sehat selalu. Silakan berikan ulasan Anda.`;
-            lastArrivalSpeechText = ucapan;
-
-            // Suarakan ucapan sampai di lokasi tujuan
-            if (window.bicara) {
-                window.bicara(ucapan);
-            }
+            const ucapanTiba = `Anda telah tiba di ${tujuan}, senang bisa membantu anda.`;
+            const ucapanUlasan = `selanjutnya silahkan beri ulasan anda, terima kasih`;
+            lastArrivalSpeechText = `${ucapanTiba} ${ucapanUlasan}`;
 
             if (window.tampilkanToast) {
-                window.tampilkanToast(`🎉 Selamat! Anda telah sampai di ${tujuan}`);
+                window.tampilkanToast(`🎉 Anda telah tiba di ${tujuan}`);
             }
 
             const sub = document.getElementById('survey-arrival-subtitle');
-            if (sub) sub.innerText = `Selamat${nama}, Anda telah sampai di ${tujuan}!`;
+            if (sub) sub.innerText = `Anda telah tiba di ${tujuan}, senang bisa membantu anda.`;
 
             // Buka popup survey penilaian
             const surveyPopup = document.getElementById('survey-popup');
             if (surveyPopup) surveyPopup.style.display = 'flex';
+
+            // Suarakan ucapan tiba, lalu lanjutkan dengan permintaan ulasan
+            if (window.bicara) {
+                window.bicara(ucapanTiba, () => {
+                    setTimeout(() => {
+                        window.bicara(ucapanUlasan);
+                    }, 350);
+                });
+            }
         };
 
         window.ulangUcapanSampai = function() {
-            if (window.bicara && lastArrivalSpeechText) {
-                window.bicara(lastArrivalSpeechText);
+            const tujuan = window.lokasiTujuanTerakhir || lokasiTujuan || "lokasi tujuan Anda";
+            const ucapanTiba = `Anda telah tiba di ${tujuan}, senang bisa membantu anda.`;
+            const ucapanUlasan = `selanjutnya silahkan beri ulasan anda, terima kasih`;
+            if (window.bicara) {
+                window.bicara(ucapanTiba, () => {
+                    setTimeout(() => {
+                        window.bicara(ucapanUlasan);
+                    }, 350);
+                });
             }
         };
         window.putarEvakuasi = function() { window.bicara("Perhatian, ini adalah jalur evakuasi darurat. Ikuti petunjuk panah berwarna hijau menyala di lantai menuju titik kumpul terdekat."); }
@@ -1962,7 +2327,6 @@
             }
             popup.style.display = 'flex';
         }
-        window.resetPosisiPeta = function() { } 
 
         window.bukaSurveyPopup = function() { document.getElementById('survey-popup').style.display = 'flex'; }
         
@@ -2247,30 +2611,87 @@
         // ==========================================
         // TITIK AWAL CONTROL
         // ==========================================
-        window.pilihLokasiSekarang = function(asal) {
-            lokasiAsal = asal;
+        window.pilihLokasiSekarang = function(asal, ucapkan = true) {
+            lokasiAsal = asal || '';
             const selectAsal = document.getElementById('select-asal-dropdown');
-            if (selectAsal && selectAsal.value !== asal) {
-                selectAsal.value = asal;
+            if (selectAsal && selectAsal.value !== (asal || '')) {
+                selectAsal.value = asal || '';
             }
             const lbl = document.getElementById('lbl-titik-awal-aktif');
-            if (lbl) lbl.innerText = asal;
+            if (lbl) lbl.innerText = asal || "-";
+
+            // Perbarui label titik awal pada chip & badge
+            const chipAsal = document.getElementById('chip-asal-text');
+            if (chipAsal) chipAsal.innerText = asal || "Pilih Asal";
+            const popupAsal = document.getElementById('popup-badge-asal');
+            if (popupAsal) popupAsal.innerText = asal || "Belum dipilih";
+
+            if (asal) {
+                // Pembacaan suara pemilihan titik awal
+                if (ucapkan && window.bicara) {
+                    if (lokasiTujuan) {
+                        window.bicara(`Titik awal diubah menjadi: ${asal}. Menghitung kembali rute menuju ${lokasiTujuan}.`);
+                    } else {
+                        window.bicara(`Titik awal Anda diatur dari: ${asal}. Silakan pilih lokasi tujuan.`);
+                    }
+                }
+
+                if (window.tampilkanToast) {
+                    window.tampilkanToast(`📍 Titik awal: ${asal}`);
+                }
+
+                // Otomatis buka pilihan tujuan jika titik awal dipilih
+                window.expandSidebarPanel();
+            } else {
+                // Sembunyikan garis rute svg bila titik awal kosong
+                const routeSvg = document.getElementById('route-svg');
+                if (routeSvg) routeSvg.style.display = 'none';
+            }
+
+            // Jika lokasi tujuan sudah ada, perbarui rute, garis svg, dan denah secara otomatis
+            if (lokasiTujuan && typeof window.pilihTujuan === 'function') {
+                window.pilihTujuan(lokasiTujuan, false, false);
+            }
+        };
+
+        window.ubahTitikAwal = function() {
+            window.expandSidebarPanel();
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (selectAsal) {
+                selectAsal.focus();
+                selectAsal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                selectAsal.style.transition = 'all 0.3s ease';
+                selectAsal.style.boxShadow = '0 0 16px #D4AF37';
+                selectAsal.style.borderColor = '#FFD700';
+                setTimeout(() => {
+                    selectAsal.style.boxShadow = '';
+                    selectAsal.style.borderColor = '#444';
+                }, 2500);
+            }
+            if (window.tampilkanToast) {
+                window.tampilkanToast("📍 Silakan pilih titik awal baru pada pilihan");
+            }
+            if (window.bicara) {
+                window.bicara("Silakan pilih titik awal Anda yang baru pada pilihan di atas.");
+            }
+        };
+
+        window.ubahTitikAwalDariPopup = function() {
+            window.tutupModal('nav-popup');
+            window.ubahTitikAwal();
         };
 
         window.kembaliPilihAsal = function() {
             const selectAsal = document.getElementById('select-asal-dropdown');
             if (selectAsal) {
-                selectAsal.innerHTML = '';
-                dataLokasiAsal.forEach((nama, idx) => {
+                selectAsal.innerHTML = '<option value="" selected>-- Pilih Titik Awal --</option>';
+                dataLokasiAsal.forEach((nama) => {
                     const opt = document.createElement('option');
                     opt.value = nama;
                     opt.innerText = nama;
-                    if (idx === 0) opt.selected = true;
                     selectAsal.appendChild(opt);
                 });
-                if (dataLokasiAsal.length > 0) {
-                    lokasiAsal = dataLokasiAsal[0];
-                }
+                window.pilihLokasiSekarang('', false);
             }
         };
 
@@ -2557,6 +2978,28 @@
         loadLogoSupabase();
         fetchAllDataSupabase();
     </script>
+
+    <!-- Running Text Pengembang (Marquee Bergerak Lambat dari Kanan ke Kiri di Bagian Bawah Layar) -->
+    <div id="bottom-running-marquee" class="bottom-running-marquee" aria-hidden="true">
+        <div class="running-marquee-track">
+            <div class="running-marquee-item">
+                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
+                <span class="marquee-line2">Riandy, S.Kep</span>
+            </div>
+            <div class="running-marquee-item">
+                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
+                <span class="marquee-line2">Riandy, S.Kep</span>
+            </div>
+            <div class="running-marquee-item">
+                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
+                <span class="marquee-line2">Riandy, S.Kep</span>
+            </div>
+            <div class="running-marquee-item">
+                <span class="marquee-line1">di desain dan dikembangkan oleh : </span>
+                <span class="marquee-line2">Riandy, S.Kep</span>
+            </div>
+        </div>
+    </div>
 
     <script src="security.js"></script>
 </body>
