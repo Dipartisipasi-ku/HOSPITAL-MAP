@@ -8,6 +8,8 @@
     "build": "echo 'Build OK'"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "@supabase/supabase-js": "^2.115.0",
+    "express": "^4.21.2",
+    "firebase": "^12.18.0"
   }
 }

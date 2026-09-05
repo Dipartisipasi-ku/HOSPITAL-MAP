@@ -974,7 +974,7 @@
                 // Ambil Asal
                 const asalSnap = await getDocs(collection(db, 'locations_origin'));
                 dataLokasiAsal = [];
-                asalSnap.forEach(doc => dataLokasiAsal.push(doc.id));
+                asalSnap.forEach(doc => dataLokasiAsal.push(decodeURIComponent(doc.id)));
                 dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b));
 
                 // Ambil Tujuan
@@ -982,7 +982,7 @@
                 dataRute = {};
                 tujuanSnap.forEach(docSnap => {
                     const t = docSnap.data();
-                    dataRute[docSnap.id] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor };
+                    dataRute[decodeURIComponent(docSnap.id)] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor };
                 });
 
                 // Ambil Hotspots
@@ -1024,9 +1024,7 @@
                 
                 renderHotspotsToMap(); renderAllAdminLists();
                 document.getElementById('sync-indicator').style.display = 'none';
-            } catch (error) {
-                console.error(error);
-                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek koneksi Anda.";
+            } catch (error) { console.error(error); if(typeof timeoutHint !== 'undefined') clearTimeout(timeoutHint); document.getElementById('loading-text').innerText = 'Gagal memuat database! Cek koneksi Anda (' + error.message + ').';
                 document.getElementById('sync-indicator').style.display = 'none';
             }
         }
@@ -1069,11 +1067,10 @@
         window.editFormAsal = function(nama) { editAsalName = nama; document.getElementById('label-mode-asal').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-asal').innerText = "💾 Update Data"; document.getElementById('admin-nama-asal').value = nama; }
         window.simpanDataAsalSupabase = async function() {
             const n = document.getElementById('admin-nama-asal').value.trim(); if (!n) return alert("Kosong!");
-            if (editAsalName) await supabase.from('lokasi_asal').update({ nama_lokasi: n }).eq('nama_lokasi', editAsalName);
-            else await supabase.from('lokasi_asal').insert([{ nama_lokasi: n }]);
+            if (editAsalName) { await deleteDoc(doc(db, 'locations_origin', encodeURIComponent(editAsalName))); await setDoc(doc(db, 'locations_origin', encodeURIComponent(n)), { nama_lokasi: n }); } else await setDoc(doc(db, 'locations_origin', encodeURIComponent(n)), { nama_lokasi: n });
             window.resetFormAsal(); await fetchAllDataSupabase();
         }
-        window.hapusAsal = async function(n) { if(confirm(`Hapus ${n}?`)) { await supabase.from('lokasi_asal').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
+        window.hapusAsal = async function(n) { if(confirm(`Hapus ${n}?`)) { await deleteDoc(doc(db, 'locations_origin', encodeURIComponent(n))); await fetchAllDataSupabase(); } }
 
         window.resetFormTujuan = function() { editTujuanName = null; document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-tujuan').innerText = "➕ Simpan Rute"; document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = ""; }
         window.editFormTujuan = function(nama) { editTujuanName = nama; const d = dataRute[nama]; document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute"; document.getElementById('admin-nama-lokasi').value = nama; document.getElementById('admin-akses').value = d.akses; document.getElementById('admin-rute').value = d.instruksi; document.getElementById('admin-tanda').value = d.gambarTanda; }
@@ -1081,12 +1078,11 @@
             const n = document.getElementById('admin-nama-lokasi').value.trim(); const a = document.getElementById('admin-akses').value; const r = document.getElementById('admin-rute').value.trim(); const t = document.getElementById('admin-tanda').value.trim();
             if (!n || !r || !t) return alert("Lengkapi data!"); 
             const payload = { akses: a, instruksi: r, gambar_tanda: t };
-            if (editTujuanName) await supabase.from('rute_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            else await supabase.from('rute_tujuan').insert([{ nama_lokasi: n, ...payload }]);
+            if (editTujuanName) { await deleteDoc(doc(db, 'locations_target', encodeURIComponent(editTujuanName))); await setDoc(doc(db, 'locations_target', encodeURIComponent(n)), payload); } else await setDoc(doc(db, 'locations_target', encodeURIComponent(n)), payload);
             window.resetFormTujuan(); await fetchAllDataSupabase();
         }
 
-        window.hapusTujuan = async function(n) { if(confirm('Hapus rute?')) { await supabase.from('rute_tujuan').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
+        window.hapusTujuan = async function(n) { if(confirm('Hapus rute?')) { await deleteDoc(doc(db, 'locations_target', encodeURIComponent(n))); await fetchAllDataSupabase(); } }
 
         window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hotspot').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hotspot').innerText = "➕ Simpan Hotspot"; document.getElementById('hs-bangunan').value = ""; document.getElementById('hs-x').value = ""; document.getElementById('hs-y').value = ""; document.getElementById('hs-nomor').value = ""; document.getElementById('hs-target').value = ""; }
         window.editFormHotspot = function(id) { editHotspotId = id; const hs = dataHotspots.find(h => h.id == id); if(!hs) return; document.getElementById('label-mode-hotspot').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hotspot').innerText = "💾 Update"; document.getElementById('hs-bangunan').value = hs.nama_bangunan; document.getElementById('hs-x').value = hs.x_pos; document.getElementById('hs-y').value = hs.y_pos; document.getElementById('hs-nomor').value = hs.nomor || ""; document.getElementById('hs-target').value = hs.target_lokasi || ""; }
@@ -1094,11 +1090,10 @@
             const b = document.getElementById('hs-bangunan').value.trim(); const x = parseFloat(document.getElementById('hs-x').value); const y = parseFloat(document.getElementById('hs-y').value); const no = document.getElementById('hs-nomor').value.trim(); const tg = document.getElementById('hs-target').value;
             if(!b || isNaN(x) || isNaN(y)) return alert("Data tidak valid!");
             const payload = { nama_bangunan: b, x_pos: x, y_pos: y, nomor: no, target_lokasi: tg };
-            if (editHotspotId) await supabase.from('hotspot_peta').update(payload).eq('id', editHotspotId);
-            else await supabase.from('hotspot_peta').insert([payload]);
+            if (editHotspotId) await updateDoc(doc(db, 'map_hotspots', editHotspotId.toString()), payload); else await addDoc(collection(db, 'map_hotspots'), payload);
             window.resetFormHotspot(); await fetchAllDataSupabase();
         }
-        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await supabase.from('hotspot_peta').delete().eq('id', id); await fetchAllDataSupabase(); } }
+        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await deleteDoc(doc(db, 'map_hotspots', id.toString())); await fetchAllDataSupabase(); } }
 
         window.simpanPetaUtama = async function() { alert("Fitur Peta Dinonaktifkan sementara."); }
         
@@ -1108,11 +1103,10 @@
             const a = document.getElementById('matrix-asal').value; const t = document.getElementById('matrix-tujuan').value; const i = document.getElementById('matrix-instruksi').value.trim(); const g = document.getElementById('matrix-tanda').value.trim();
             if(!a || !t || !i) return alert("Lengkapi asal, tujuan, dan instruksi!");
             const payload = { lokasi_asal: a, lokasi_tujuan: t, instruksi: i, gambar_tanda: g };
-            if(editMatrixId) await supabase.from('rute_matrix').update(payload).eq('id', editMatrixId);
-            else await supabase.from('rute_matrix').insert([payload]);
+            if(editMatrixId) await updateDoc(doc(db, 'route_matrix', editMatrixId.toString()), payload); else await addDoc(collection(db, 'route_matrix'), payload);
             window.resetFormMatrix(); await fetchAllDataSupabase();
         }
-        window.hapusMatrix = async function(id) { if(confirm("Hapus relasi rute?")) { await supabase.from('rute_matrix').delete().eq('id', id); await fetchAllDataSupabase(); } }
+        window.hapusMatrix = async function(id) { if(confirm("Hapus relasi rute?")) { await deleteDoc(doc(db, 'route_matrix', id.toString())); await fetchAllDataSupabase(); } }
 
         window.renderMatrixAdminList = function() {
             const list = document.getElementById('list-matrix'); if(!list) return; list.innerHTML = '';
@@ -1179,7 +1173,17 @@
     }
         window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
         window.simpanPengaturanSupabase = function() { alert("Pengaturan TTS Disimpan (Lokal)"); }
-        window.resetPINSupabase = function() { alert("PIN Reset"); }
+        window.resetPINSupabase = async function() {
+        const p1 = document.getElementById('pin-lama').value;
+        const p2 = document.getElementById('pin-baru').value;
+        if(p1 === systemPIN && p2.length >= 4) {
+            await setDoc(doc(db, 'settings', 'general'), { pin: p2 }, { merge: true });
+            document.getElementById('pin-lama').value = '';
+            document.getElementById('pin-baru').value = '';
+            alert("PIN Berhasil Diubah!");
+            window.fetchAllDataFirebase();
+        } else { alert("PIN Lama Salah atau PIN Baru terlalu pendek!"); }
+    }
         window.syncDataAdmin = function() { fetchAllDataSupabase(); }
 
         window.tampilkanInfoHotspot = function(nama, target) {
@@ -1373,7 +1377,7 @@
                 pelayanan_petugas: pelayanan
             };
 
-            await supabase.from('survey_kepuasan').insert([payload]);
+            await addDoc(collection(db, 'satisfaction_surveys'), payload);
             window.tutupModal('survey-popup');
             window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
 
@@ -1383,19 +1387,6 @@
             document.getElementById('chk-kemudahan').checked = false;
             document.getElementById('chk-pelayanan').checked = false;
         }
-
-            
-            window.tutupModal('survey-popup');
-            window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
-            
-            // Reset Form Survey
-            document.getElementById('ulasan-teks').value = ""; 
-            if(ratingEl) ratingEl.checked = false;
-            document.getElementById('chk-informatif').checked = false;
-            document.getElementById('chk-kemudahan').checked = false;
-            document.getElementById('chk-pelayanan').checked = false;
-        }
-    
     </script>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
