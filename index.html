@@ -200,6 +200,21 @@
         .action-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.15); }
         .sync-loader { font-size: 12px; color: #D4AF37; font-style: italic; display: none; }
 
+        /* Matriks Rute Badges & Checkbox Styling */
+        .matrix-item { display: flex; flex-direction: column; gap: 4px; background: #1A1A1A; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; font-size: 13px; border-left: 4px solid #D4AF37; border: 1px solid #333; }
+        .matrix-item:hover { background: #222; }
+        .matrix-item-header { display: flex; justify-content: space-between; align-items: center; }
+        .matrix-route-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: bold; flex-wrap: wrap; }
+        .badge-asal { background: #8B0000; color: #FFF; padding: 2px 7px; border-radius: 4px; }
+        .badge-tujuan { background: #D4AF37; color: #111; padding: 2px 7px; border-radius: 4px; }
+        .matrix-instr-preview { font-size: 12px; color: #bbb; line-height: 1.35; margin-top: 2px; }
+        .multi-check-container { max-height: 140px; overflow-y: auto; background: #181818; border: 1px solid #444; border-radius: 6px; padding: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .multi-check-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #E0E0E0; cursor: pointer; padding: 3px 6px; border-radius: 4px; }
+        .multi-check-item:hover { background: #2a2a2a; }
+        .multi-check-item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #D4AF37; cursor: pointer; }
+        .btn-mini-action { background: #333; color: #D4AF37; border: 1px solid #555; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-mini-action:hover { background: #D4AF37; color: #111; }
+
         /* Tombol Aksi Popup Utama */
         .btn-primary { background: #8B0000; color: #E0E0E0; border: 2px solid transparent; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.25s;}
         .btn-primary:hover { background: #D4AF37; color: #111111; border-color: #8B0000; }
@@ -210,8 +225,8 @@
         
         .btn-evakuasi { background: #e84118; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 0 4px 10px rgba(232, 65, 24, 0.4); transition: 0.3s;}
         .btn-evakuasi:hover { background: #c23616; transform: scale(1.02); }
-        .btn-group-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-group-row button { margin: 0; }
+        .btn-group-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-group-row button { margin: 0; flex: 1; min-width: 120px; }
 
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
         .popup-content { background: #F0F0F0; color: #111111; padding: 30px; border-radius: 15px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 3px solid #8B0000; animation: slideDown 0.3s ease; }
@@ -239,8 +254,8 @@
         /* ------------------------------------------- */
         @media (max-width: 950px) {
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; max-width: 100%; height: 35vh; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
-            .map-view { width: 100%; height: 65vh; padding: 10px; z-index: 50;}
+            .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 4px solid #8B0000; padding: 15px; z-index: 100;}
+            .map-view { width: 100%; flex: 1; padding: 10px; z-index: 50;}
             
             .map-controls-hud { top: 10px; right: 10px; bottom: auto; left: auto; padding: 10px; width: 160px; transform: scale(0.9); transform-origin: top right;}
             .map-controls-hud h4 { font-size: 10px; }
@@ -248,6 +263,12 @@
             .btn-cpanel { bottom: 10px; right: 10px; top: auto; padding: 8px 15px; font-size: 12px; }
             .btn-hud-tanya { bottom: 10px; right: 120px; padding: 10px 18px; font-size: 14px; }
             .tujuan-list { max-height: 100%; }
+            
+            /* Perbaikan Popup di Mobile (HP) */
+            .popup-content { padding: 20px 15px; max-height: 90vh; overflow-y: auto; }
+            .popup-content h2 { font-size: 20px; }
+            .instruksi-teks { font-size: 15px; }
+            .sign-image { max-height: 180px; }
         }
     </style>
 </head>
@@ -266,17 +287,33 @@
         <div class="sidebar">
             <h2 class="header-title">🗺️ Navigasi Pintar</h2>
             
-            <div class="origin-section">
-                <label>📍 TITIK AWAL ANDA (SAAT INI):</label>
-                <select id="select-lokasi-asal" class="origin-select" onchange="setLokasiAsal()"></select>
+            <!-- VIEW 1: Pilih Titik Awal -->
+            <div id="view-asal">
+                <div style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37;">
+                    <label class="target-label" style="color:#D4AF37; margin-bottom: 6px; display: block; font-size: 13px;">📍 PILIH TITIK AWAL ANDA:</label>
+                    <select id="select-asal-dropdown" class="origin-select" onchange="if(this.value) window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 12px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; appearance: none;"></select>
+                </div>
             </div>
-            
-            <div class="search-divider"></div>
 
-            <label class="target-label">🎯 CARI RUANGAN TUJUAN:</label>
-            <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Ketik nama ruangan / poli..." onkeyup="filterTujuan()">
+            <!-- VIEW 2: Pilih Tujuan -->
+            <div id="view-tujuan" style="display: none;">
+                <div style="background:#181818; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #D4AF37;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <div style="font-size:11px; color:#bbb;">Titik Awal Saat Ini:</div>
+                            <div style="color:#D4AF37; font-weight:bold; font-size:14px; margin-top:2px;" id="lbl-titik-awal-aktif">-</div>
+                        </div>
+                        <button onclick="kembaliPilihAsal()" style="background:#8B0000; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold; white-space: nowrap;">🔄 Ubah</button>
+                    </div>
+                </div>
+                
+                <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
+                <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan()" style="padding: 10px; margin-bottom: 8px;">
 
-            <div id="container-tujuan" class="tujuan-list"></div>
+                <!-- Dropdown Select untuk Tujuan -->
+                <select id="select-tujuan-dropdown" onchange="if(this.value) window.pilihTujuan(this.value);" style="width: 100%; padding: 12px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; appearance: none;">
+                </select>
+            </div>
         </div>
 
         <!-- Area Denah Interaktif -->
@@ -288,26 +325,33 @@
             </div>
 
             <!-- HUD Kontrol Tampilan (Pojok Kanan Atas) -->
-            <div class="map-controls-hud">
-                <h4>Zoom Peta</h4>
-                <div class="control-row">
-                    <button class="btn-map-control btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕</button>
-                    <button class="btn-map-control btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖</button>
+            <div class="map-controls-hud" id="hud-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <h4 style="margin:0; text-align:left;">Kontrol Peta</h4>
+                    <button class="btn-map-control" style="width: auto; padding: 4px 8px; font-size: 11px; flex: none; background: transparent; color: #D4AF37;" onclick="toggleHud()">▼ Tutup</button>
                 </div>
-                
-                <h4 style="margin-top: 4px;">Mode Tampilan</h4>
-                <div class="control-row">
-                    <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 2D</button>
-                    <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D</button>
+                <div id="hud-collapsible">
+                    <div class="control-row" style="margin-bottom: 8px;">
+                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(0.2)" title="Perbesar">➕ Zoom In</button>
+                        <button class="btn-map-control btn-zoom" onclick="zoomPeta(-0.2)" title="Perkecil">➖ Zoom Out</button>
+                    </div>
+                    
+                    <h4 style="margin-top: 4px;">Mode Tampilan</h4>
+                    <div class="control-row">
+                        <button class="btn-map-control active" id="btn-flat" onclick="aturModePeta('FLAT')">🟦 2D</button>
+                        <button class="btn-map-control" id="btn-waze" onclick="aturModePeta('3D')">🧊 3D</button>
+                    </div>
+                    
+                    <h4 style="margin-top: 4px;">Rotasi</h4>
+                    <div class="control-row">
+                        <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
+                        <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
+                    </div>
+                    <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset Peta</button>
                 </div>
-                
-                <h4 style="margin-top: 4px;">Rotasi</h4>
-                <div class="control-row">
-                    <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
-                    <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
-                </div>
-                <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset</button>
             </div>
+            
+            <button id="btn-hud-expand" onclick="toggleHud()" class="btn-map-control" style="position: absolute; top: 15px; right: 15px; z-index: 140; display: none; background: rgba(17,17,17,0.9); color: #D4AF37; border: 1.5px solid #D4AF37; box-shadow: 0 4px 10px rgba(0,0,0,0.5); padding: 8px 12px; width: auto; font-size: 18px; border-radius: 50%; width: 45px; height: 45px;">⚙️</button>
 
             <!-- Wrapper Pembungkus Gambar & Hotspot -->
             <div class="map-wrapper" id="interactive-map">
@@ -337,7 +381,7 @@
                     <option value="superadmin">Superadmin</option>
                     <option value="administrator">Administrator</option>
                 </select>
-                <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12">
+                <input type="password" id="login-pin" placeholder="Masukkan 12 Karakter PIN" maxlength="12" onkeydown="if(event.key === 'Enter') prosesLogin()">
                 <button class="btn-primary" onclick="prosesLogin()">LOGIN</button>
                 <button class="btn-primary btn-danger" style="margin-top:10px;" onclick="tutupModal('login-modal')">❌ Batal</button>
             </div>
@@ -425,6 +469,70 @@
             <button class="btn-save-admin" id="btn-save-tujuan" onclick="simpanDataRuteSupabase()">➕ Simpan Rute</button>
         </div>
 
+        <!-- Section Matriks Rute (Titik Awal ➔ Lokasi Tujuan) -->
+        <div class="admin-section" id="section-matrix">
+            <h3 style="color: #D4AF37;">🔀 Matriks Rute (Asal ➔ Tujuan)</h3>
+            <p style="font-size:12px; color:#bbb; margin: 2px 0 8px 0; line-height: 1.4;">
+                Atur panduan arah khusus dari <b>1 Titik Awal ke banyak Tujuan</b> atau <b>banyak Titik Awal ke 1 Tujuan</b>.
+            </p>
+
+            <!-- Search Filter Matriks -->
+            <input type="text" id="filter-matrix" placeholder="🔍 Cari rute asal / tujuan..." oninput="filterMatrixList()" style="margin-bottom:6px; font-size:12px; padding:8px 10px;">
+
+            <!-- Daftar Matriks Tersimpan -->
+            <div class="data-list" id="list-matrix" style="max-height: 180px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
+                <label id="label-mode-matrix" style="color:#D4AF37; font-weight:bold; font-size:12px;">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormMatrix()">Batal</button>
+            </div>
+
+            <!-- Pola Pemetaan -->
+            <label style="font-size:12px; color:#C0C0C0; margin-top:4px;">Pola Pemetaan Rute:</label>
+            <select id="matrix-mode" onchange="gantiModeMatrix()">
+                <option value="single">1 Titik Awal ➔ 1 Lokasi Tujuan</option>
+                <option value="one-to-many">1 Titik Awal ➔ Banyak Lokasi Tujuan Sekaligus</option>
+                <option value="many-to-one">Banyak Titik Awal ➔ 1 Lokasi Tujuan Sekaligus</option>
+            </select>
+
+            <!-- Input Titik Awal -->
+            <div id="wrapper-matrix-asal">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label style="font-size:12px; color:#C0C0C0; margin:0;">📍 Titik Awal:</label>
+                    <div id="asal-multi-tools" style="display:none; gap:6px;">
+                        <button type="button" class="btn-mini-action" onclick="pilihSemuaMatrixAsal(true)">Pilih Semua</button>
+                        <button type="button" class="btn-mini-action" onclick="pilihSemuaMatrixAsal(false)">Kosongkan</button>
+                    </div>
+                </div>
+                <select id="matrix-asal-single"></select>
+                <div id="matrix-asal-multi" class="multi-check-container" style="display:none;"></div>
+            </div>
+
+            <!-- Input Lokasi Tujuan -->
+            <div id="wrapper-matrix-tujuan">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label style="font-size:12px; color:#C0C0C0; margin:0;">🎯 Lokasi Tujuan:</label>
+                    <div id="tujuan-multi-tools" style="display:none; gap:6px;">
+                        <button type="button" class="btn-mini-action" onclick="pilihSemuaMatrixTujuan(true)">Pilih Semua</button>
+                        <button type="button" class="btn-mini-action" onclick="pilihSemuaMatrixTujuan(false)">Kosongkan</button>
+                    </div>
+                </div>
+                <select id="matrix-tujuan-single"></select>
+                <div id="matrix-tujuan-multi" class="multi-check-container" style="display:none;"></div>
+            </div>
+
+            <label style="font-size:12px; color:#C0C0C0;">Instruksi Arah Rute:</label>
+            <textarea id="matrix-instruksi" placeholder="Contoh: Dari pintu masuk gerbang utama, jalan lurus 15 meter melewati koridor apotek lalu belok kanan..."></textarea>
+
+            <label style="font-size:12px; color:#C0C0C0;">URL Gambar Patokan (Opsional):</label>
+            <input type="text" id="matrix-tanda" placeholder="Kosongkan untuk memakai foto patokan ruangan tujuan">
+
+            <div style="display:flex; gap:8px; margin-top:4px;">
+                <button class="btn-save-admin" id="btn-save-matrix" onclick="simpanMatrixSupabase()">💾 Simpan ke Matriks</button>
+                <button type="button" class="btn-save-admin" style="background:#2c3e50; color:#ecf0f1; border-color:#34495e; flex:0.6;" onclick="ujiMatrixRute()">🧪 Tes Suara</button>
+            </div>
+        </div>
+
         <!-- Section TTS & Keamanan -->
         <div class="admin-section">
             <h3>🎛️ Pengaturan Suara (TTS)</h3>
@@ -471,11 +579,21 @@
     <!-- POPUP NAVIGASI RUTE UTAMA (Khusus Rute Tujuan) -->
     <div class="popup-overlay" id="nav-popup">
         <div class="popup-content">
-            <h2 style="color: #8B0000; margin-bottom: 12px; border-bottom: 2px solid #D4AF37; padding-bottom: 10px;">📍 Rute Navigasi Tujuan</h2>
+            <h2 style="color: #8B0000; margin-bottom: 8px; border-bottom: 2px solid #D4AF37; padding-bottom: 8px;">📍 Rute Navigasi Tujuan</h2>
             
+            <!-- Badge Relasi Rute Asal ➔ Tujuan -->
+            <div id="popup-rute-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid #D4AF37; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:bold; color:#8B0000; margin-bottom:12px; flex-wrap:wrap; justify-content:center;">
+                <span>📍 <span id="popup-badge-asal">Titik Awal</span></span>
+                <span style="color:#D4AF37; font-size:16px;">➔</span>
+                <span>🎯 <span id="popup-badge-tujuan">Lokasi Tujuan</span></span>
+                <span id="popup-badge-status" style="font-size:11px; background:#8B0000; color:#FFF; padding:2px 6px; border-radius:10px; margin-left:4px;">Panduan Aktif</span>
+            </div>
+
             <div class="instruksi-teks" id="teks-instruksi"></div>
             <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
             
+            <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
+
             <!-- Tombol Opsional Evakuasi -->
             <button class="btn-evakuasi" onclick="putarEvakuasi()">🚨 Lihat Instruksi Evakuasi Darurat</button>
 
@@ -529,9 +647,11 @@
         let dataLokasiAsal = []; 
         let dataRute = {}; 
         let dataHotspots = []; 
+        let dataMatrixRute = []; 
         
-        let editAsalName = null, editTujuanName = null, editHotspotId = null;
+        let editAsalName = null, editTujuanName = null, editHotspotId = null, editMatrixId = null;
         let lokasiAsal = "", lokasiTujuan = "";
+        let lastNavSpeechText = "";
 
         // ==========================================
         // SMART NUMBER EXTRACTOR (Untuk Sorting)
@@ -578,6 +698,62 @@
             terapkanTransformasiPeta();
         }
         window.putarPeta = function(derajat) { rotasiPeta += derajat; terapkanTransformasiPeta(); }
+        // ==========================================
+        // FITUR KONTROL PETA (HUD & GESTURE)
+        // ==========================================
+        window.toggleHud = function() {
+            const panel = document.getElementById('hud-panel');
+            const expandBtn = document.getElementById('btn-hud-expand');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'flex';
+                expandBtn.style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+                expandBtn.style.display = 'flex'; // Use flex to center the icon properly
+                expandBtn.style.alignItems = 'center';
+                expandBtn.style.justifyContent = 'center';
+            }
+        }
+
+        // Variabel untuk pinch zoom
+        let initialDistance = 0;
+        let initialScale = 1;
+
+        // Mencegah scroll / pan default browser di atas peta saat multitouch dan implementasi pinch zoom
+        const mapAreaTouch = document.getElementById('interactive-map');
+        if(mapAreaTouch) {
+            mapAreaTouch.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault(); 
+                    initialDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    initialScale = currentZoom;
+                }
+            }, { passive: false });
+
+            mapAreaTouch.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault(); 
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    // Hitung rasio zoom
+                    const ratio = currentDistance / initialDistance;
+                    let targetZoom = initialScale * ratio;
+                    
+                    // Batasi zoom sama seperti tombol
+                    if (targetZoom < 0.5) targetZoom = 0.5;
+                    if (targetZoom > 4.5) targetZoom = 4.5;
+                    
+                    currentZoom = targetZoom;
+                    terapkanTransformasiPeta();
+                }
+            }, { passive: false });
+        }
+
         window.zoomPeta = function(factor) {
             currentZoom += factor;
             if(currentZoom < 0.5) currentZoom = 0.5; 
@@ -682,6 +858,19 @@
                     });
                 }
 
+                // Ambil Matriks Rute (Asal ➔ Tujuan)
+                try {
+                    const { data: matrixData, error: matrixErr } = await supabase.from('rute_matrix').select('*');
+                    if (!matrixErr && matrixData) {
+                        dataMatrixRute = matrixData;
+                    } else {
+                        dataMatrixRute = [];
+                    }
+                } catch (e) {
+                    console.warn("Gagal memuat rute_matrix:", e);
+                    dataMatrixRute = [];
+                }
+
                 // Update Landing Status
                 document.getElementById('loading-text').innerText = "Data Siap! Sentuh Layar Untuk Memulai";
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
@@ -725,6 +914,8 @@
             });
             selectTarget.innerHTML = '<option value="">-- Tanpa Rute (Hanya Label Info) --</option>';
             tujuanKeys.forEach(nama => { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; });
+
+            renderMatrixAdminList();
         }
 
         window.resetFormAsal = function() { editAsalName = null; document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru"; document.getElementById('admin-nama-asal').value = ""; }
@@ -748,6 +939,273 @@
             window.resetFormTujuan(); await fetchAllDataSupabase();
         }
         window.hapusTujuan = async function(n) { if(confirm(`Hapus tujuan ${n}?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
+
+        // ==========================================
+        // C-PANEL: MATRIKS RUTE (1-to-N & N-to-1)
+        // ==========================================
+        function renderMatrixAdminList() {
+            const listEl = document.getElementById('list-matrix');
+            if(!listEl) return;
+            listEl.innerHTML = '';
+
+            // Render opsi Asal
+            const asalSelect = document.getElementById('matrix-asal-single');
+            const asalMulti = document.getElementById('matrix-asal-multi');
+            if(asalSelect && asalMulti) {
+                asalSelect.innerHTML = '';
+                asalMulti.innerHTML = '';
+                dataLokasiAsal.forEach(nama => {
+                    asalSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
+                    asalMulti.innerHTML += `
+                        <label class="multi-check-item">
+                            <input type="checkbox" name="chk-matrix-asal" value="${nama}">
+                            <span>${nama}</span>
+                        </label>
+                    `;
+                });
+            }
+
+            // Render opsi Tujuan
+            const tujuanSelect = document.getElementById('matrix-tujuan-single');
+            const tujuanMulti = document.getElementById('matrix-tujuan-multi');
+            if(tujuanSelect && tujuanMulti) {
+                tujuanSelect.innerHTML = '';
+                tujuanMulti.innerHTML = '';
+                let tujuanKeys = Object.keys(dataRute);
+                tujuanKeys.sort((a, b) => {
+                    let numA = parseInt(dataRute[a].nomor) || extractNumber(a);
+                    let numB = parseInt(dataRute[b].nomor) || extractNumber(b);
+                    if(numA === numB) return a.localeCompare(b);
+                    return numA - numB;
+                });
+                tujuanKeys.forEach(nama => {
+                    const labelTujuan = `${dataRute[nama].nomor ? `[${dataRute[nama].nomor}] ` : ''}${nama}`;
+                    tujuanSelect.innerHTML += `<option value="${nama}">${labelTujuan}</option>`;
+                    tujuanMulti.innerHTML += `
+                        <label class="multi-check-item">
+                            <input type="checkbox" name="chk-matrix-tujuan" value="${nama}">
+                            <span>${labelTujuan}</span>
+                        </label>
+                    `;
+                });
+            }
+
+            // Filter
+            const filterKeyword = (document.getElementById('filter-matrix')?.value || '').toLowerCase().trim();
+            const filteredMatrix = dataMatrixRute.filter(m => {
+                if(!filterKeyword) return true;
+                return (m.nama_asal && m.nama_asal.toLowerCase().includes(filterKeyword)) ||
+                       (m.nama_tujuan && m.nama_tujuan.toLowerCase().includes(filterKeyword)) ||
+                       (m.instruksi && m.instruksi.toLowerCase().includes(filterKeyword));
+            });
+
+            if (filteredMatrix.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center; padding:12px; color:#888; font-size:12px;">${filterKeyword ? 'Tidak ada rute matriks yang cocok.' : 'Belum ada rute khusus tersimpan di matriks.'}</div>`;
+                return;
+            }
+
+            filteredMatrix.forEach(m => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'matrix-item';
+                itemDiv.innerHTML = `
+                    <div class="matrix-item-header">
+                        <div class="matrix-route-badge">
+                            <span class="badge-asal">📍 ${m.nama_asal}</span>
+                            <span style="color:#D4AF37;">➔</span>
+                            <span class="badge-tujuan">🎯 ${m.nama_tujuan}</span>
+                        </div>
+                        <div class="data-item-actions">
+                            <button class="action-btn" title="Edit" onclick="editFormMatrix('${m.id}')">✏️</button>
+                            <button class="action-btn" title="Hapus" onclick="hapusMatrix('${m.id}')">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="matrix-instr-preview">${m.instruksi}</div>
+                    ${m.gambar_tanda ? `<div style="font-size:11px; color:#27ae60; margin-top:2px;">📷 Foto patokan kustom terpasang</div>` : ''}
+                `;
+                listEl.appendChild(itemDiv);
+            });
+        }
+
+        window.filterMatrixList = function() {
+            renderMatrixAdminList();
+        }
+
+        window.gantiModeMatrix = function() {
+            const mode = document.getElementById('matrix-mode').value;
+            const asalSingle = document.getElementById('matrix-asal-single');
+            const asalMulti = document.getElementById('matrix-asal-multi');
+            const asalTools = document.getElementById('asal-multi-tools');
+            
+            const tujuanSingle = document.getElementById('matrix-tujuan-single');
+            const tujuanMulti = document.getElementById('matrix-tujuan-multi');
+            const tujuanTools = document.getElementById('tujuan-multi-tools');
+
+            if (mode === 'single') {
+                asalSingle.style.display = 'block';
+                asalMulti.style.display = 'none';
+                asalTools.style.display = 'none';
+                tujuanSingle.style.display = 'block';
+                tujuanMulti.style.display = 'none';
+                tujuanTools.style.display = 'none';
+            } else if (mode === 'one-to-many') {
+                asalSingle.style.display = 'block';
+                asalMulti.style.display = 'none';
+                asalTools.style.display = 'none';
+                tujuanSingle.style.display = 'none';
+                tujuanMulti.style.display = 'flex';
+                tujuanTools.style.display = 'flex';
+            } else if (mode === 'many-to-one') {
+                asalSingle.style.display = 'none';
+                asalMulti.style.display = 'flex';
+                asalTools.style.display = 'flex';
+                tujuanSingle.style.display = 'block';
+                tujuanMulti.style.display = 'none';
+                tujuanTools.style.display = 'none';
+            }
+        }
+
+        window.pilihSemuaMatrixAsal = function(status) {
+            document.querySelectorAll('input[name="chk-matrix-asal"]').forEach(chk => chk.checked = status);
+        }
+
+        window.pilihSemuaMatrixTujuan = function(status) {
+            document.querySelectorAll('input[name="chk-matrix-tujuan"]').forEach(chk => chk.checked = status);
+        }
+
+        window.resetFormMatrix = function() {
+            editMatrixId = null;
+            document.getElementById('label-mode-matrix').innerText = "Mode: [ Tambah Baru ]";
+            document.getElementById('btn-save-matrix').innerText = "💾 Simpan ke Matriks";
+            document.getElementById('matrix-instruksi').value = "";
+            document.getElementById('matrix-tanda').value = "";
+            document.getElementById('matrix-mode').value = "single";
+            window.gantiModeMatrix();
+        }
+
+        window.editFormMatrix = function(id) {
+            editMatrixId = id;
+            const m = dataMatrixRute.find(item => item.id === id);
+            if (!m) return;
+            
+            document.getElementById('label-mode-matrix').innerText = "Mode: [ EDIT DATA ]";
+            document.getElementById('btn-save-matrix').innerText = "💾 Perbarui Matriks";
+            document.getElementById('matrix-mode').value = "single";
+            window.gantiModeMatrix();
+            
+            document.getElementById('matrix-asal-single').value = m.nama_asal;
+            document.getElementById('matrix-tujuan-single').value = m.nama_tujuan;
+            document.getElementById('matrix-instruksi').value = m.instruksi;
+            document.getElementById('matrix-tanda').value = m.gambar_tanda || "";
+            
+            document.getElementById('matrix-instruksi').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.simpanMatrixSupabase = async function() {
+            const mode = document.getElementById('matrix-mode').value;
+            const instruksi = document.getElementById('matrix-instruksi').value.trim();
+            const gambarTanda = document.getElementById('matrix-tanda').value.trim() || null;
+
+            if (!instruksi) {
+                return alert("Instruksi arah rute wajib diisi!");
+            }
+
+            try {
+                if (editMatrixId) {
+                    const asal = document.getElementById('matrix-asal-single').value;
+                    const tujuan = document.getElementById('matrix-tujuan-single').value;
+                    const { error } = await supabase.from('rute_matrix').update({
+                        nama_asal: asal,
+                        nama_tujuan: tujuan,
+                        instruksi: instruksi,
+                        gambar_tanda: gambarTanda
+                    }).eq('id', editMatrixId);
+
+                    if (error) throw error;
+                    alert("Rute matriks berhasil diperbarui!");
+                } else if (mode === 'single') {
+                    const asal = document.getElementById('matrix-asal-single').value;
+                    const tujuan = document.getElementById('matrix-tujuan-single').value;
+                    if (!asal || !tujuan) return alert("Pilih titik awal dan lokasi tujuan!");
+
+                    const existing = dataMatrixRute.find(item => item.nama_asal === asal && item.nama_tujuan === tujuan);
+                    if (existing) {
+                        const { error } = await supabase.from('rute_matrix').update({
+                            instruksi: instruksi,
+                            gambar_tanda: gambarTanda
+                        }).eq('id', existing.id);
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase.from('rute_matrix').insert([{
+                            nama_asal: asal,
+                            nama_tujuan: tujuan,
+                            instruksi: instruksi,
+                            gambar_tanda: gambarTanda
+                        }]);
+                        if (error) throw error;
+                    }
+                    alert(`Rute dari [${asal}] ke [${tujuan}] berhasil disimpan!`);
+                } else if (mode === 'one-to-many') {
+                    const asal = document.getElementById('matrix-asal-single').value;
+                    const checkedTujuan = Array.from(document.querySelectorAll('input[name="chk-matrix-tujuan"]:checked')).map(c => c.value);
+                    if (checkedTujuan.length === 0) return alert("Pilih minimal 1 lokasi tujuan dari daftar!");
+
+                    for (const t of checkedTujuan) {
+                        const existing = dataMatrixRute.find(item => item.nama_asal === asal && item.nama_tujuan === t);
+                        if (existing) {
+                            await supabase.from('rute_matrix').update({ instruksi: instruksi, gambar_tanda: gambarTanda }).eq('id', existing.id);
+                        } else {
+                            await supabase.from('rute_matrix').insert([{ nama_asal: asal, nama_tujuan: t, instruksi: instruksi, gambar_tanda: gambarTanda }]);
+                        }
+                    }
+                    alert(`Berhasil menyimpan rute dari [${asal}] ke ${checkedTujuan.length} lokasi tujuan!`);
+                } else if (mode === 'many-to-one') {
+                    const tujuan = document.getElementById('matrix-tujuan-single').value;
+                    const checkedAsal = Array.from(document.querySelectorAll('input[name="chk-matrix-asal"]:checked')).map(c => c.value);
+                    if (checkedAsal.length === 0) return alert("Pilih minimal 1 titik awal dari daftar!");
+
+                    for (const a of checkedAsal) {
+                        const existing = dataMatrixRute.find(item => item.nama_asal === a && item.nama_tujuan === tujuan);
+                        if (existing) {
+                            await supabase.from('rute_matrix').update({ instruksi: instruksi, gambar_tanda: gambarTanda }).eq('id', existing.id);
+                        } else {
+                            await supabase.from('rute_matrix').insert([{ nama_asal: a, nama_tujuan: tujuan, instruksi: instruksi, gambar_tanda: gambarTanda }]);
+                        }
+                    }
+                    alert(`Berhasil menyimpan rute dari ${checkedAsal.length} titik awal menuju [${tujuan}]!`);
+                }
+
+                window.resetFormMatrix();
+                await fetchAllDataSupabase();
+            } catch (err) {
+                console.error("Gagal simpan matriks:", err);
+                alert("Gagal menyimpan data matriks! Periksa konsol / koneksi Supabase.");
+            }
+        }
+
+        window.hapusMatrix = async function(id) {
+            const target = dataMatrixRute.find(m => m.id === id);
+            const label = target ? `[${target.nama_asal} ➔ ${target.nama_tujuan}]` : "rute ini";
+            if (!confirm(`Hapus ${label} dari matriks rute?`)) return;
+
+            try {
+                const { error } = await supabase.from('rute_matrix').delete().eq('id', id);
+                if (error) throw error;
+                await fetchAllDataSupabase();
+            } catch (err) {
+                console.error("Gagal menghapus matriks:", err);
+                alert("Gagal menghapus rute dari database.");
+            }
+        }
+
+        window.ujiMatrixRute = function() {
+            const asal = document.getElementById('matrix-asal-single').value || dataLokasiAsal[0] || "Titik Awal";
+            const tujuan = document.getElementById('matrix-tujuan-single').value || Object.keys(dataRute)[0] || "Tujuan";
+            const instruksi = document.getElementById('matrix-instruksi').value.trim() || "Ikuti lorong utama rumah sakit.";
+            
+            const teksSuara = `Pengujian rute navigasi dari ${asal} menuju ${tujuan}. ${instruksi}.`;
+            window.bicara(teksSuara);
+            alert(`🔊 Menjalankan pengujian suara:\n\n"${teksSuara}"`);
+        }
 
         window.uploadPeta = async function() {
             const fi = document.getElementById('map-file'); if(!fi.files || fi.files.length === 0) return alert("Pilih berkas peta!");
@@ -836,10 +1294,19 @@
 
                 div.onclick = () => {
                     document.getElementById('route-svg').style.display = 'none'; // Sembunyikan garis animasi
-                    if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
-                        window.pilihTujuan(hs.target_lokasi);
-                    } else { 
-                        window.bicara(`Ini adalah area ${hs.nama_bangunan}.`); 
+                    
+                    if (document.getElementById('view-asal').style.display !== 'none') {
+                        if (hs.target_lokasi && dataLokasiAsal.includes(hs.target_lokasi)) {
+                            window.pilihLokasiSekarang(hs.target_lokasi);
+                        } else {
+                            window.bicara(`Ini adalah area ${hs.nama_bangunan}. Silakan gunakan daftar di menu kiri untuk memilih titik awal.`);
+                        }
+                    } else {
+                        if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
+                            window.pilihTujuan(hs.target_lokasi);
+                        } else { 
+                            window.bicara(`Ini adalah area ${hs.nama_bangunan}.`); 
+                        }
                     }
                 };
                 container.insertBefore(div, document.getElementById('draw-overlay'));
@@ -851,33 +1318,52 @@
             setTimeout(() => {
                 document.getElementById('start-overlay').style.display = 'none';
                 
-                if(dataLokasiAsal.length > 0) window.pilihLokasiSekarang(dataLokasiAsal[0], false);
-
                 renderTombolLokasiAsal(); renderTombolTujuan();
-                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan cari ruangan tujuan Anda.");
+                
+                document.getElementById('view-asal').style.display = 'block';
+                document.getElementById('view-tujuan').style.display = 'none';
+                
+                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan pilih titik awal Anda saat ini.");
             }, 600);
         }
 
         function renderTombolLokasiAsal() {
-            const select = document.getElementById('select-lokasi-asal'); select.innerHTML = "";
-            dataLokasiAsal.forEach(nama => { select.innerHTML += `<option value="${nama}">${nama}</option>`; });
-            if(dataLokasiAsal.length > 0) lokasiAsal = dataLokasiAsal[0];
-        }
-
-        window.setLokasiAsal = function() {
-            lokasiAsal = document.getElementById('select-lokasi-asal').value;
-            window.bicara(`Titik awal Anda sekarang berada di ${lokasiAsal}.`);
+            const selectEl = document.getElementById('select-asal-dropdown'); 
+            if(!selectEl) return;
+            selectEl.innerHTML = '<option value="">-- Sentuh untuk Pilih --</option>';
+            dataLokasiAsal.forEach(nama => { 
+                const opt = document.createElement('option');
+                opt.value = nama;
+                opt.innerText = `📍 ${nama}`;
+                selectEl.appendChild(opt);
+            });
+            if(dataLokasiAsal.length > 0 && !lokasiAsal) {
+                lokasiAsal = dataLokasiAsal[0];
+            }
         }
 
         window.pilihLokasiSekarang = function(nama, mainSuara = true) {
             lokasiAsal = nama;
+            document.getElementById('lbl-titik-awal-aktif').innerText = lokasiAsal;
+            document.getElementById('view-asal').style.display = 'none';
+            document.getElementById('view-tujuan').style.display = 'block';
             document.getElementById('search-tujuan').value = "";
             window.filterTujuan(); 
             if(mainSuara) { window.bicara(`Titik awal diatur ke ${lokasiAsal}. Silakan cari ruangan tujuan Anda.`); }
         }
 
+        window.kembaliPilihAsal = function() {
+            document.getElementById('view-tujuan').style.display = 'none';
+            document.getElementById('view-asal').style.display = 'block';
+            document.getElementById('select-asal-dropdown').value = ""; // Reset dropdown visual
+            window.bicara(`Silakan pilih kembali titik awal Anda.`);
+        }
+
         function renderTombolTujuan() {
-            const container = document.getElementById('container-tujuan'); container.innerHTML = "";
+            const selectEl = document.getElementById('select-tujuan-dropdown'); 
+            if(!selectEl) return;
+            selectEl.innerHTML = '<option value="">-- Sentuh untuk Pilih Ruangan --</option>';
+            
             let tujuanArr = [];
             for (let nama in dataRute) { tujuanArr.push({ nama: nama, data: dataRute[nama] }); }
             
@@ -889,45 +1375,195 @@
             });
 
             tujuanArr.forEach(item => {
-                const badgeClass = item.data.akses === 'Pengunjung' ? 'badge-pengunjung' : 'badge-non';
-                const btn = document.createElement('button'); btn.className = 'btn-pilihan tujuan-item';
-                btn.innerHTML = `<span class="nama-tujuan"><span class="span-nomor">${item.data.nomor ? `[${item.data.nomor}]` : ''}</span> ${item.nama}</span> <span class="badge-akses ${badgeClass}">${item.data.akses}</span>`;
-                btn.onclick = () => window.pilihTujuan(item.nama); container.appendChild(btn);
+                const opt = document.createElement('option');
+                opt.value = item.nama;
+                opt.className = 'tujuan-item'; // Menambahkan class agar bisa difilter
+                const nomor = item.data.nomor ? `[${item.data.nomor}] ` : '';
+                opt.innerText = `${nomor}${item.nama} (${item.data.akses})`;
+                selectEl.appendChild(opt);
             });
         }
 
         window.filterTujuan = function() {
             let input = document.getElementById('search-tujuan').value.toLowerCase();
-            let buttons = document.getElementsByClassName('tujuan-item');
-            for (let i = 0; i < buttons.length; i++) {
-                let txtValue = buttons[i].querySelector('.nama-tujuan').textContent;
-                if (txtValue.toLowerCase().indexOf(input) > -1) buttons[i].style.display = ""; else buttons[i].style.display = "none";
+            let selectEl = document.getElementById('select-tujuan-dropdown');
+            let options = selectEl.getElementsByClassName('tujuan-item');
+            
+            let firstVisible = null;
+            for (let i = 0; i < options.length; i++) {
+                let txtValue = options[i].innerText || options[i].textContent;
+                if (txtValue.toLowerCase().indexOf(input) > -1) {
+                    options[i].style.display = "";
+                    if(!firstVisible) firstVisible = options[i].value;
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+            
+            // Set value select ke opsi pertama yang valid bila mencari sesuatu
+            if(input !== "" && firstVisible) {
+                selectEl.value = firstVisible;
+            } else {
+                selectEl.value = "";
             }
         }
 
+        // ==========================================
+        // KALKULASI KOORDINAT RUTE LOKASI
+        // ==========================================
+        function getCoordinatesForLokasi(namaLokasi) {
+            if (!namaLokasi) return null;
+            const cleanNama = namaLokasi.toLowerCase().trim();
+
+            // 1. Cek langsung ke map_hotspots berdasarkan target_lokasi atau nama_bangunan
+            const hsDirect = dataHotspots.find(h => 
+                (h.target_lokasi && h.target_lokasi.toLowerCase().trim() === cleanNama) ||
+                (h.nama_bangunan && h.nama_bangunan.toLowerCase().trim() === cleanNama)
+            );
+            if (hsDirect) {
+                return {
+                    x: parseFloat(hsDirect.pos_left) + (parseFloat(hsDirect.width) / 2),
+                    y: parseFloat(hsDirect.pos_top) + (parseFloat(hsDirect.height) / 2)
+                };
+            }
+
+            // 2. Cek kecocokan parsial di map_hotspots
+            const hsPartial = dataHotspots.find(h => 
+                (h.nama_bangunan && (cleanNama.includes(h.nama_bangunan.toLowerCase().trim()) || h.nama_bangunan.toLowerCase().trim().includes(cleanNama))) ||
+                (h.target_lokasi && (cleanNama.includes(h.target_lokasi.toLowerCase().trim()) || h.target_lokasi.toLowerCase().trim().includes(cleanNama)))
+            );
+            if (hsPartial) {
+                return {
+                    x: parseFloat(hsPartial.pos_left) + (parseFloat(hsPartial.width) / 2),
+                    y: parseFloat(hsPartial.pos_top) + (parseFloat(hsPartial.height) / 2)
+                };
+            }
+
+            // 3. Titik patokan umum denah rumah sakit
+            if (cleanNama.includes('depan') || cleanNama.includes('gerbang utama') || cleanNama.includes('pintu masuk') || cleanNama.includes('lobi')) {
+                return { x: 50, y: 92 };
+            }
+            if (cleanNama.includes('belakang') || cleanNama.includes('gerbang belakang')) {
+                return { x: 48, y: 14 };
+            }
+            if (cleanNama.includes('tengah') || cleanNama.includes('gerbang tengah')) {
+                return { x: 50, y: 55 };
+            }
+            if (cleanNama.includes('igd') || cleanNama.includes('darurat')) {
+                return { x: 62, y: 78 };
+            }
+            if (cleanNama.includes('mcu')) {
+                return { x: 38, y: 75 };
+            }
+            if (cleanNama.includes('parkir')) {
+                return { x: 45, y: 90 };
+            }
+
+            // Default titik tengah bawah
+            return { x: 50, y: 90 };
+        }
+
         window.pilihTujuan = function(tujuan) {
-            lokasiTujuan = tujuan; const rute = dataRute[tujuan];
+            lokasiTujuan = tujuan; 
+            const ruteDefault = dataRute[tujuan] || {};
             
-            const hs = dataHotspots.find(h => h.target_lokasi === tujuan);
-            if(hs) {
-                const tx = parseFloat(hs.pos_left) + (parseFloat(hs.width) / 2);
-                const ty = parseFloat(hs.pos_top) + (parseFloat(hs.height) / 2);
+            // Reset state input dan dropdown supaya rapi kembali setelah modal ditutup
+            document.getElementById('search-tujuan').value = "";
+            document.getElementById('select-tujuan-dropdown').value = "";
+            window.filterTujuan();
+            
+            // 1. Cari apakah ada relasi di rute_matrix untuk pasangan (lokasiAsal ➔ tujuan)
+            const matchMatrix = dataMatrixRute.find(m => 
+                m.nama_asal && m.nama_tujuan &&
+                m.nama_asal.trim().toLowerCase() === lokasiAsal.trim().toLowerCase() && 
+                m.nama_tujuan.trim().toLowerCase() === tujuan.trim().toLowerCase()
+            );
+
+            let instruksiFinal = "";
+            let gambarFinal = "";
+            let isKhusus = false;
+
+            if (matchMatrix && matchMatrix.instruksi && matchMatrix.instruksi.trim() !== "") {
+                instruksiFinal = matchMatrix.instruksi.trim();
+                gambarFinal = (matchMatrix.gambar_tanda && matchMatrix.gambar_tanda.trim() !== "")
+                    ? matchMatrix.gambar_tanda.trim()
+                    : (ruteDefault.gambarTanda || "");
+                isKhusus = true;
+            } else {
+                // Fallback rute standar direktori tujuan
+                if (ruteDefault.instruksi && ruteDefault.instruksi.trim() !== "") {
+                    instruksiFinal = ruteDefault.instruksi.trim();
+                } else {
+                    instruksiFinal = `Dari ${lokasiAsal || 'titik awal Anda'}, ikuti panduan lorong menuju ${tujuan}.`;
+                }
+                gambarFinal = ruteDefault.gambarTanda || "";
+            }
+
+            // 2. Perbarui tampilan Badge Relasi & Status di Popup
+            const badgeAsalEl = document.getElementById('popup-badge-asal');
+            const badgeTujuanEl = document.getElementById('popup-badge-tujuan');
+            const badgeStatusEl = document.getElementById('popup-badge-status');
+            const popupBadgeBox = document.getElementById('popup-rute-badge');
+
+            if (badgeAsalEl) badgeAsalEl.innerText = lokasiAsal || "Titik Awal";
+            if (badgeTujuanEl) badgeTujuanEl.innerText = tujuan;
+            
+            if (isKhusus) {
+                if (badgeStatusEl) {
+                    badgeStatusEl.innerText = "✨ Rute Matriks Spesifik";
+                    badgeStatusEl.style.background = "#27ae60";
+                }
+                if (popupBadgeBox) popupBadgeBox.style.borderColor = "#27ae60";
+            } else {
+                if (badgeStatusEl) {
+                    badgeStatusEl.innerText = "📌 Rute Panduan Umum";
+                    badgeStatusEl.style.background = "#8B0000";
+                }
+                if (popupBadgeBox) popupBadgeBox.style.borderColor = "#D4AF37";
+            }
+
+            // 3. Perbarui Teks & Foto Patokan di Popup
+            const teksArahan = `Dari ${lokasiAsal || 'lokasi Anda saat ini'}, ${instruksiFinal}. Di akhir rute, Anda dapat melihat tanda patokan pada layar.`;
+            document.getElementById('teks-instruksi').innerText = teksArahan;
+            
+            const imgTanda = document.getElementById('gambar-tanda');
+            if (gambarFinal) {
+                imgTanda.src = gambarFinal;
+                imgTanda.style.display = 'block';
+            } else {
+                imgTanda.style.display = 'none';
+            }
+
+            // 4. Perbarui Titik Awal & Akhir Jalur Animasi SVG
+            const coordAsal = getCoordinatesForLokasi(lokasiAsal);
+            const coordTujuan = getCoordinatesForLokasi(tujuan);
+            
+            if (coordAsal && coordTujuan) {
+                document.getElementById('route-line').setAttribute('x1', coordAsal.x + '%');
+                document.getElementById('route-line').setAttribute('y1', coordAsal.y + '%');
+                document.getElementById('route-line').setAttribute('x2', coordTujuan.x + '%');
+                document.getElementById('route-line').setAttribute('y2', coordTujuan.y + '%');
                 
-                document.getElementById('route-line').setAttribute('x2', tx + '%');
-                document.getElementById('route-line').setAttribute('y2', ty + '%');
-                document.getElementById('route-end').setAttribute('cx', tx + '%');
-                document.getElementById('route-end').setAttribute('cy', ty + '%');
-                document.getElementById('route-line').setAttribute('stroke', '#00a8ff');
+                document.getElementById('route-start').setAttribute('cx', coordAsal.x + '%');
+                document.getElementById('route-start').setAttribute('cy', coordAsal.y + '%');
+                document.getElementById('route-end').setAttribute('cx', coordTujuan.x + '%');
+                document.getElementById('route-end').setAttribute('cy', coordTujuan.y + '%');
+                
+                document.getElementById('route-line').setAttribute('stroke', isKhusus ? '#00a8ff' : '#D4AF37');
                 document.getElementById('route-end').setAttribute('fill', '#4cd137');
                 document.getElementById('route-svg').style.display = 'block';
             }
 
-            const teksArahan = `Silakan ikuti arah berikut: ${rute.instruksi}. Di akhir rute, Anda akan menemukan tanda patokan seperti pada foto di layar.`;
-            document.getElementById('teks-instruksi').innerText = teksArahan;
-            document.getElementById('gambar-tanda').src = rute.gambarTanda;
-            
+            // 5. Eksekusi Pembacaan Suara TTS
+            lastNavSpeechText = teksArahan;
             document.getElementById('nav-popup').style.display = 'flex'; 
             window.bicara(teksArahan);
+        }
+
+        window.ulangSuaraRute = function() {
+            if (lastNavSpeechText) {
+                window.bicara(lastNavSpeechText);
+            }
         }
 
         window.putarEvakuasi = function() {
@@ -942,7 +1578,10 @@
 
         window.telahSampai = function() {
             window.tutupModal('nav-popup');
-            window.bicara(`Anda telah menyelesaikan rute. Terima kasih.`, () => { document.getElementById('survey-popup').style.display = 'flex'; });
+            window.bicara(`Anda telah tiba di ${lokasiTujuan}, senang bisa membantu Anda.`, () => { 
+                document.getElementById('survey-popup').style.display = 'flex'; 
+                window.bicara("Selanjutnya silakan beri ulasan Anda, terima kasih.");
+            });
         }
 
         // ==========================================
