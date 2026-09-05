@@ -23,5 +23,11 @@ service cloud.firestore {
     match /satisfaction_surveys/{id} {
       allow read, write: if true;
     }
+    match /nomor_bangunan/{id} {
+      allow read, write: if true;
+    }
+    match /keterangan_risiko/{id} {
+      allow read, write: if true;
+    }
   }
 }

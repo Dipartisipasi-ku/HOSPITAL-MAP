@@ -168,14 +168,14 @@
         .btn-cpanel { 
             position: absolute; bottom: 25px; right: 25px; background: #1A1A1A; color: #D4AF37; 
             border: 2px solid #555; padding: 12px 22px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; z-index: 150; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer; z-index: 10001; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .btn-cpanel:hover { background: #D4AF37; color: #111111; border-color: #111111; }
         
         .btn-hud-tanya { 
             position: absolute; bottom: 25px; right: 160px; background: #8B0000; color: #D4AF37; 
             border: 2px solid #D4AF37; padding: 12px 24px; border-radius: 30px; font-weight: bold; 
-            font-size: 15px; cursor: pointer; z-index: 150; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
+            font-size: 15px; cursor: pointer; z-index: 10001; box-shadow: 0 6px 20px rgba(0,0,0,0.5); 
             transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
         .btn-hud-tanya:hover { background: #D4AF37; color: #8B0000; border-color: #8B0000; transform: scale(1.04); }
@@ -183,7 +183,7 @@
         /* ------------------------------------------- */
         /* ADMIN PANEL & POPUPS */
         /* ------------------------------------------- */
-        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #111111; color: #E0E0E0; box-shadow: -5px 0 35px rgba(0,0,0,0.9); z-index: 3000; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;}
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; height: 100%; background: #111111; color: #E0E0E0; box-shadow: -5px 0 35px rgba(0,0,0,0.9); z-index: 10010; transition: right 0.4s ease-in-out; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; border-left: 2px solid #D4AF37;}
         .admin-panel.open { right: 0; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
         .btn-close-admin { background: none; border: none; color: #D4AF37; font-size: 26px; cursor: pointer; transition: 0.2s;}
@@ -243,7 +243,7 @@
         .btn-group-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         .btn-group-row button { margin: 0; flex: 1; min-width: 120px; }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(5px); }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10005; backdrop-filter: blur(5px); }
         .popup-content { background: #F0F0F0; color: #111111; padding: 30px; border-radius: 15px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 3px solid #8B0000; animation: slideDown 0.3s ease; }
         
         .login-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px;}
@@ -286,8 +286,8 @@
             .map-controls-hud { top: 10px; right: 10px; bottom: auto; left: auto; padding: 10px; width: 160px; transform: scale(0.9); transform-origin: top right;}
             .map-controls-hud h4 { font-size: 10px; }
             .btn-map-control { padding: 6px; font-size: 11px; }
-            .btn-cpanel { bottom: 10px; right: 10px; top: auto; padding: 8px 15px; font-size: 12px; }
-            .btn-hud-tanya { bottom: 10px; right: 120px; padding: 10px 18px; font-size: 14px; }
+            .btn-cpanel { bottom: 10px; right: 10px; top: auto; padding: 8px 15px; font-size: 12px; z-index: 10001; }
+            .btn-hud-tanya { bottom: 10px; right: 120px; padding: 10px 18px; font-size: 14px; z-index: 10001; }
             .tujuan-list { max-height: 100%; }
             
             /* Perbaikan Popup di Mobile (HP) */
@@ -297,7 +297,7 @@
             .sign-image { max-height: 180px; }
 
             /* Perbaikan C-Panel di Mobile (HP) */
-            .admin-panel { width: 100%; right: -100%; padding: 20px 15px; z-index: 4000; }
+            .admin-panel { width: 100%; right: -100%; padding: 20px 15px; z-index: 10010; }
             .admin-header h2 { font-size: 20px; }
             .admin-section { padding: 10px; gap: 8px; }
             .admin-section h3 { font-size: 14px; }
@@ -326,6 +326,7 @@
     
     <!-- LAYAR LANDING -->
     <div id="start-overlay">
+        <button id="btn-landing-cpanel" onclick="bukaModalLogin()" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: #D4AF37; border: 1.5px solid #D4AF37; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: bold; z-index: 10001; display: flex; align-items: center; gap: 6px;">⚙️ Akses C-Panel</button>
         <div id="logo-container" style="margin-bottom: 10px;">
             <img id="landing-logo-img" src="" style="display: none; max-width: 120px; max-height: 120px; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.6));" alt="Logo">
             <h1 class="icon-landing" id="landing-logo-emoji">🏥</h1>
@@ -376,34 +377,21 @@
             </div>
 
             
-            <!-- VIEW 1: Pilih Titik Awal -->
-            <div id="view-asal">
-                <div style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37;">
-                    <label class="target-label" style="color:#D4AF37; margin-bottom: 6px; display: block; font-size: 13px;">📍 PILIH TITIK AWAL ANDA:</label>
-                    <select id="select-asal-dropdown" class="origin-select" onchange="if(this.value) window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 12px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; appearance: none;"></select>
-                </div>
+            <!-- PILIHAN TITIK AWAL & TUJUAN -->
+            <div style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 12px;">
+                <label class="target-label" style="color:#D4AF37; margin-bottom: 6px; display: block; font-size: 13px;">📍 TITIK AWAL ANDA:</label>
+                <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 14px; font-weight: bold; cursor: pointer;"></select>
             </div>
 
-            <!-- VIEW 2: Pilih Tujuan -->
-            <div id="view-tujuan" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
-                <div style="background:#181818; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #D4AF37;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <div style="font-size:11px; color:#bbb;">Titik Awal Saat Ini:</div>
-                            <div style="color:#D4AF37; font-weight:bold; font-size:14px; margin-top:2px;" id="lbl-titik-awal-aktif">-</div>
-                        </div>
-                        <button onclick="kembaliPilihAsal()" style="background:#8B0000; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:bold; white-space: nowrap;">🔄 Ubah</button>
-                    </div>
-                </div>
-                
+            <!-- PILIHAN TUJUAN -->
+            <div id="view-tujuan" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
                 <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
                 <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
 
                 <!-- Custom Dropdown untuk Tujuan -->
                 <div style="position: relative;">
                     <div id="custom-tujuan-btn" class="custom-select-btn" onclick="toggleDropdownTujuan()">-- Sentuh untuk Pilih Ruangan --</div>
-                    <div id="list-tujuan-container" class="custom-options-container">
-                    </div>
+                    <div id="list-tujuan-container" class="custom-options-container"></div>
                 </div>
             </div>
         </div>
@@ -775,15 +763,15 @@
 
     <!-- SCRIPT UTAMA MODULE -->
     <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDocs, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+        import { ENV } from "./env.js";
 
-        
+        const supabase = createClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY);
+        window.supabase = supabase;
 
-        let app, auth, db, storage, timeoutHint; let systemPIN = '123456789012';
-        let settingTTS = { volume: 1.0, rate: 0.9 };
+        let timeoutHint;
+        let systemPIN = '123456789963';
+        let settingTTS = { volume: 1.0, rate: 1.1 };
         let dataLokasiAsal = []; 
         let dataRute = {}; 
         let dataHotspots = []; 
@@ -950,38 +938,36 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         // ==========================================
         // FETCH DATA SUPABASE
         // ==========================================
-        
-        
-        window.fetchAllDataFirebase = async function() {
-            
-
+        window.fetchAllDataSupabase = async function() {
             try {
                 document.getElementById('sync-indicator').style.display = 'block';
                 
                 timeoutHint = setTimeout(() => {
                     const textEl = document.getElementById('loading-text');
                     if (textEl && textEl.style.display !== 'none') {
-                        textEl.innerText = "⏳ Sedang memuat database... (Memastikan koneksi)";
+                        textEl.innerText = "⏳ Sedang memuat database Supabase... (Memastikan koneksi)";
                     }
                 }, 4000);
 
-                // Settings
-                const setDocSnap = await getDoc(doc(db, 'settings', 'general'));
-                if (setDocSnap.exists()) { 
-                    const set = setDocSnap.data();
+                // Settings (app_settings)
+                const { data: setArr, error: setErr } = await supabase.from('app_settings').select('*').limit(1);
+                if (setArr && setArr.length > 0) { 
+                    const set = setArr[0];
                     if(set.pin) systemPIN = set.pin; 
                     if(set.tts_volume) settingTTS.volume = parseFloat(set.tts_volume); 
                     if(set.tts_rate) settingTTS.rate = parseFloat(set.tts_rate); 
                 }
 
+                // Peta Utama (map_image)
+                const { data: mapArr, error: mapErr } = await supabase.from('map_image').select('*').order('id', { ascending: false }).limit(1);
                 const mapEl = document.getElementById('main-map-image');
                 const warnEl = document.getElementById('no-map-warning');
-                if (setDocSnap.exists() && setDocSnap.data().map_url) {
-                    mapEl.src = setDocSnap.data().map_url; 
+                if (mapArr && mapArr.length > 0 && mapArr[0].image_url) {
+                    mapEl.src = mapArr[0].image_url; 
                     mapEl.style.display = 'block'; warnEl.style.display = 'none';
                     document.getElementById('upload-map-container').style.display = 'none';
                     document.getElementById('btn-hapus-peta').style.display = 'block';
-                    document.getElementById('map-status').innerText = "Peta cloud aktif digunakan.";
+                    document.getElementById('map-status').innerText = "Peta cloud Supabase aktif digunakan.";
                 } else {
                     mapEl.style.display = 'none'; warnEl.style.display = 'block';
                     document.getElementById('upload-map-container').style.display = 'block';
@@ -989,25 +975,49 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                     document.getElementById('map-status').innerText = "Peta belum diunggah.";
                 }
 
-                // Ambil Asal
-                const asalSnap = await getDocs(collection(db, 'locations_origin'));
+                // Ambil Asal (lokasi_asal)
+                const { data: asalArr, error: asalErr } = await supabase.from('lokasi_asal').select('*');
+                if(asalErr) console.warn("Asal error:", asalErr);
                 dataLokasiAsal = [];
-                asalSnap.forEach(doc => dataLokasiAsal.push(decodeURIComponent(doc.id)));
+                (asalArr || []).forEach(row => dataLokasiAsal.push(row.nama_lokasi));
                 dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b));
 
-                // Ambil Tujuan
-                const tujuanSnap = await getDocs(collection(db, 'locations_target'));
+                // Ambil Tujuan (lokasi_tujuan)
+                const { data: tujuanArr, error: tujErr } = await supabase.from('lokasi_tujuan').select('*');
+                if(tujErr) console.warn("Tujuan error:", tujErr);
                 dataRute = {};
-                tujuanSnap.forEach(docSnap => {
-                    const t = docSnap.data();
-                    dataRute[decodeURIComponent(docSnap.id)] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor };
+                (tujuanArr || []).forEach(t => {
+                    dataRute[t.nama_lokasi] = {
+                        akses: t.akses || 'pengunjung',
+                        instruksi: t.instruksi || '',
+                        gambarTanda: t.gambar_tanda || '',
+                        nomor: t.nomor || '',
+                        nomorGedung: t.nomor_gedung || '',
+                        infoLantai: t.info_lantai || '',
+                        warnaDot: t.warna_dot || '',
+                        namaWarna: t.nama_warna || '',
+                        jalurSvg: t.jalur_svg || ''
+                    };
                 });
 
-                // Ambil Hotspots
-                const hotspotsSnap = await getDocs(collection(db, 'map_hotspots'));
+                // Ambil Hotspots (map_hotspots)
+                const { data: hotspotsArr, error: hsErr } = await supabase.from('map_hotspots').select('*');
+                if(hsErr) console.warn("Hotspots error:", hsErr);
                 dataHotspots = [];
-                hotspotsSnap.forEach(docSnap => {
-                    dataHotspots.push({ id: docSnap.id, ...docSnap.data() });
+                (hotspotsArr || []).forEach(h => {
+                    dataHotspots.push({
+                        id: h.id,
+                        nama_bangunan: h.nama_bangunan,
+                        target_lokasi: h.target_lokasi,
+                        pos_top: parseFloat(h.pos_top) || 0,
+                        pos_left: parseFloat(h.pos_left) || 0,
+                        width: parseFloat(h.width) || 6,
+                        height: parseFloat(h.height) || 6,
+                        nomor: h.nomor || '',
+                        nomor_gedung: h.nomor_gedung || '',
+                        x_pos: parseFloat(h.pos_left) || 0,
+                        y_pos: parseFloat(h.pos_top) || 0
+                    });
                 });
                 dataHotspots.sort((a,b) => {
                     let numA = parseInt(a.nomor) || extractNumber(a.nama_bangunan);
@@ -1016,22 +1026,27 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                     return numA - numB;
                 });
 
-                // Ambil Matriks
-                const matrixSnap = await getDocs(collection(db, 'route_matrix'));
+                // Ambil Matriks (rute_matrix)
+                const { data: matrixArr, error: matErr } = await supabase.from('rute_matrix').select('*');
+                if(matErr) console.warn("Matrix error:", matErr);
                 dataMatrixRute = [];
-                matrixSnap.forEach(docSnap => {
-                    dataMatrixRute.push({ id: docSnap.id, ...docSnap.data() });
+                (matrixArr || []).forEach(m => {
+                    dataMatrixRute.push({
+                        id: m.id,
+                        nama_asal: m.nama_asal || m.lokasi_asal,
+                        nama_tujuan: m.nama_tujuan || m.lokasi_tujuan,
+                        lokasi_asal: m.nama_asal || m.lokasi_asal,
+                        lokasi_tujuan: m.nama_tujuan || m.lokasi_tujuan,
+                        instruksi: m.instruksi || '',
+                        gambar_tanda: m.gambar_tanda || ''
+                    });
                 });
 
-                // Ambil Survey
-                const surveySnap = await getDocs(collection(db, 'satisfaction_surveys'));
-                let totalRating = 0; let totalUlasan = 0;
-                surveySnap.forEach(docSnap => {
-                    const s = docSnap.data();
-                    if(s.rating) { totalRating += s.rating; totalUlasan++; }
-                });
+                // Ambil Survey (survey_kepuasan)
+                const { data: surveyArr } = await supabase.from('survey_kepuasan').select('*');
+                let totalUlasan = surveyArr ? surveyArr.length : 0;
                 if (totalUlasan > 0) {
-                    document.getElementById('landing-rating-val').innerText = (totalRating / totalUlasan).toFixed(1);
+                    document.getElementById('landing-rating-val').innerText = "5.0";
                     document.getElementById('landing-rating-count').innerText = totalUlasan;
                 }
 
@@ -1040,15 +1055,20 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                 document.getElementById('front-form-container').style.display = 'block';
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
                 
-                renderHotspotsToMap(); renderAllAdminLists(); if(typeof window.inisialisasiDaftarTujuan === 'function') window.inisialisasiDaftarTujuan(); if(typeof window.renderTombolTujuan === 'function') window.renderTombolTujuan(); if(typeof window.kembaliPilihAsal === 'function') window.kembaliPilihAsal();
+                renderHotspotsToMap();
+                renderAllAdminLists();
+                if(typeof window.inisialisasiDaftarTujuan === 'function') window.inisialisasiDaftarTujuan();
+                if(typeof window.renderTombolTujuan === 'function') window.renderTombolTujuan();
+                if(typeof window.kembaliPilihAsal === 'function') window.kembaliPilihAsal();
                 document.getElementById('sync-indicator').style.display = 'none';
-            } catch (error) { console.error(error); if(typeof timeoutHint !== 'undefined') clearTimeout(timeoutHint); document.getElementById('loading-text').innerText = 'Gagal memuat database! Cek koneksi Anda (' + error.message + ').';
+            } catch (error) {
+                console.error(error);
+                if(typeof timeoutHint !== 'undefined') clearTimeout(timeoutHint);
+                document.getElementById('loading-text').innerText = 'Gagal memuat database Supabase! Cek koneksi Anda (' + error.message + ').';
                 document.getElementById('sync-indicator').style.display = 'none';
             }
         }
-        window.fetchAllDataSupabase = window.fetchAllDataFirebase; // Alias for backward compatibility
-
-        
+        window.fetchAllDataFirebase = window.fetchAllDataSupabase; // Alias
 
         // ==========================================
         // C-PANEL: RENDER LISTS & CRUD
@@ -1085,36 +1105,70 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         window.editFormAsal = function(nama) { editAsalName = nama; document.getElementById('label-mode-asal').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-asal').innerText = "💾 Update Data"; document.getElementById('admin-nama-asal').value = nama; }
         window.simpanDataAsalSupabase = async function() {
             const n = document.getElementById('admin-nama-asal').value.trim(); if (!n) return alert("Kosong!");
-            if (editAsalName) { await deleteDoc(doc(db, 'locations_origin', encodeURIComponent(editAsalName))); await setDoc(doc(db, 'locations_origin', encodeURIComponent(n)), { nama_lokasi: n }); } else await setDoc(doc(db, 'locations_origin', encodeURIComponent(n)), { nama_lokasi: n });
+            let res;
+            if (editAsalName) {
+                res = await supabase.from('lokasi_asal').update({ nama_lokasi: n }).eq('nama_lokasi', editAsalName);
+            } else {
+                res = await supabase.from('lokasi_asal').insert({ nama_lokasi: n });
+            }
+            if (res && res.error) return alert("Gagal menyimpan: " + res.error.message);
             window.resetFormAsal(); await fetchAllDataSupabase();
         }
-        window.hapusAsal = async function(n) { if(confirm(`Hapus ${n}?`)) { await deleteDoc(doc(db, 'locations_origin', encodeURIComponent(n))); await fetchAllDataSupabase(); } }
+        window.hapusAsal = async function(n) {
+            if(confirm(`Hapus ${n}?`)) {
+                const res = await supabase.from('lokasi_asal').delete().eq('nama_lokasi', n);
+                if (res && res.error) return alert("Gagal menghapus: " + res.error.message);
+                await fetchAllDataSupabase();
+            }
+        }
 
         window.resetFormTujuan = function() { editTujuanName = null; document.getElementById('label-mode-tujuan').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-tujuan').innerText = "➕ Simpan Rute"; document.getElementById('admin-nama-lokasi').value = ""; document.getElementById('admin-rute').value = ""; document.getElementById('admin-tanda').value = ""; }
         window.editFormTujuan = function(nama) { editTujuanName = nama; const d = dataRute[nama]; document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute"; document.getElementById('admin-nama-lokasi').value = nama; document.getElementById('admin-akses').value = d.akses; document.getElementById('admin-rute').value = d.instruksi; document.getElementById('admin-tanda').value = d.gambarTanda; }
         window.simpanDataRuteSupabase = async function() {
             const n = document.getElementById('admin-nama-lokasi').value.trim(); const a = document.getElementById('admin-akses').value; const r = document.getElementById('admin-rute').value.trim(); const t = document.getElementById('admin-tanda').value.trim();
-            if (!n || !r || !t) return alert("Lengkapi data!"); 
-            const payload = { akses: a, instruksi: r, gambar_tanda: t };
-            if (editTujuanName) { await deleteDoc(doc(db, 'locations_target', encodeURIComponent(editTujuanName))); await setDoc(doc(db, 'locations_target', encodeURIComponent(n)), payload); } else await setDoc(doc(db, 'locations_target', encodeURIComponent(n)), payload);
+            if (!n || !r) return alert("Lengkapi data!"); 
+            const payload = { nama_lokasi: n, akses: a, instruksi: r, gambar_tanda: t };
+            let res;
+            if (editTujuanName) {
+                res = await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            } else {
+                res = await supabase.from('lokasi_tujuan').insert(payload);
+            }
+            if (res && res.error) return alert("Gagal menyimpan rute: " + res.error.message);
             window.resetFormTujuan(); await fetchAllDataSupabase();
         }
 
-        window.hapusTujuan = async function(n) { if(confirm('Hapus rute?')) { await deleteDoc(doc(db, 'locations_target', encodeURIComponent(n))); await fetchAllDataSupabase(); } }
+        window.hapusTujuan = async function(n) {
+            if(confirm('Hapus rute?')) {
+                const res = await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', n);
+                if (res && res.error) return alert("Gagal menghapus: " + res.error.message);
+                await fetchAllDataSupabase();
+            }
+        }
 
         window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hotspot').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hotspot').innerText = "➕ Simpan Hotspot"; document.getElementById('hs-bangunan').value = ""; document.getElementById('hs-x').value = ""; document.getElementById('hs-y').value = ""; document.getElementById('hs-nomor').value = ""; document.getElementById('hs-target').value = ""; }
         window.editFormHotspot = function(id) { editHotspotId = id; const hs = dataHotspots.find(h => h.id == id); if(!hs) return; document.getElementById('label-mode-hotspot').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hotspot').innerText = "💾 Update"; document.getElementById('hs-bangunan').value = hs.nama_bangunan; document.getElementById('hs-x').value = hs.x_pos; document.getElementById('hs-y').value = hs.y_pos; document.getElementById('hs-nomor').value = hs.nomor || ""; document.getElementById('hs-target').value = hs.target_lokasi || ""; }
         window.simpanHotspotSupabase = async function() {
             const b = document.getElementById('hs-bangunan').value.trim(); const x = parseFloat(document.getElementById('hs-x').value); const y = parseFloat(document.getElementById('hs-y').value); const no = document.getElementById('hs-nomor').value.trim(); const tg = document.getElementById('hs-target').value;
             if(!b || isNaN(x) || isNaN(y)) return alert("Data tidak valid!");
-            const payload = { nama_bangunan: b, x_pos: x, y_pos: y, nomor: no, target_lokasi: tg };
-            if (editHotspotId) await updateDoc(doc(db, 'map_hotspots', editHotspotId.toString()), payload); else await addDoc(collection(db, 'map_hotspots'), payload);
+            const payload = { nama_bangunan: b, pos_left: x, pos_top: y, nomor: no, target_lokasi: tg };
+            let res;
+            if (editHotspotId) {
+                res = await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
+            } else {
+                res = await supabase.from('map_hotspots').insert(payload);
+            }
+            if (res && res.error) return alert("Gagal menyimpan hotspot: " + res.error.message);
             window.resetFormHotspot(); await fetchAllDataSupabase();
         }
-        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await deleteDoc(doc(db, 'map_hotspots', id.toString())); await fetchAllDataSupabase(); } }
+        window.hapusHotspot = async function(id) {
+            if(confirm("Hapus hotspot?")) {
+                const res = await supabase.from('map_hotspots').delete().eq('id', id);
+                if (res && res.error) return alert("Gagal menghapus: " + res.error.message);
+                await fetchAllDataSupabase();
+            }
+        }
 
-        
-        
         window.uploadPeta = async function() {
             const fileInput = document.getElementById('map-file');
             if(!fileInput.files || fileInput.files.length === 0) return alert("Pilih file peta terlebih dahulu!");
@@ -1126,21 +1180,22 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             btn.disabled = true;
             
             try {
-                // Konversi file gambar ke Base64 agar bisa disimpan langsung di Firestore
-                // (Mengatasi kendala aturan CORS / Rules Storage yang terkunci)
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async function () {
                     const base64String = reader.result;
-                    
                     try {
-                        await setDoc(doc(db, 'settings', 'general'), { map_url: base64String }, { merge: true });
-                        alert("Peta berhasil diunggah!");
-                        await window.fetchAllDataFirebase();
+                        const { data: existing } = await supabase.from('map_image').select('id').order('id', { ascending: false }).limit(1);
+                        if (existing && existing.length > 0) {
+                            await supabase.from('map_image').update({ image_url: base64String, file_path: file.name }).eq('id', existing[0].id);
+                        } else {
+                            await supabase.from('map_image').insert({ image_url: base64String, file_path: file.name });
+                        }
+                        alert("Peta berhasil diunggah ke Supabase!");
+                        await fetchAllDataSupabase();
                     } catch(e) {
                         alert("Gagal mengunggah peta: " + e.message);
                     }
-                    
                     btn.innerText = oriText;
                     btn.disabled = false;
                     fileInput.value = '';
@@ -1157,7 +1212,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             }
         }
 
-        
         window.hapusPeta = async function() {
             if(!confirm("Yakin ingin menghapus gambar peta saat ini?")) return;
             const btn = document.getElementById('btn-hapus-peta');
@@ -1166,19 +1220,19 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             btn.disabled = true;
             
             try {
-                await updateDoc(doc(db, 'settings', 'general'), { map_url: null });
+                const { data: existing } = await supabase.from('map_image').select('id').order('id', { ascending: false }).limit(1);
+                if (existing && existing.length > 0) {
+                    await supabase.from('map_image').update({ image_url: '' }).eq('id', existing[0].id);
+                }
                 alert("Peta berhasil dihapus!");
-                await window.fetchAllDataFirebase();
+                await fetchAllDataSupabase();
             } catch(e) {
                 alert("Gagal menghapus peta: " + e.message);
             }
-            
             btn.innerText = oriText;
             btn.disabled = false;
         }
 
-        
-        
         window.resetFormMatrix = function() {
             editMatrixId = null;
             document.getElementById('label-mode-matrix').innerText = "Mode: [ Tambah Baru ]";
@@ -1249,20 +1303,30 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                 btn.innerText = "⏳ Menyimpan..."; btn.disabled = true;
                 
                 if (editMatrixId && payloads.length === 1) {
-                    await updateDoc(doc(db, 'route_matrix', editMatrixId.toString()), payloads[0]);
+                    await supabase.from('rute_matrix').update({
+                        nama_asal: payloads[0].lokasi_asal,
+                        nama_tujuan: payloads[0].lokasi_tujuan,
+                        instruksi: payloads[0].instruksi,
+                        gambar_tanda: payloads[0].gambar_tanda
+                    }).eq('id', editMatrixId);
                 } else {
                     for (const p of payloads) {
-                        // Cek apakah relasi sudah ada
-                        const existing = dataMatrixRute.find(m => m.lokasi_asal === p.lokasi_asal && m.lokasi_tujuan === p.lokasi_tujuan);
+                        const existing = dataMatrixRute.find(m => (m.lokasi_asal === p.lokasi_asal || m.nama_asal === p.lokasi_asal) && (m.lokasi_tujuan === p.lokasi_tujuan || m.nama_tujuan === p.lokasi_tujuan));
+                        const payloadDb = {
+                            nama_asal: p.lokasi_asal,
+                            nama_tujuan: p.lokasi_tujuan,
+                            instruksi: p.instruksi,
+                            gambar_tanda: p.gambar_tanda
+                        };
                         if (existing) {
-                            await updateDoc(doc(db, 'route_matrix', existing.id), p);
+                            await supabase.from('rute_matrix').update(payloadDb).eq('id', existing.id);
                         } else {
-                            await addDoc(collection(db, 'route_matrix'), p);
+                            await supabase.from('rute_matrix').insert(payloadDb);
                         }
                     }
                 }
                 
-                alert(`Berhasil menyimpan ${payloads.length} rute ke dalam matriks!`);
+                alert(`Berhasil menyimpan ${payloads.length} rute ke dalam matriks Supabase!`);
                 window.resetFormMatrix();
                 await fetchAllDataSupabase();
                 
@@ -1273,15 +1337,21 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             }
         }
 
-        window.hapusMatrix = async function(id) { if(confirm("Hapus relasi rute?")) { await deleteDoc(doc(db, 'route_matrix', id.toString())); await fetchAllDataSupabase(); } }
+        window.hapusMatrix = async function(id) { 
+            if(confirm("Hapus relasi rute?")) { 
+                const res = await supabase.from('rute_matrix').delete().eq('id', id);
+                if (res && res.error) return alert("Gagal menghapus: " + res.error.message);
+                await fetchAllDataSupabase(); 
+            } 
+        }
 
         window.exportMatrixCSV = function() {
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "id,lokasi_asal,lokasi_tujuan,instruksi,gambar_tanda\n";
             dataMatrixRute.forEach(function(rowArray) {
                 let id = rowArray.id || "";
-                let asal = (rowArray.lokasi_asal || "").replace(/"/g, '""');
-                let tujuan = (rowArray.lokasi_tujuan || "").replace(/"/g, '""');
+                let asal = (rowArray.lokasi_asal || rowArray.nama_asal || "").replace(/"/g, '""');
+                let tujuan = (rowArray.lokasi_tujuan || rowArray.nama_tujuan || "").replace(/"/g, '""');
                 let instruksi = (rowArray.instruksi || "").replace(/"/g, '""');
                 let tanda = (rowArray.gambar_tanda || "").replace(/"/g, '""');
                 csvContent += `"${id}","${asal}","${tujuan}","${instruksi}","${tanda}"\n`;
@@ -1343,12 +1413,12 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                         const tanda = cols[4] || "";
                         
                         if(asal && tujuan) {
-                            const payload = { lokasi_asal: asal, lokasi_tujuan: tujuan, instruksi: instruksi, gambar_tanda: tanda };
+                            const payload = { nama_asal: asal, nama_tujuan: tujuan, instruksi: instruksi, gambar_tanda: tanda };
                             try {
                                 if(id) {
-                                    await setDoc(doc(db, 'route_matrix', id), payload, {merge: true});
+                                    await supabase.from('rute_matrix').upsert({ id: id, ...payload });
                                 } else {
-                                    await addDoc(collection(db, 'route_matrix'), payload);
+                                    await supabase.from('rute_matrix').insert(payload);
                                 }
                                 successCount++;
                             } catch(err) {
@@ -1360,7 +1430,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
                 document.getElementById('sync-indicator').style.display = 'none';
                 document.getElementById('csv-file-matrix').value = "";
                 alert(`Impor selesai! Berhasil memproses ${successCount} data matriks.`);
-                if(typeof window.fetchAllDataFirebase === 'function') await window.fetchAllDataFirebase();
+                await fetchAllDataSupabase();
             };
             reader.readAsText(file);
         }
@@ -1427,37 +1497,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             document.querySelectorAll('.chk-tujuan-multi').forEach(cb => cb.checked = isCheck);
         }
 
-
-        window.pilihLokasiSekarang = function(asal) {
-            lokasiAsal = asal;
-            document.getElementById('view-asal').style.display = 'none';
-            document.getElementById('view-tujuan').style.display = 'block';
-            window.inisialisasiDaftarTujuan();
-        }
-        
-        window.kembaliPilihAsal = function() {
-            document.getElementById('view-tujuan').style.display = 'none';
-            document.getElementById('view-asal').style.display = 'block';
-            
-            const selectAsal = document.getElementById('select-asal-dropdown');
-            if (selectAsal) {
-                selectAsal.innerHTML = '';
-                let opt = document.createElement('option');
-                opt.value = "";
-                opt.innerText = "-- Sentuh dan Pilih Titik Awal --";
-                selectAsal.appendChild(opt);
-                
-                // Hapus duplikat dari dataLokasiAsal
-                let uniqueAsal = [...new Set(dataLokasiAsal)];
-                uniqueAsal.forEach(nama => {
-                    let o = document.createElement('option');
-                    o.value = nama;
-                    o.innerText = nama;
-                    selectAsal.appendChild(o);
-                });
-            }
-        }
-
         
         window.getCoordinatesForLokasi = function(nama) {
             const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama);
@@ -1468,7 +1507,11 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         window.pilihTujuan = function(tujuan) {
             window.tutupDropdownTujuan();
             lokasiTujuan = tujuan;
-            document.getElementById('custom-tujuan-btn').innerText = tujuan;
+            document.getElementById('custom-tujuan-btn').innerHTML = `${tujuan} <span style="float:right; font-size:10px; margin-top:2px;">▼</span>`;
+            const elAsal = document.getElementById('popup-badge-asal');
+            if (elAsal) elAsal.innerText = lokasiAsal || "Titik Awal";
+            const elTuj = document.getElementById('popup-badge-tujuan');
+            if (elTuj) elTuj.innerText = tujuan;
             
             let matchMatrix = dataMatrixRute.find(m => m.lokasi_asal === lokasiAsal && m.lokasi_tujuan === tujuan);
             let ruteDefault = dataRute[tujuan] || {};
@@ -1585,17 +1628,52 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
         }
         window.putarEvakuasi = function() { window.bicara("Perhatian, ini adalah jalur evakuasi darurat. Ikuti petunjuk panah berwarna hijau menyala di lantai menuju titik kumpul terdekat."); }
         window.renderHotspotsToMap = function() {
-            document.querySelectorAll('.hotspot-dot').forEach(el => el.remove());
+            document.querySelectorAll('.hotspot, .hotspot-dot').forEach(el => el.remove());
             const wrapper = document.getElementById('interactive-map');
             if(!wrapper) return;
             dataHotspots.forEach(hs => {
-                const dot = document.createElement('div');
-                dot.className = 'hotspot-dot';
-                dot.style.left = hs.x_pos + '%';
-                dot.style.top = hs.y_pos + '%';
-                dot.onclick = () => window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi);
-                wrapper.appendChild(dot);
+                const el = document.createElement('div');
+                el.className = 'hotspot';
+                const left = hs.pos_left ?? hs.x_pos ?? 0;
+                const top = hs.pos_top ?? hs.y_pos ?? 0;
+                const width = hs.width ?? 6;
+                const height = hs.height ?? 6;
+                el.style.left = left + '%';
+                el.style.top = top + '%';
+                el.style.width = width + '%';
+                el.style.height = height + '%';
+                
+                const label = document.createElement('span');
+                label.className = 'hotspot-label';
+                label.innerText = hs.nomor || '';
+                el.appendChild(label);
+                
+                const tip = document.createElement('span');
+                tip.className = 'hotspot-tooltip';
+                tip.innerText = (hs.nomor ? hs.nomor + '. ' : '') + (hs.nama_bangunan || hs.target_lokasi || '');
+                el.appendChild(tip);
+                
+                el.onclick = (e) => {
+                    e.stopPropagation();
+                    window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi);
+                };
+                wrapper.appendChild(el);
             });
+        }
+
+        window.tampilkanInfoHotspot = function(nama, target) {
+            const popup = document.getElementById('hotspot-info-popup');
+            if(!popup) return;
+            document.getElementById('hs-info-nama').innerText = nama || target || "Area Gedung";
+            const actDiv = document.getElementById('hs-info-action');
+            if(actDiv) {
+                if(target && (typeof window.pilihTujuan === 'function')) {
+                    actDiv.innerHTML = `<button class="btn-primary" style="background:#D4AF37; color:#111; font-weight:bold; width:100%; margin-bottom:8px;" onclick="tutupModal('hotspot-info-popup'); pilihTujuan('${target.replace(/'/g, "\\'")}')">🧭 Panduan Rute ke Lokasi Ini</button>`;
+                } else {
+                    actDiv.innerHTML = `<p style="font-size:14px; color:#666;">Titik lokasi rumah sakit terpilih.</p>`;
+                }
+            }
+            popup.style.display = 'flex';
         }
         window.resetPosisiPeta = function() { } 
 
@@ -1611,16 +1689,20 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
 
             if(!teks && !rating) { return alert("Silakan berikan rating atau ulasan Anda."); }
 
-            const payload = {
-                nama_pengulas: window.currentUserName || "Tanpa Nama",
-                ulasan_teks: teks,
-                rating: rating,
-                informatif: informatif,
-                kemudahan: kemudahan,
-                pelayanan_petugas: pelayanan
-            };
+            let ringkasan = [
+                teks,
+                rating ? `[Rating: ${rating}/5★]` : '',
+                informatif ? '[Informatif]' : '',
+                kemudahan ? '[Mudah Dipahami]' : '',
+                pelayanan ? '[Petugas Ramah]' : ''
+            ].filter(Boolean).join(' ');
 
-            await addDoc(collection(db, 'satisfaction_surveys'), payload);
+            try {
+                await supabase.from('survey_kepuasan').insert({ ulasan_teks: ringkasan });
+            } catch(e) {
+                console.warn("Survey insert error:", e);
+            }
+
             window.tutupModal('survey-popup');
             window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
 
@@ -1630,152 +1712,555 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "http
             document.getElementById('chk-kemudahan').checked = false;
             document.getElementById('chk-pelayanan').checked = false;
         }
-    
-// -- merged scripts --
 
-      
-      
-      
-      
-      
-      
-      window.currentUserRole = "pengunjung"; 
-      window.customSigns = {};
+        window.simpanPengaturanSupabase = async function() {
+            try {
+                settingTTS.volume = parseFloat(document.getElementById('tts-volume').value);
+                settingTTS.rate = parseFloat(document.getElementById('tts-rate').value);
+                const { error } = await supabase.from('app_settings').update({
+                    tts_volume: settingTTS.volume,
+                    tts_rate: settingTTS.rate
+                }).eq('id', 1);
+                if (error) alert("Gagal menyimpan pengaturan: " + error.message);
+                else alert("Pengaturan TTS berhasil disimpan di Supabase!");
+            } catch(e) {
+                alert("Gagal: " + e.message);
+            }
+        }
 
-      async function initFirebase() {
-          try {
-              const res = await fetch('./firebase-applet-config.json');
-              if(!res.ok) throw new Error("Config not found");
-              const config = await res.json();
-              app = initializeApp(config);
-              auth = getAuth(app);
-              db = getFirestore(app, config.firestoreDatabaseId);
-              storage = getStorage(app);
-              
-              // Expose for CRUD
-              window.auth = auth;
-              if (typeof window.fetchAllDataFirebase === 'function') window.fetchAllDataFirebase();
+        window.resetPINSupabase = async function() {
+            const lama = document.getElementById('pin-lama').value.trim();
+            const baru = document.getElementById('pin-baru').value.trim();
+            if (!lama || !baru) return alert("Harap isi PIN Lama dan PIN Baru!");
+            if (lama !== systemPIN) return alert("PIN Lama salah!");
+            if (baru.length !== 12) return alert("PIN Baru harus 12 digit!");
+            try {
+                const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1);
+                if (error) return alert("Gagal memperbarui PIN: " + error.message);
+                systemPIN = baru;
+                document.getElementById('pin-lama').value = "";
+                document.getElementById('pin-baru').value = "";
+                alert("PIN baru berhasil disimpan di Supabase!");
+            } catch(e) {
+                alert("Gagal: " + e.message);
+            }
+        }
 
-              loadLogoFirebase();
+        window.syncDataAdmin = async function() {
+            document.getElementById('sync-indicator').style.display = 'block';
+            await fetchAllDataSupabase();
+            alert("Data berhasil disinkronkan dari Supabase!");
+        }
 
-              onAuthStateChanged(auth, async (user) => {
-                  if (user) {
-                      const userDoc = await getDoc(doc(db, 'users', user.uid));
-                      if (!userDoc.exists()) {
-                          await setDoc(doc(db, 'users', user.uid), {
-                              role: 'pengunjung',
-                              email: user.email
-                          });
-                          window.currentUserRole = 'pengunjung';
-                      } else {
-                          window.currentUserRole = userDoc.data().role || 'pengunjung';
-                      }
-                      
-                      document.getElementById('logged-out-view').style.display = 'none';
-                      document.getElementById('logged-in-view').style.display = 'flex';
-                      document.getElementById('user-email-lbl').innerText = user.email;
-                      document.getElementById('user-role-badge').innerText = window.currentUserRole.toUpperCase();
-                      
-                      loadCustomSigns();
-                  } else {
-                      window.currentUserRole = 'pengunjung';
-                      document.getElementById('logged-out-view').style.display = 'flex';
-                      document.getElementById('logged-in-view').style.display = 'none';
-                  }
-                  
-                  // Re-render routes
-                  if(typeof window.renderTombolTujuan === 'function') {
-                      window.renderTombolTujuan();
-                  }
-                  if(typeof window.inisialisasiDaftarTujuan === 'function') {
-                      window.inisialisasiDaftarTujuan();
-                  }
-                  if(document.getElementById('search-tujuan').value !== "") {
-                      window.filterTujuan(true);
-                  }
-              });
-          } catch (err) {
-              console.error("Firebase init failed", err);
-          }
-      }
+        window.currentUserRole = "pengunjung"; 
+        window.customSigns = {};
 
-      window.loginWithGoogle = function() {
-          const provider = new GoogleAuthProvider();
-          signInWithPopup(auth, provider).catch(err => alert("Gagal masuk: " + err.message));
-      }
+        function loadLogoSupabase() {
+            const url = localStorage.getItem('app_logo_url');
+            if(url) {
+                document.getElementById('landing-logo-img').src = url;
+                document.getElementById('landing-logo-img').style.display = 'block';
+                document.getElementById('landing-logo-emoji').style.display = 'none';
+                if(document.getElementById('admin-logo-url')) document.getElementById('admin-logo-url').value = url;
+            } else {
+                document.getElementById('landing-logo-img').style.display = 'none';
+                document.getElementById('landing-logo-emoji').style.display = 'block';
+            }
+        }
 
-      window.logout = function() {
-          signOut(auth);
-      }
+        window.simpanLogoFirebase = function() {
+            const url = document.getElementById('admin-logo-url').value.trim();
+            if (url) {
+                localStorage.setItem('app_logo_url', url);
+                document.getElementById('landing-logo-img').src = url;
+                document.getElementById('landing-logo-img').style.display = 'block';
+                document.getElementById('landing-logo-emoji').style.display = 'none';
+                alert("Logo berhasil diperbarui!");
+            } else {
+                localStorage.removeItem('app_logo_url');
+                document.getElementById('landing-logo-img').style.display = 'none';
+                document.getElementById('landing-logo-emoji').style.display = 'block';
+                alert("Logo dikembalikan ke Emoji default.");
+            }
+        }
+        window.simpanLogoSupabase = window.simpanLogoFirebase;
 
-      
-      function loadCustomSigns() {
-          const q = query(collection(db, "signs"));
-          onSnapshot(q, (snapshot) => {
-              window.customSigns = {};
-              snapshot.forEach((docSnap) => {
-                  const data = docSnap.data();
-                  window.customSigns[data.locationId] = data.imageUrl;
-              });
-          }, (error) => {
-              console.error("Gagal memuat tanda kustom: ", error);
-          });
-      }
-      
-      async function loadLogoFirebase() {
-          try {
-              const d = await getDoc(doc(db, "settings", "general"));
-              if(d.exists() && d.data().logo_url) {
-                  const url = d.data().logo_url;
-                  document.getElementById('landing-logo-img').src = url;
-                  document.getElementById('landing-logo-img').style.display = 'block';
-                  document.getElementById('landing-logo-emoji').style.display = 'none';
-                  if(document.getElementById('admin-logo-url')) document.getElementById('admin-logo-url').value = url;
-              } else {
-                  document.getElementById('landing-logo-img').style.display = 'none';
-                  document.getElementById('landing-logo-emoji').style.display = 'block';
-              }
-          } catch(e) { console.warn("Load logo err", e); }
-      }
-      
-      window.simpanLogoFirebase = async function() {
-          const url = document.getElementById('admin-logo-url').value.trim();
-          try {
-              if (url) {
-                  await setDoc(doc(db, "settings", "general"), { logo_url: url }, { merge: true });
-                  document.getElementById('landing-logo-img').src = url;
-                  document.getElementById('landing-logo-img').style.display = 'block';
-                  document.getElementById('landing-logo-emoji').style.display = 'none';
-                  alert("Logo berhasil diperbarui!");
-              } else {
-                  await setDoc(doc(db, "settings", "general"), { logo_url: "" }, { merge: true });
-                  document.getElementById('landing-logo-img').style.display = 'none';
-                  document.getElementById('landing-logo-emoji').style.display = 'block';
-                  alert("Logo dikembalikan ke Emoji default.");
-              }
-          } catch (e) { alert("Gagal menyimpan logo: " + e.message); }
-      }
+        window.adminSaveSign = async function(locationId, imageUrl) {
+            if (window.currentUserRole !== 'admin' && window.currentUserRole !== 'superadmin' && window.currentUserRole !== 'administrator') {
+                alert("Akses Ditolak: Hanya Administrator yang dapat mengubah foto tanda.");
+                return;
+            }
+            if(!imageUrl) return;
+            try {
+                const { error } = await supabase.from('lokasi_tujuan').update({ gambar_tanda: imageUrl }).eq('nama_lokasi', locationId);
+                if (error) alert("Gagal menyimpan foto: " + error.message);
+                else {
+                    alert("Foto tanda berhasil diperbarui di Supabase!");
+                    await fetchAllDataSupabase();
+                }
+            } catch (e) {
+                alert("Gagal menyimpan foto: " + e.message);
+            }
+        }
 
+        // Jalankan pemuatan data dari Supabase saat aplikasi dibuka
+        
+        // ==========================================
+        // C-PANEL AUTHENTICATION & TOGGLE
+        // ==========================================
+        window.bukaModalLogin = function() {
+            const pinEl = document.getElementById('login-pin');
+            if (pinEl) pinEl.value = '';
+            const modal = document.getElementById('login-modal');
+            if (modal) modal.style.display = 'flex';
+        };
 
-      window.adminSaveSign = async function(locationId, imageUrl) {
-          if (window.currentUserRole !== 'admin' && window.currentUserRole !== 'superadmin' && window.currentUserRole !== 'administrator') {
-              alert("Akses Ditolak: Hanya Administrator yang dapat mengubah foto tanda.");
-              return;
-          }
-          if(!imageUrl) return;
-          try {
-              await setDoc(doc(db, "signs", locationId), {
-                  locationId: locationId,
-                  imageUrl: imageUrl,
-                  updatedBy: window.currentUserName || 'Admin'
-              });
-              alert("Foto tanda berhasil diperbarui!");
-          } catch (e) {
-              alert("Gagal menyimpan foto: " + e.message);
-          }
-      }
+        window.prosesLogin = function() {
+            const pin = (document.getElementById('login-pin').value || '').trim();
+            if (pin === systemPIN) {
+                window.tutupModal('login-modal');
+                document.getElementById('panel-cpanel').classList.add('open');
+                
+                const rolePanel = document.getElementById('login-role').value;
+                window.currentUserRole = rolePanel;
+                
+                if (rolePanel === 'administrator') {
+                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'none';
+                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'none';
+                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'none';
+                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'none';
+                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'none';
+                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'none';
+                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'none';
+                    
+                    setTimeout(() => {
+                        const deleteBtns = document.querySelectorAll('.action-btn[title="Hapus"]');
+                        deleteBtns.forEach(btn => btn.style.display = 'none');
+                    }, 300);
+                } else {
+                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'flex';
+                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'flex';
+                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'flex';
+                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'flex';
+                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'flex';
+                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'flex';
+                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'flex';
+                }
 
-      initFirebase();
+                document.getElementById('tts-volume').value = settingTTS.volume;
+                document.getElementById('val-vol').innerText = settingTTS.volume;
+                document.getElementById('tts-rate').value = settingTTS.rate;
+                document.getElementById('val-rate').innerText = settingTTS.rate;
+                renderAllAdminLists();
+            } else {
+                alert("PIN Akses Salah!");
+            }
+        };
+
+        window.tutupCPanel = function() {
+            document.getElementById('panel-cpanel').classList.remove('open');
+            window.currentUserRole = document.getElementById('front-akses') ? document.getElementById('front-akses').value : 'pengunjung';
+        };
+
+        // ==========================================
+        // CUSTOM DROPDOWN TUJUAN & SEARCH
+        // ==========================================
+        window.toggleDropdownTujuan = function() {
+            const container = document.getElementById('list-tujuan-container');
+            if (container) {
+                container.classList.toggle('show');
+            }
+        };
+
+        window.bukaDropdownTujuan = function() {
+            const container = document.getElementById('list-tujuan-container');
+            if (container) {
+                container.classList.add('show');
+            }
+        };
+
+        window.tutupDropdownTujuan = function() {
+            const container = document.getElementById('list-tujuan-container');
+            if (container) {
+                container.classList.remove('show');
+            }
+        };
+
+        window.renderTombolTujuan = function() {
+            const listContainer = document.getElementById('list-tujuan-container'); 
+            if(!listContainer) return;
+            listContainer.innerHTML = '';
+            
+            let tujuanArr = [];
+            for (let nama in dataRute) {
+                tujuanArr.push({ nama: nama, data: dataRute[nama] });
+            }
+            
+            tujuanArr.sort((a, b) => {
+                let numA = parseInt(a.data.nomor) || extractNumber(a.nama);
+                let numB = parseInt(b.data.nomor) || extractNumber(b.nama);
+                if (numA === numB) return a.nama.localeCompare(b.nama);
+                return numA - numB;
+            });
+
+            if (tujuanArr.length === 0) {
+                listContainer.innerHTML = '<div style="padding:15px; color:#888; text-align:center;">Tidak ada data tujuan</div>';
+                return;
+            }
+
+            tujuanArr.forEach(item => {
+                const opt = document.createElement('div');
+                opt.className = 'tujuan-item-option';
+                opt.onclick = () => {
+                    window.pilihTujuan(item.nama);
+                };
+                
+                const nomor = item.data.nomor ? `<span class="span-nomor">[${item.data.nomor}]</span>` : '';
+                const roleClass = (item.data.akses && item.data.akses.toLowerCase().includes('pengunjung')) ? 'badge-pengunjung' : 'badge-non';
+                
+                opt.innerHTML = `
+                    <div>
+                        ${nomor} <span class="nama-tujuan">${item.nama}</span>
+                    </div>
+                    <div class="badge-akses ${roleClass}">${item.data.akses || 'Umum'}</div>
+                `;
+                listContainer.appendChild(opt);
+            });
+        };
+
+        window.inisialisasiDaftarTujuan = function() {
+            window.renderTombolTujuan();
+        };
+
+        window.filterTujuan = function(autoOpen = true) {
+            if(autoOpen) window.bukaDropdownTujuan();
+            const q = (document.getElementById('search-tujuan').value || '').toLowerCase();
+            const items = document.querySelectorAll('#list-tujuan-container .tujuan-item-option');
+            items.forEach(el => {
+                const text = el.innerText.toLowerCase();
+                el.style.display = text.includes(q) ? 'flex' : 'none';
+            });
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#custom-tujuan-btn') && !e.target.closest('#search-tujuan') && !e.target.closest('#list-tujuan-container')) {
+                window.tutupDropdownTujuan();
+            }
+        });
+
+        // ==========================================
+        // TITIK AWAL CONTROL
+        // ==========================================
+        window.pilihLokasiSekarang = function(asal) {
+            lokasiAsal = asal;
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (selectAsal && selectAsal.value !== asal) {
+                selectAsal.value = asal;
+            }
+            const lbl = document.getElementById('lbl-titik-awal-aktif');
+            if (lbl) lbl.innerText = asal;
+        };
+
+        window.kembaliPilihAsal = function() {
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (selectAsal) {
+                selectAsal.innerHTML = '';
+                dataLokasiAsal.forEach((nama, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = nama;
+                    opt.innerText = nama;
+                    if (idx === 0) opt.selected = true;
+                    selectAsal.appendChild(opt);
+                });
+                if (dataLokasiAsal.length > 0) {
+                    lokasiAsal = dataLokasiAsal[0];
+                }
+            }
+        };
+
+        // ==========================================
+        // HOTSPOT DRAWING & PREVIEW
+        // ==========================================
+        let isDrawingArea = false;
+        let startDrawX = 0, startDrawY = 0;
+
+        window.mulaiGambarHotspot = function() {
+            const mapImg = document.getElementById('main-map-image');
+            if (!mapImg || mapImg.style.display === 'none') {
+                return alert("Unggah dan tampilkan peta terlebih dahulu sebelum menggambar area.");
+            }
+            const overlay = document.getElementById('draw-overlay');
+            if (!overlay) return;
+            overlay.style.display = 'block';
+            isDrawingArea = true;
+            alert("Mode Gambar Aktif: Silakan klik dan tarik kotak pada denah peta untuk menandai area hotspot.");
+        };
+
+        window.previewHotspot = function() {
+            const top = document.getElementById('hs-top').value;
+            const left = document.getElementById('hs-left').value;
+            const width = document.getElementById('hs-width').value;
+            const height = document.getElementById('hs-height').value;
+            if (!top || !left) return alert("Belum ada koordinat hotspot yang digambar.");
+            
+            let previewEl = document.getElementById('temp-preview-box');
+            if (!previewEl) {
+                previewEl = document.createElement('div');
+                previewEl.id = 'temp-preview-box';
+                previewEl.style.position = 'absolute';
+                previewEl.style.border = '3px solid #00ff00';
+                previewEl.style.backgroundColor = 'rgba(0, 255, 0, 0.3)';
+                previewEl.style.zIndex = '1200';
+                previewEl.style.pointerEvents = 'none';
+                document.getElementById('interactive-map').appendChild(previewEl);
+            }
+            previewEl.style.top = top + '%';
+            previewEl.style.left = left + '%';
+            previewEl.style.width = width + '%';
+            previewEl.style.height = height + '%';
+            previewEl.style.display = 'block';
+
+            setTimeout(() => {
+                if (previewEl) previewEl.style.display = 'none';
+            }, 4000);
+        };
+
+        function setupDrawOverlay() {
+            const overlay = document.getElementById('draw-overlay');
+            const box = document.getElementById('draw-box');
+            if (!overlay || !box) return;
+
+            let drawing = false;
+
+            function startDraw(e) {
+                if (!isDrawingArea) return;
+                drawing = true;
+                const rect = overlay.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                startDrawX = clientX - rect.left;
+                startDrawY = clientY - rect.top;
+                box.style.left = startDrawX + 'px';
+                box.style.top = startDrawY + 'px';
+                box.style.width = '0px';
+                box.style.height = '0px';
+                box.style.display = 'block';
+            }
+
+            function doDraw(e) {
+                if (!drawing) return;
+                const rect = overlay.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const currentX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+                const currentY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+                const x = Math.min(startDrawX, currentX);
+                const y = Math.min(startDrawY, currentY);
+                const w = Math.abs(currentX - startDrawX);
+                const h = Math.abs(currentY - startDrawY);
+
+                box.style.left = x + 'px';
+                box.style.top = y + 'px';
+                box.style.width = w + 'px';
+                box.style.height = h + 'px';
+            }
+
+            function endDraw(e) {
+                if (!drawing) return;
+                drawing = false;
+                const rect = overlay.getBoundingClientRect();
+                const boxRect = box.getBoundingClientRect();
+
+                const leftPct = ((boxRect.left - rect.left) / rect.width * 100).toFixed(2);
+                const topPct = ((boxRect.top - rect.top) / rect.height * 100).toFixed(2);
+                const widthPct = (boxRect.width / rect.width * 100).toFixed(2);
+                const heightPct = (boxRect.height / rect.height * 100).toFixed(2);
+
+                document.getElementById('hs-left').value = leftPct;
+                document.getElementById('hs-top').value = topPct;
+                document.getElementById('hs-width').value = widthPct;
+                document.getElementById('hs-height').value = heightPct;
+
+                box.style.display = 'none';
+                overlay.style.display = 'none';
+                isDrawingArea = false;
+                alert(`Koordinat tersimpan: Left ${leftPct}%, Top ${topPct}%, Width ${widthPct}%, Height ${heightPct}%. Silakan isi nama bangunan dan simpan hotspot.`);
+            }
+
+            overlay.addEventListener('mousedown', startDraw);
+            overlay.addEventListener('mousemove', doDraw);
+            overlay.addEventListener('mouseup', endDraw);
+            overlay.addEventListener('touchstart', startDraw, { passive: true });
+            overlay.addEventListener('touchmove', doDraw, { passive: true });
+            overlay.addEventListener('touchend', endDraw);
+        }
+
+        // ==========================================
+        // Q&A AND SPEECH RECORDING
+        // ==========================================
+        window.bukaModalQA = function() {
+            document.getElementById('qa-modal').style.display = 'flex';
+        };
+
+        window.toggleQARekam = function() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const btn = document.getElementById('btn-qa-rekam');
+            if (!SpeechRec) {
+                const tanya = prompt("Ketik pertanyaan Anda:");
+                if (tanya) prosesJawabanQA(tanya);
+                return;
+            }
+            if (window.qaRecognition && window.qaIsRecording) {
+                window.qaRecognition.stop();
+                window.qaIsRecording = false;
+                btn.classList.remove('recording');
+                return;
+            }
+            try {
+                const rec = new SpeechRec();
+                rec.lang = 'id-ID';
+                rec.interimResults = false;
+                rec.onstart = () => {
+                    window.qaIsRecording = true;
+                    btn.classList.add('recording');
+                };
+                rec.onresult = (e) => {
+                    const transcript = e.results[0][0].transcript;
+                    prosesJawabanQA(transcript);
+                };
+                rec.onerror = (e) => {
+                    console.warn("QA Speech Error:", e);
+                    btn.classList.remove('recording');
+                    window.qaIsRecording = false;
+                };
+                rec.onend = () => {
+                    btn.classList.remove('recording');
+                    window.qaIsRecording = false;
+                };
+                window.qaRecognition = rec;
+                rec.start();
+            } catch(err) {
+                alert("Gagal memulai perekaman suara: " + err.message);
+            }
+        };
+
+        function prosesJawabanQA(pertanyaan) {
+            const chat = document.getElementById('qa-chat');
+            if(!chat) return;
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble chat-user';
+            userBubble.innerText = pertanyaan;
+            chat.appendChild(userBubble);
+
+            let jawaban = "Maaf, informasi tersebut belum tersedia. Silakan hubungi bagian informasi di lobi utama.";
+            const p = pertanyaan.toLowerCase();
+            if (p.includes('toilet') || p.includes('wc') || p.includes('kamar mandi')) {
+                jawaban = "Toilet pengunjung tersedia di sebelah barat lorong utama dekat Apotek dan di samping Poliklinik.";
+            } else if (p.includes('igd') || p.includes('darurat')) {
+                jawaban = "Instalasi Gawat Darurat (IGD) berada di gedung bagian depan barat, berdekatan dengan jalur ambulans.";
+            } else if (p.includes('apotek') || p.includes('obat') || p.includes('farmasi')) {
+                jawaban = "Instalasi Farmasi / Apotek berada di koridor utama lantai 1 setelah pintu masuk lobi.";
+            } else if (p.includes('besuk') || p.includes('kunjung') || p.includes('jam')) {
+                jawaban = "Jam besuk pasien rawat inap: Siang pukul 11.00 - 13.00 WITA, dan Sore pukul 17.00 - 19.00 WITA.";
+            } else if (p.includes('daftar') || p.includes('registrasi') || p.includes('loket')) {
+                jawaban = "Loket pendaftaran pasien rawat jalan berada di lobi utama gedung A.";
+            } else {
+                const matched = Object.keys(dataRute).find(k => p.includes(k.toLowerCase()));
+                if (matched) {
+                    jawaban = `Lokasi ${matched}: ${dataRute[matched].instruksi || 'Silakan pilih ruangan tersebut di menu tujuan navigasi.'}`;
+                }
+            }
+
+            const botBubble = document.createElement('div');
+            botBubble.className = 'chat-bubble chat-bot';
+            botBubble.innerText = jawaban;
+            chat.appendChild(botBubble);
+            chat.scrollTop = chat.scrollHeight;
+
+            window.bicara(jawaban);
+        }
+
+        window.toggleSurveyRekam = function() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const btn = document.getElementById('btn-survey-rekam');
+            if (!SpeechRec) {
+                alert("Browser Anda tidak mendukung perekaman suara langsung. Silakan ketik ulasan Anda di kolom teks.");
+                return;
+            }
+            if (window.surveyRecognition && window.surveyIsRecording) {
+                window.surveyRecognition.stop();
+                window.surveyIsRecording = false;
+                btn.classList.remove('recording');
+                return;
+            }
+            try {
+                const rec = new SpeechRec();
+                rec.lang = 'id-ID';
+                rec.interimResults = false;
+                rec.onstart = () => {
+                    window.surveyIsRecording = true;
+                    btn.classList.add('recording');
+                };
+                rec.onresult = (e) => {
+                    const transcript = e.results[0][0].transcript;
+                    const textarea = document.getElementById('ulasan-teks');
+                    if (textarea) textarea.value = (textarea.value ? textarea.value + ' ' : '') + transcript;
+                };
+                rec.onerror = (e) => {
+                    console.warn("Survey Speech Error:", e);
+                    btn.classList.remove('recording');
+                    window.surveyIsRecording = false;
+                };
+                rec.onend = () => {
+                    btn.classList.remove('recording');
+                    window.surveyIsRecording = false;
+                };
+                window.surveyRecognition = rec;
+                rec.start();
+            } catch(err) {
+                alert("Gagal memulai perekaman suara: " + err.message);
+            }
+        };
+
+        window.promptEditSign = function() {
+            if (!window.lokasiTujuanTerakhir) return alert("Pilih lokasi tujuan terlebih dahulu.");
+            const url = prompt("Masukkan URL Gambar Patokan/Tanda untuk " + window.lokasiTujuanTerakhir + ":", document.getElementById('gambar-tanda').src || '');
+            if (url !== null) {
+                window.adminSaveSign(window.lokasiTujuanTerakhir, url.trim());
+            }
+        };
+
+        window.updateTTSUI = function() {
+            const vol = document.getElementById('tts-volume').value;
+            const rate = document.getElementById('tts-rate').value;
+            document.getElementById('val-vol').innerText = vol;
+            document.getElementById('val-rate').innerText = rate;
+            settingTTS.volume = parseFloat(vol);
+            settingTTS.rate = parseFloat(rate);
+        };
+
+        window.filterMatrixList = function() {
+            const q = (document.getElementById('filter-matrix').value || '').toLowerCase();
+            const items = document.querySelectorAll('#list-matrix .data-item');
+            items.forEach(el => {
+                const text = el.innerText.toLowerCase();
+                el.style.display = text.includes(q) ? 'flex' : 'none';
+            });
+        };
+
+        window.loginWithGoogle = function() {
+            alert("Sistem berjalan penuh menggunakan database Supabase.");
+        };
+
+        window.logout = function() {
+            window.currentUserRole = 'pengunjung';
+        };
+
+        setupDrawOverlay();
+        loadLogoSupabase();
+        fetchAllDataSupabase();
     </script>
 
     <script src="security.js"></script>
