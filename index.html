@@ -304,23 +304,64 @@
             .admin-section input, .admin-section select, .admin-section textarea { padding: 8px; font-size: 14px; }
             .flex-row { flex-direction: column; align-items: stretch; gap: 5px; }
         }
+    
+        .toast-msg {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #D4AF37; 
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed; 
+            z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%);
+            font-size: 15px; font-weight: bold; border: 1px solid #D4AF37;
+        }
+        .toast-msg.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
     </style>
 </head>
 <body>
+    <div id="toast-snackbar" class="toast-msg"></div>
 
+    
     <!-- LAYAR LANDING -->
-    <div id="start-overlay" onclick="mulaiAplikasi()">
-        <h1 class="icon-landing">🏥</h1>
+    <div id="start-overlay">
+        <div id="logo-container" style="margin-bottom: 10px;">
+            <img id="landing-logo-img" src="" style="display: none; max-width: 120px; max-height: 120px; object-fit: contain; margin: 0 auto; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.6));" alt="Logo">
+            <h1 class="icon-landing" id="landing-logo-emoji">🏥</h1>
+        </div>
         <h1 class="title-landing pulse-text">RS ATMA HUSADA MAHAKAM</h1>
         <h3 class="subtitle-landing">Sistem Navigasi & Denah Evakuasi Digital</h3>
-        <p id="loading-text" class="badge-status">⏳ Menghubungkan ke Server Database...</p>
+        
+        <div id="survey-stats" style="margin-bottom: 5px; font-size: 14px; color: #E0E0E0; text-shadow: 0 2px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 20px; border: 1px solid #D4AF37;">
+            ⭐ Kepuasan Pengunjung: <strong style="color:#FFD700;" id="landing-rating-val">-</strong>/5 (<span id="landing-rating-count">0</span> Ulasan)
+        </div>
+        
+        <div id="front-form-container" style="display: none; background: #181818; padding: 20px; border-radius: 10px; margin-top: 15px; border: 1px solid #D4AF37; width: 85%; max-width: 320px; text-align: left;">
+
+            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">NAMA ANDA:</label>
+            <input type="text" id="front-nama" placeholder="Masukkan nama..." style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 15px; box-sizing: border-box; font-size: 14px;">
+            
+            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">AKSES SEBAGAI:</label>
+            <select id="front-akses" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 20px; box-sizing: border-box; font-size: 14px;">
+                <option value="pengunjung">Pengunjung</option>
+                <option value="staff">Staff</option>
+            </select>
+            
+            <button onclick="mulaiAplikasi()" style="width: 100%; padding: 14px; border-radius: 6px; border: none; background: #D4AF37; color: #111; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase;">MASUK / MULAI</button>
+        </div>
+        
+        <p id="loading-text" class="badge-status" style="margin-top: 20px;">⏳ Menghubungkan ke Server Database...</p>
+        <div style="position: absolute; bottom: 15px; font-size: 12px; color: #D4AF37; text-shadow: 0 2px 4px rgba(0,0,0,0.9); font-weight: bold; letter-spacing: 0.5px;">Didesain dan dikembangkan oleh: Riandy, S.Kep</div>
     </div>
+
+
 
     <div class="app-container">
         <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
         <div class="sidebar">
             <h2 class="header-title">🗺️ Navigasi Pintar</h2>
-            <div id="auth-panel" style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom:15px; color: #E0E0E0; font-size: 13px;">
+            <div id="auth-panel" style="display: none !important;">
                 <div id="logged-out-view" style="display: flex; align-items: center;">
                     <button onclick="loginWithGoogle()" style="background:#D4AF37; color:#111; padding: 6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Masuk / Login</button>
                     <span style="margin-left: 10px; font-size: 11px;">Akses default: Pengunjung</span>
@@ -449,8 +490,20 @@
         <button class="btn-save-admin" style="background: #D4AF37; color:#111; border-color:#111; margin-bottom:10px;" onclick="syncDataAdmin()">🔄 Muat Ulang / Sync Data</button>
         <div class="sync-loader" id="sync-indicator">Memuat data dari database...</div>
 
+        
+        <!-- Section Logo Aplikasi -->
+        <div class="admin-section" id="section-logo" style="border-color: #D4AF37;">
+            <h3 style="color: #D4AF37;">🖼️ Logo Aplikasi (URL)</h3>
+            <div class="flex-row">
+                <input type="text" id="admin-logo-url" placeholder="URL Gambar / https://...">
+                <button class="btn-save-admin" style="flex: 0 0 auto; background: #D4AF37; color: #111;" onclick="simpanLogoFirebase()">💾 Simpan Logo</button>
+            </div>
+            <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Kosongkan jika ingin kembali menggunakan Emoji 🏥 default.</p>
+        </div>
+
         <!-- Section Peta Utama -->
-        <div class="admin-section" style="border-color: #D4AF37;">
+
+        <div class="admin-section" id="section-peta" style="border-color: #D4AF37;">
             <h3 style="color: #D4AF37;">🖼️ Peta Utama (Supabase Storage)</h3>
             <p id="map-status" style="font-size: 13px; color: #C0C0C0; margin-bottom: 8px;"></p>
             <div id="upload-map-container">
@@ -461,7 +514,7 @@
         </div>
 
         <!-- Section Hotspot Peta -->
-        <div class="admin-section" style="border-color: #8B0000;">
+        <div class="admin-section" id="section-hotspot" style="border-color: #8B0000;">
             <h3 style="color: #8B0000;">🔲 Hotspot Bangunan / Peta</h3>
             <div class="data-list" id="list-hotspot"></div>
             <hr style="border-color:#333; margin:10px 0;">
@@ -491,7 +544,7 @@
         </div>
 
         <!-- Section Asal -->
-        <div class="admin-section">
+        <div class="admin-section" id="section-asal">
             <h3>📍 Lokasi Saat Ini (Kiosk Asal)</h3>
             <div class="data-list" id="list-asal"></div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
@@ -503,7 +556,7 @@
         </div>
 
         <!-- Section Tujuan -->
-        <div class="admin-section">
+        <div class="admin-section" id="section-tujuan">
             <h3>🗺️ Direktori Tujuan & Rute</h3>
             <div class="data-list" id="list-tujuan"></div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
@@ -585,7 +638,7 @@
         </div>
 
         <!-- Section TTS & Keamanan -->
-        <div class="admin-section">
+        <div class="admin-section" id="section-tts">
             <h3>🎛️ Pengaturan Suara (TTS)</h3>
             <label>Volume (<span id="val-vol">1.0</span>)</label>
             <input type="range" id="tts-volume" min="0.1" max="1" step="0.1" value="1.0" oninput="updateTTSUI()">
@@ -598,7 +651,7 @@
         </div>
         
         <div class="admin-section">
-            <h3>🔐 Reset PIN Akses</h3>
+            <!-- Section PIN --><h3 id="section-pin">🔐 Reset PIN Akses</h3>
             <input type="password" id="pin-lama" placeholder="PIN Lama (12 Karakter)" maxlength="12">
             <input type="password" id="pin-baru" placeholder="PIN Baru (12 Karakter)" maxlength="12">
             <button class="btn-save-admin" style="background: #111; color:#D4AF37; border-color:#D4AF37;" onclick="resetPINSupabase()">Simpan PIN Baru</button>
@@ -943,8 +996,24 @@
                     dataMatrixRute = [];
                 }
 
+                
+                // Ambil Data Survey Kepuasan
+                try {
+                    const { data: surveys } = await supabase.from('survey_kepuasan').select('rating');
+                    if (surveys) {
+                        let totalRating = 0; let totalUlasan = 0;
+                        surveys.forEach(s => { if(s.rating) { totalRating += s.rating; totalUlasan++; } });
+                        if (totalUlasan > 0) {
+                            document.getElementById('landing-rating-val').innerText = (totalRating / totalUlasan).toFixed(1);
+                            document.getElementById('landing-rating-count').innerText = totalUlasan;
+                        }
+                    }
+                } catch(e) { console.warn("Gagal memuat survey:", e); }
+                
                 // Update Landing Status
-                document.getElementById('loading-text').innerText = "Data Siap! Sentuh Layar Untuk Memulai";
+
+                document.getElementById('loading-text').style.display = 'none';
+                document.getElementById('front-form-container').style.display = 'block';
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
                 
                 renderHotspotsToMap(); renderAllAdminLists();
@@ -1004,542 +1073,132 @@
         window.editFormTujuan = function(nama) { editTujuanName = nama; const d = dataRute[nama]; document.getElementById('label-mode-tujuan').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-tujuan').innerText = "💾 Update Rute"; document.getElementById('admin-nama-lokasi').value = nama; document.getElementById('admin-akses').value = d.akses; document.getElementById('admin-rute').value = d.instruksi; document.getElementById('admin-tanda').value = d.gambarTanda; }
         window.simpanDataRuteSupabase = async function() {
             const n = document.getElementById('admin-nama-lokasi').value.trim(); const a = document.getElementById('admin-akses').value; const r = document.getElementById('admin-rute').value.trim(); const t = document.getElementById('admin-tanda').value.trim();
-            if (!n || !r || !t) return alert("Lengkapi data!"); const payload = { nama_lokasi: n, akses: a, instruksi: r, gambar_tanda: t };
-            if (editTujuanName && editTujuanName !== n) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            else if (editTujuanName === n) await supabase.from('lokasi_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
-            else await supabase.from('lokasi_tujuan').insert([payload]);
+            if (!n || !r || !t) return alert("Lengkapi data!"); 
+            const payload = { akses: a, instruksi: r, gambar_tanda: t };
+            if (editTujuanName) await supabase.from('rute_tujuan').update(payload).eq('nama_lokasi', editTujuanName);
+            else await supabase.from('rute_tujuan').insert([{ nama_lokasi: n, ...payload }]);
             window.resetFormTujuan(); await fetchAllDataSupabase();
         }
-        window.hapusTujuan = async function(n) { if(confirm(`Hapus tujuan ${n}?`)) { await supabase.from('lokasi_tujuan').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
 
-        // ==========================================
-        // C-PANEL: MATRIKS RUTE (1-to-N & N-to-1)
-        // ==========================================
-        function renderMatrixAdminList() {
-            const listEl = document.getElementById('list-matrix');
-            if(!listEl) return;
-            listEl.innerHTML = '';
+        window.hapusTujuan = async function(n) { if(confirm('Hapus rute?')) { await supabase.from('rute_tujuan').delete().eq('nama_lokasi', n); await fetchAllDataSupabase(); } }
 
-            // Render opsi Asal
-            const asalSelect = document.getElementById('matrix-asal-single');
-            const asalMulti = document.getElementById('matrix-asal-multi');
-            if(asalSelect && asalMulti) {
-                asalSelect.innerHTML = '';
-                asalMulti.innerHTML = '';
-                dataLokasiAsal.forEach(nama => {
-                    asalSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
-                    asalMulti.innerHTML += `
-                        <label class="multi-check-item">
-                            <input type="checkbox" name="chk-matrix-asal" value="${nama}">
-                            <span>${nama}</span>
-                        </label>
-                    `;
-                });
-            }
-
-            // Render opsi Tujuan
-            const tujuanSelect = document.getElementById('matrix-tujuan-single');
-            const tujuanMulti = document.getElementById('matrix-tujuan-multi');
-            if(tujuanSelect && tujuanMulti) {
-                tujuanSelect.innerHTML = '';
-                tujuanMulti.innerHTML = '';
-                let tujuanKeys = Object.keys(dataRute);
-                tujuanKeys.sort((a, b) => {
-                    let numA = parseInt(dataRute[a].nomor) || extractNumber(a);
-                    let numB = parseInt(dataRute[b].nomor) || extractNumber(b);
-                    if(numA === numB) return a.localeCompare(b);
-                    return numA - numB;
-                });
-                tujuanKeys.forEach(nama => {
-                    const labelTujuan = `${dataRute[nama].nomor ? `[${dataRute[nama].nomor}] ` : ''}${nama}`;
-                    tujuanSelect.innerHTML += `<option value="${nama}">${labelTujuan}</option>`;
-                    tujuanMulti.innerHTML += `
-                        <label class="multi-check-item">
-                            <input type="checkbox" name="chk-matrix-tujuan" value="${nama}">
-                            <span>${labelTujuan}</span>
-                        </label>
-                    `;
-                });
-            }
-
-            // Filter
-            const filterKeyword = (document.getElementById('filter-matrix')?.value || '').toLowerCase().trim();
-            const filteredMatrix = dataMatrixRute.filter(m => {
-                if(!filterKeyword) return true;
-                return (m.nama_asal && m.nama_asal.toLowerCase().includes(filterKeyword)) ||
-                       (m.nama_tujuan && m.nama_tujuan.toLowerCase().includes(filterKeyword)) ||
-                       (m.instruksi && m.instruksi.toLowerCase().includes(filterKeyword));
-            });
-
-            if (filteredMatrix.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center; padding:12px; color:#888; font-size:12px;">${filterKeyword ? 'Tidak ada rute matriks yang cocok.' : 'Belum ada rute khusus tersimpan di matriks.'}</div>`;
-                return;
-            }
-
-            filteredMatrix.forEach(m => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'matrix-item';
-                itemDiv.innerHTML = `
-                    <div class="matrix-item-header">
-                        <div class="matrix-route-badge">
-                            <span class="badge-asal">📍 ${m.nama_asal}</span>
-                            <span style="color:#D4AF37;">➔</span>
-                            <span class="badge-tujuan">🎯 ${m.nama_tujuan}</span>
-                        </div>
-                        <div class="data-item-actions">
-                            <button class="action-btn" title="Edit" onclick="editFormMatrix('${m.id}')">✏️</button>
-                            <button class="action-btn" title="Hapus" onclick="hapusMatrix('${m.id}')">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="matrix-instr-preview">${m.instruksi}</div>
-                    ${m.gambar_tanda ? `<div style="font-size:11px; color:#27ae60; margin-top:2px;">📷 Foto patokan kustom terpasang</div>` : ''}
-                `;
-                listEl.appendChild(itemDiv);
-            });
-        }
-
-        window.filterMatrixList = function() {
-            renderMatrixAdminList();
-        }
-
-        window.gantiModeMatrix = function() {
-            const mode = document.getElementById('matrix-mode').value;
-            const asalSingle = document.getElementById('matrix-asal-single');
-            const asalMulti = document.getElementById('matrix-asal-multi');
-            const asalTools = document.getElementById('asal-multi-tools');
-            
-            const tujuanSingle = document.getElementById('matrix-tujuan-single');
-            const tujuanMulti = document.getElementById('matrix-tujuan-multi');
-            const tujuanTools = document.getElementById('tujuan-multi-tools');
-
-            if (mode === 'single') {
-                asalSingle.style.display = 'block';
-                asalMulti.style.display = 'none';
-                asalTools.style.display = 'none';
-                tujuanSingle.style.display = 'block';
-                tujuanMulti.style.display = 'none';
-                tujuanTools.style.display = 'none';
-            } else if (mode === 'one-to-many') {
-                asalSingle.style.display = 'block';
-                asalMulti.style.display = 'none';
-                asalTools.style.display = 'none';
-                tujuanSingle.style.display = 'none';
-                tujuanMulti.style.display = 'flex';
-                tujuanTools.style.display = 'flex';
-            } else if (mode === 'many-to-one') {
-                asalSingle.style.display = 'none';
-                asalMulti.style.display = 'flex';
-                asalTools.style.display = 'flex';
-                tujuanSingle.style.display = 'block';
-                tujuanMulti.style.display = 'none';
-                tujuanTools.style.display = 'none';
-            }
-        }
-
-        window.pilihSemuaMatrixAsal = function(status) {
-            document.querySelectorAll('input[name="chk-matrix-asal"]').forEach(chk => chk.checked = status);
-        }
-
-        window.pilihSemuaMatrixTujuan = function(status) {
-            document.querySelectorAll('input[name="chk-matrix-tujuan"]').forEach(chk => chk.checked = status);
-        }
-
-        window.resetFormMatrix = function() {
-            editMatrixId = null;
-            document.getElementById('label-mode-matrix').innerText = "Mode: [ Tambah Baru ]";
-            document.getElementById('btn-save-matrix').innerText = "💾 Simpan ke Matriks";
-            document.getElementById('matrix-instruksi').value = "";
-            document.getElementById('matrix-tanda').value = "";
-            document.getElementById('matrix-mode').value = "single";
-            window.gantiModeMatrix();
-        }
-
-        window.editFormMatrix = function(id) {
-            editMatrixId = id;
-            const m = dataMatrixRute.find(item => item.id == id);
-            if (!m) return;
-            
-            document.getElementById('label-mode-matrix').innerText = "Mode: [ EDIT DATA ]";
-            document.getElementById('btn-save-matrix').innerText = "💾 Perbarui Matriks";
-            document.getElementById('matrix-mode').value = "single";
-            window.gantiModeMatrix();
-            
-            document.getElementById('matrix-asal-single').value = m.nama_asal;
-            document.getElementById('matrix-tujuan-single').value = m.nama_tujuan;
-            document.getElementById('matrix-instruksi').value = m.instruksi;
-            document.getElementById('matrix-tanda').value = m.gambar_tanda || "";
-            
-            document.getElementById('matrix-instruksi').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        window.simpanMatrixSupabase = async function() {
-            const mode = document.getElementById('matrix-mode').value;
-            const instruksi = document.getElementById('matrix-instruksi').value.trim();
-            const gambarTanda = document.getElementById('matrix-tanda').value.trim() || null;
-
-            if (!instruksi) {
-                return alert("Instruksi arah rute wajib diisi!");
-            }
-
-            try {
-                if (editMatrixId) {
-                    const asal = document.getElementById('matrix-asal-single').value;
-                    const tujuan = document.getElementById('matrix-tujuan-single').value;
-                    const { error } = await supabase.from('rute_matrix').update({
-                        nama_asal: asal,
-                        nama_tujuan: tujuan,
-                        instruksi: instruksi,
-                        gambar_tanda: gambarTanda
-                    }).eq('id', editMatrixId);
-
-                    if (error) throw error;
-                    alert("Rute matriks berhasil diperbarui!");
-                } else if (mode === 'single') {
-                    const asal = document.getElementById('matrix-asal-single').value;
-                    const tujuan = document.getElementById('matrix-tujuan-single').value;
-                    if (!asal || !tujuan) return alert("Pilih titik awal dan lokasi tujuan!");
-
-                    const existing = dataMatrixRute.find(item => item.nama_asal === asal && item.nama_tujuan === tujuan);
-                    if (existing) {
-                        const { error } = await supabase.from('rute_matrix').update({
-                            instruksi: instruksi,
-                            gambar_tanda: gambarTanda
-                        }).eq('id', existing.id);
-                        if (error) throw error;
-                    } else {
-                        const { error } = await supabase.from('rute_matrix').insert([{
-                            nama_asal: asal,
-                            nama_tujuan: tujuan,
-                            instruksi: instruksi,
-                            gambar_tanda: gambarTanda
-                        }]);
-                        if (error) throw error;
-                    }
-                    alert(`Rute dari [${asal}] ke [${tujuan}] berhasil disimpan!`);
-                } else if (mode === 'one-to-many') {
-                    const asal = document.getElementById('matrix-asal-single').value;
-                    const checkedTujuan = Array.from(document.querySelectorAll('input[name="chk-matrix-tujuan"]:checked')).map(c => c.value);
-                    if (checkedTujuan.length === 0) return alert("Pilih minimal 1 lokasi tujuan dari daftar!");
-
-                    for (const t of checkedTujuan) {
-                        const existing = dataMatrixRute.find(item => item.nama_asal === asal && item.nama_tujuan === t);
-                        if (existing) {
-                            await supabase.from('rute_matrix').update({ instruksi: instruksi, gambar_tanda: gambarTanda }).eq('id', existing.id);
-                        } else {
-                            await supabase.from('rute_matrix').insert([{ nama_asal: asal, nama_tujuan: t, instruksi: instruksi, gambar_tanda: gambarTanda }]);
-                        }
-                    }
-                    alert(`Berhasil menyimpan rute dari [${asal}] ke ${checkedTujuan.length} lokasi tujuan!`);
-                } else if (mode === 'many-to-one') {
-                    const tujuan = document.getElementById('matrix-tujuan-single').value;
-                    const checkedAsal = Array.from(document.querySelectorAll('input[name="chk-matrix-asal"]:checked')).map(c => c.value);
-                    if (checkedAsal.length === 0) return alert("Pilih minimal 1 titik awal dari daftar!");
-
-                    for (const a of checkedAsal) {
-                        const existing = dataMatrixRute.find(item => item.nama_asal === a && item.nama_tujuan === tujuan);
-                        if (existing) {
-                            await supabase.from('rute_matrix').update({ instruksi: instruksi, gambar_tanda: gambarTanda }).eq('id', existing.id);
-                        } else {
-                            await supabase.from('rute_matrix').insert([{ nama_asal: a, nama_tujuan: tujuan, instruksi: instruksi, gambar_tanda: gambarTanda }]);
-                        }
-                    }
-                    alert(`Berhasil menyimpan rute dari ${checkedAsal.length} titik awal menuju [${tujuan}]!`);
-                }
-
-                window.resetFormMatrix();
-                await fetchAllDataSupabase();
-            } catch (err) {
-                console.error("Gagal simpan matriks:", err);
-                alert("Gagal menyimpan data matriks! Periksa konsol / koneksi Supabase.");
-            }
-        }
-
-        window.hapusMatrix = async function(id) {
-            const target = dataMatrixRute.find(m => m.id == id);
-            const label = target ? `[${target.nama_asal} ➔ ${target.nama_tujuan}]` : "rute ini";
-            if (!confirm(`Hapus ${label} dari matriks rute?`)) return;
-
-            try {
-                const { error } = await supabase.from('rute_matrix').delete().eq('id', id);
-                if (error) throw error;
-                await fetchAllDataSupabase();
-            } catch (err) {
-                console.error("Gagal menghapus matriks:", err);
-                alert("Gagal menghapus rute dari database.");
-            }
-        }
-
-        window.ujiMatrixRute = function() {
-            const asal = document.getElementById('matrix-asal-single').value || dataLokasiAsal[0] || "Titik Awal";
-            const tujuan = document.getElementById('matrix-tujuan-single').value || Object.keys(dataRute)[0] || "Tujuan";
-            const instruksi = document.getElementById('matrix-instruksi').value.trim() || "Ikuti lorong utama rumah sakit.";
-            
-            const teksSuara = `Pengujian rute navigasi dari ${asal} menuju ${tujuan}. ${instruksi}.`;
-            window.bicara(teksSuara);
-            alert(`🔊 Menjalankan pengujian suara:\n\n"${teksSuara}"`);
-        }
-
-        window.uploadPeta = async function() {
-            const fi = document.getElementById('map-file'); if(!fi.files || fi.files.length === 0) return alert("Pilih berkas peta!");
-            const f = fi.files[0]; const ext = f.name.split('.').pop(); const fn = `map_${Date.now()}.${ext}`;
-            document.getElementById('map-status').innerText = "Mengunggah...";
-            const { error: e } = await supabase.storage.from('maps').upload(fn, f);
-            if(e) { document.getElementById('map-status').innerText = "Gagal!"; return alert("Gagal upload! Periksa Storage Policy."); }
-            const u = supabase.storage.from('maps').getPublicUrl(fn).data.publicUrl;
-            await supabase.from('map_image').update({ image_url: u, file_path: fn }).eq('id', 1);
-            alert("Peta berhasil diunggah!"); fetchAllDataSupabase();
-        }
-        window.hapusPeta = async function() {
-            if(!confirm("Hapus peta ini dari server?")) return;
-            const { data } = await supabase.from('map_image').select('file_path').eq('id', 1).single();
-            if(data && data.file_path) { await supabase.storage.from('maps').remove([data.file_path]); }
-            await supabase.from('map_image').update({ image_url: null, file_path: null }).eq('id', 1);
-            alert("Peta dihapus!"); fetchAllDataSupabase();
-        }
-
-        let isDrawingArea = false, drawStartX = 0, drawStartY = 0; let drawOverlay, drawBox, mapImg;
-        window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hs').innerText = "➕ Simpan"; document.getElementById('hs-nama').value = ""; document.getElementById('hs-target').value = ""; document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = ""; document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = ""; const p = document.getElementById('hotspot-preview'); if(p) p.remove(); }
-        window.editFormHotspot = function(id) {
-            editHotspotId = id; const hs = dataHotspots.find(h => h.id == id);
-            if(hs) { document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hs').innerText = "💾 Update"; document.getElementById('hs-nama').value = hs.nama_bangunan; document.getElementById('hs-target').value = hs.target_lokasi || ""; document.getElementById('hs-top').value = hs.pos_top; document.getElementById('hs-left').value = hs.pos_left; document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height; window.previewHotspot(); }
-        }
+        window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hotspot').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hotspot').innerText = "➕ Simpan Hotspot"; document.getElementById('hs-bangunan').value = ""; document.getElementById('hs-x').value = ""; document.getElementById('hs-y').value = ""; document.getElementById('hs-nomor').value = ""; document.getElementById('hs-target').value = ""; }
+        window.editFormHotspot = function(id) { editHotspotId = id; const hs = dataHotspots.find(h => h.id == id); if(!hs) return; document.getElementById('label-mode-hotspot').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hotspot').innerText = "💾 Update"; document.getElementById('hs-bangunan').value = hs.nama_bangunan; document.getElementById('hs-x').value = hs.x_pos; document.getElementById('hs-y').value = hs.y_pos; document.getElementById('hs-nomor').value = hs.nomor || ""; document.getElementById('hs-target').value = hs.target_lokasi || ""; }
         window.simpanHotspotSupabase = async function() {
-            const n = document.getElementById('hs-nama').value.trim(); const t = document.getElementById('hs-target').value; const top = parseFloat(document.getElementById('hs-top').value); const left = parseFloat(document.getElementById('hs-left').value); const w = parseFloat(document.getElementById('hs-width').value); const h = parseFloat(document.getElementById('hs-height').value);
-            if(!n || isNaN(top) || isNaN(left) || isNaN(w) || isNaN(h)) return alert("Lengkapi form & koordinat!");
-            const p = { nama_bangunan: n, target_lokasi: t || null, pos_top: top, pos_left: left, width: w, height: h };
-            if (editHotspotId) await supabase.from('map_hotspots').update(p).eq('id', editHotspotId); else await supabase.from('map_hotspots').insert([p]);
+            const b = document.getElementById('hs-bangunan').value.trim(); const x = parseFloat(document.getElementById('hs-x').value); const y = parseFloat(document.getElementById('hs-y').value); const no = document.getElementById('hs-nomor').value.trim(); const tg = document.getElementById('hs-target').value;
+            if(!b || isNaN(x) || isNaN(y)) return alert("Data tidak valid!");
+            const payload = { nama_bangunan: b, x_pos: x, y_pos: y, nomor: no, target_lokasi: tg };
+            if (editHotspotId) await supabase.from('hotspot_peta').update(payload).eq('id', editHotspotId);
+            else await supabase.from('hotspot_peta').insert([payload]);
             window.resetFormHotspot(); await fetchAllDataSupabase();
         }
-        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot ini?")) { await supabase.from('map_hotspots').delete().eq('id', id); await fetchAllDataSupabase(); } }
+        window.hapusHotspot = async function(id) { if(confirm("Hapus hotspot?")) { await supabase.from('hotspot_peta').delete().eq('id', id); await fetchAllDataSupabase(); } }
 
-        window.mulaiGambarHotspot = function() {
-            window.resetPosisiPeta(); drawOverlay = document.getElementById('draw-overlay'); drawBox = document.getElementById('draw-box'); mapImg = document.querySelector('.map-wrapper img');
-            document.getElementById('panel-cpanel').classList.remove('open'); drawOverlay.style.display = 'block'; drawBox.style.display = 'none';
-            alert("Tarik kursor (klik & geser) di atas denah untuk mencetak area hotspot.");
-        };
-
-        let isDraggingPreview = false, isResizingPreview = false, startPreviewX = 0, startPreviewY = 0;
-        let startHsLeft = 0, startHsTop = 0, startHsWidth = 0, startHsHeight = 0;
-
-        window.previewHotspot = function() {
-            const top = parseFloat(document.getElementById('hs-top').value) || 0; 
-            const left = parseFloat(document.getElementById('hs-left').value) || 0; 
-            const w = parseFloat(document.getElementById('hs-width').value) || 10; 
-            const h = parseFloat(document.getElementById('hs-height').value) || 10;
-            
-            let p = document.getElementById('hotspot-preview');
-            if(!p) { 
-                p = document.createElement('div'); 
-                p.id = 'hotspot-preview'; 
-                p.style.position = 'absolute'; 
-                p.style.background = 'rgba(212, 175, 55, 0.45)'; 
-                p.style.border = '2px solid #8B0000'; 
-                p.style.zIndex = '999'; 
-                p.style.cursor = 'move'; 
-                p.style.pointerEvents = 'auto'; // allow dragging
-
-                let handle = document.createElement('div');
-                handle.className = 'hs-resize-handle';
-                handle.style.position = 'absolute'; 
-                handle.style.bottom = '-6px'; 
-                handle.style.right = '-6px'; 
-                handle.style.width = '16px'; 
-                handle.style.height = '16px'; 
-                handle.style.background = '#8B0000'; 
-                handle.style.border = '2px solid #FFF'; 
-                handle.style.borderRadius = '50%'; 
-                handle.style.cursor = 'nwse-resize'; 
-                handle.style.zIndex = '1000';
-                p.appendChild(handle);
-                
-                document.getElementById('interactive-map').appendChild(p);
-
-                function getPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
-                
-                function startDragAction(e, type) {
-                    if (isDrawingArea) return;
-                    e.stopPropagation(); // prevent map panning
-                    const pos = getPos(e);
-                    startPreviewX = pos.x; 
-                    startPreviewY = pos.y;
-                    startHsLeft = parseFloat(document.getElementById('hs-left').value) || 0;
-                    startHsTop = parseFloat(document.getElementById('hs-top').value) || 0;
-                    startHsWidth = parseFloat(document.getElementById('hs-width').value) || 10;
-                    startHsHeight = parseFloat(document.getElementById('hs-height').value) || 10;
-                    if(type === 'move') isDraggingPreview = true;
-                    if(type === 'resize') isResizingPreview = true;
-                }
-
-                p.addEventListener('mousedown', (e) => { if(e.target !== handle) startDragAction(e, 'move'); });
-                p.addEventListener('touchstart', (e) => { if(e.target !== handle) startDragAction(e, 'move'); }, {passive: false});
-                
-                handle.addEventListener('mousedown', (e) => startDragAction(e, 'resize'));
-                handle.addEventListener('touchstart', (e) => startDragAction(e, 'resize'), {passive: false});
-
-                function onPreviewMove(e) {
-                    if(!isDraggingPreview && !isResizingPreview) return;
-                    e.preventDefault(); e.stopPropagation(); // Prevent scroll/pan
-                    const pos = getPos(e);
-                    const rect = document.querySelector('.map-wrapper img').getBoundingClientRect();
-                    let dX = ((pos.x - startPreviewX) / rect.width) * 100;
-                    let dY = ((pos.y - startPreviewY) / rect.height) * 100;
-
-                    if(isDraggingPreview) {
-                        let nL = startHsLeft + dX; let nT = startHsTop + dY;
-                        document.getElementById('hs-left').value = nL.toFixed(2);
-                        document.getElementById('hs-top').value = nT.toFixed(2);
-                        p.style.left = `${nL}%`; p.style.top = `${nT}%`;
-                    } else if(isResizingPreview) {
-                        let nW = startHsWidth + dX; let nH = startHsHeight + dY;
-                        if(nW < 1) nW = 1; if(nH < 1) nH = 1;
-                        document.getElementById('hs-width').value = nW.toFixed(2);
-                        document.getElementById('hs-height').value = nH.toFixed(2);
-                        p.style.width = `${nW}%`; p.style.height = `${nH}%`;
-                    }
-                }
-                
-                function onPreviewEnd(e) {
-                    isDraggingPreview = false; 
-                    isResizingPreview = false;
-                }
-
-                window.addEventListener('mousemove', onPreviewMove);
-                window.addEventListener('touchmove', onPreviewMove, {passive: false});
-                window.addEventListener('mouseup', onPreviewEnd);
-                window.addEventListener('touchend', onPreviewEnd);
-            }
-            p.style.top = `${top}%`; p.style.left = `${left}%`; p.style.width = `${w}%`; p.style.height = `${h}%`;
+        window.simpanPetaUtama = async function() { alert("Fitur Peta Dinonaktifkan sementara."); }
+        
+        window.resetFormMatrix = function() { editMatrixId = null; document.getElementById('matrix-asal').value = ""; document.getElementById('matrix-tujuan').value = ""; document.getElementById('matrix-instruksi').value = ""; document.getElementById('matrix-tanda').value = ""; }
+        window.editFormMatrix = function(id) { editMatrixId = id; const d = dataMatrixRute.find(m => m.id == id); if(!d) return; document.getElementById('matrix-asal').value = d.lokasi_asal; document.getElementById('matrix-tujuan').value = d.lokasi_tujuan; document.getElementById('matrix-instruksi').value = d.instruksi; document.getElementById('matrix-tanda').value = d.gambar_tanda || ""; }
+        window.simpanDataMatrix = async function() {
+            const a = document.getElementById('matrix-asal').value; const t = document.getElementById('matrix-tujuan').value; const i = document.getElementById('matrix-instruksi').value.trim(); const g = document.getElementById('matrix-tanda').value.trim();
+            if(!a || !t || !i) return alert("Lengkapi asal, tujuan, dan instruksi!");
+            const payload = { lokasi_asal: a, lokasi_tujuan: t, instruksi: i, gambar_tanda: g };
+            if(editMatrixId) await supabase.from('rute_matrix').update(payload).eq('id', editMatrixId);
+            else await supabase.from('rute_matrix').insert([payload]);
+            window.resetFormMatrix(); await fetchAllDataSupabase();
         }
+        window.hapusMatrix = async function(id) { if(confirm("Hapus relasi rute?")) { await supabase.from('rute_matrix').delete().eq('id', id); await fetchAllDataSupabase(); } }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const overlay = document.getElementById('draw-overlay'); const box = document.getElementById('draw-box');
-            function getEventPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
-            function sDraw(e) { isDrawingArea = true; const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect(); drawStartX = ((pos.x - rect.left) / rect.width) * 100; drawStartY = ((pos.y - rect.top) / rect.height) * 100; drawStartX = Math.max(0, Math.min(100, drawStartX)); drawStartY = Math.max(0, Math.min(100, drawStartY)); box.style.left = drawStartX + '%'; box.style.top = drawStartY + '%'; box.style.width = '0%'; box.style.height = '0%'; box.style.display = 'block'; }
-            function mDraw(e) { if(!isDrawingArea) return; e.preventDefault(); const pos = getEventPos(e); const rect = mapImg.getBoundingClientRect(); let cX = Math.max(0, Math.min(100, ((pos.x - rect.left) / rect.width) * 100)); let cY = Math.max(0, Math.min(100, ((pos.y - rect.top) / rect.height) * 100)); let left = Math.min(drawStartX, cX); let top = Math.min(drawStartY, cY); let w = Math.abs(cX - drawStartX); let h = Math.abs(cY - drawStartY); box.style.left = left + '%'; box.style.top = top + '%'; box.style.width = w + '%'; box.style.height = h + '%'; }
-            function eDraw(e) { if(!isDrawingArea) return; isDrawingArea = false; overlay.style.display = 'none'; const fW = parseFloat(box.style.width); const fH = parseFloat(box.style.height); if(fW < 1 || fH < 1) { document.getElementById('panel-cpanel').classList.add('open'); return; } document.getElementById('hs-left').value = parseFloat(box.style.left).toFixed(2); document.getElementById('hs-top').value = parseFloat(box.style.top).toFixed(2); document.getElementById('hs-width').value = fW.toFixed(2); document.getElementById('hs-height').value = fH.toFixed(2); document.getElementById('panel-cpanel').classList.add('open'); window.previewHotspot(); }
-            overlay.addEventListener('mousedown', sDraw); overlay.addEventListener('mousemove', mDraw); overlay.addEventListener('mouseup', eDraw); overlay.addEventListener('touchstart', sDraw, {passive: false}); overlay.addEventListener('touchmove', mDraw, {passive: false}); overlay.addEventListener('touchend', eDraw);
-        });
-
-        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
-        window.bukaModalLogin = function() { document.getElementById('login-modal').style.display = 'flex'; }
-        window.prosesLogin = function() { if (document.getElementById('login-pin').value === systemPIN) { window.tutupModal('login-modal'); document.getElementById('panel-cpanel').classList.add('open'); document.getElementById('tts-volume').value = settingTTS.volume; document.getElementById('val-vol').innerText = settingTTS.volume; document.getElementById('tts-rate').value = settingTTS.rate; document.getElementById('val-rate').innerText = settingTTS.rate; renderAllAdminLists(); } else { alert("PIN Akses Salah!"); } }
-        window.tutupCPanel = function() { document.getElementById('panel-cpanel').classList.remove('open'); }
-        window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
-        window.simpanPengaturanSupabase = async function() { const vol = parseFloat(document.getElementById('tts-volume').value); const r = parseFloat(document.getElementById('tts-rate').value); const { error } = await supabase.from('app_settings').update({ tts_volume: vol, tts_rate: r }).eq('id', 1); if(!error) { settingTTS.volume = vol; settingTTS.rate = r; alert("Pengaturan TTS Disimpan!"); } }
-        window.resetPINSupabase = async function() { const lama = document.getElementById('pin-lama').value; const baru = document.getElementById('pin-baru').value; if (lama !== systemPIN) return alert("PIN Lama tidak sesuai!"); if (baru.length !== 12) return alert("PIN Baru wajib 12 karakter!"); const { error } = await supabase.from('app_settings').update({ pin: baru }).eq('id', 1); if(!error) { systemPIN = baru; alert("PIN berhasil diperbarui!"); document.getElementById('pin-lama').value = ""; document.getElementById('pin-baru').value = ""; } }
-
-        // ==========================================
-        // APLIKASI PENGUNJUNG (NAVIGASI & UI)
-        // ==========================================
-        window.tampilkanInfoHotspot = function(nama_bangunan, target_lokasi) {
-            const nama = nama_bangunan || "Area Tidak Dikenal";
-            document.getElementById('hs-info-nama').innerText = nama;
-            
-            const actionContainer = document.getElementById('hs-info-action');
-            if (actionContainer) {
-                actionContainer.innerHTML = "";
-                // Jika area ini valid untuk dijadikan titik awal, beri tombol untuk jadikan titik awal
-                if (target_lokasi && dataLokasiAsal.includes(target_lokasi) && document.getElementById('view-asal').style.display !== 'none') {
-                    const btnAsal = document.createElement('button');
-                    btnAsal.className = 'btn-primary';
-                    btnAsal.style.marginTop = '10px';
-                    btnAsal.innerHTML = `📍 Jadikan Titik Awal`;
-                    btnAsal.onclick = () => {
-                        window.tutupModal('hotspot-info-popup');
-                        window.pilihLokasiSekarang(target_lokasi);
-                    };
-                    actionContainer.appendChild(btnAsal);
-                }
-            }
-            
-            document.getElementById('hotspot-info-popup').style.display = 'flex';
-            window.bicara(`Ini adalah area ${nama}.`);
+        window.renderMatrixAdminList = function() {
+            const list = document.getElementById('list-matrix'); if(!list) return; list.innerHTML = '';
+            dataMatrixRute.forEach(d => {
+                list.innerHTML += `<div class="data-item"><div class="data-item-name">${d.lokasi_asal} ➔ ${d.lokasi_tujuan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormMatrix(${d.id})">✏️</button><button class="action-btn" title="Hapus" onclick="hapusMatrix(${d.id})">🗑️</button></div></div>`;
+            });
         }
-
-        function renderHotspotsToMap() {
-            const container = document.getElementById('interactive-map');
-            container.querySelectorAll('.hotspot').forEach(el => el.remove());
-
-            dataHotspots.forEach(hs => {
-                const div = document.createElement('div'); div.className = 'hotspot';
-                div.style.top = `${hs.pos_top}%`; div.style.left = `${hs.pos_left}%`;
-                div.style.width = `${hs.width}%`; div.style.height = `${hs.height}%`;
-                div.id = `hs-${hs.id}`;
-
-                const tooltip = document.createElement('div'); tooltip.className = 'hotspot-tooltip'; tooltip.innerText = hs.nama_bangunan; div.appendChild(tooltip);
+        
+        
+        window.prosesLogin = function() { 
+            if (document.getElementById('login-pin').value === systemPIN) { 
+                window.tutupModal('login-modal'); 
+                document.getElementById('panel-cpanel').classList.add('open'); 
                 
-                let namaTujuanTerkait = hs.target_lokasi;
-                let nomorTampil = hs.nomor || (namaTujuanTerkait && dataRute[namaTujuanTerkait] ? dataRute[namaTujuanTerkait].nomor : null);
+                const rolePanel = document.getElementById('login-role').value;
+                window.currentUserRole = rolePanel;
                 
-                if(nomorTampil) {
-                    const label = document.createElement('div'); label.className = 'hotspot-label'; label.innerText = nomorTampil; div.appendChild(label);
-                }
-
-                div.onclick = () => {
-                    document.getElementById('route-svg').style.display = 'none'; // Sembunyikan garis animasi
+                if(rolePanel === 'administrator') {
+                    // Sembunyikan tab selain Data Tujuan (Tanda Lokasi)
+                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'none';
+                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'none';
+                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'none';
+                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'none';
+                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'none';
+                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'none';
+                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'none';
                     
-                    if (document.getElementById('view-asal').style.display !== 'none') {
-                        // Jika belum memilih titik awal -> tampilkan popup info
-                        window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi);
-                    } else {
-                        // Jika sudah memilih titik awal -> klik di peta jadi tujuan
-                        if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
-                            window.pilihTujuan(hs.target_lokasi);
-                        } else { 
-                            window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi); 
-                        }
-                    }
-                };
-                container.insertBefore(div, document.getElementById('draw-overlay'));
-            });
-        }
+                    // Sembunyikan tombol hapus
+                    setTimeout(() => {
+                        const deleteBtns = document.querySelectorAll('.action-btn[title="Hapus"]');
+                        deleteBtns.forEach(btn => btn.style.display = 'none');
+                    }, 500);
+                } else {
+                    // Tampilkan semua
+                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'flex';
+                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'flex';
+                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'flex';
+                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'flex';
+                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'flex';
+                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'flex';
+                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'flex';
+                }
 
-        window.mulaiAplikasi = function() {
-            document.getElementById('start-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('start-overlay').style.display = 'none';
+                document.getElementById('tts-volume').value = settingTTS.volume; 
+                document.getElementById('val-vol').innerText = settingTTS.volume; 
+                document.getElementById('tts-rate').value = settingTTS.rate; 
+                document.getElementById('val-rate').innerText = settingTTS.rate; 
+                renderAllAdminLists(); 
                 
-                renderTombolLokasiAsal(); renderTombolTujuan();
-                
-                document.getElementById('view-asal').style.display = 'block';
-                document.getElementById('view-tujuan').style.display = 'none';
-                
-                window.bicara("Selamat datang di Rumah Sakit Jiwa Daerah Atma Husada Mahakam. Silakan pilih titik awal Anda saat ini.");
-            }, 600);
+            } else { 
+                alert("PIN Akses Salah!"); 
+            } 
+        }
+        window.bukaModalQA = function() {
+ document.getElementById('qa-modal').style.display = 'flex'; }
+        window.bukaModalLogin = function() { 
+        document.getElementById('login-pin').value = '';
+        document.getElementById('login-modal').style.display = 'flex'; 
+    }
+        window.tutupModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        window.tutupCPanel = function() { 
+        document.getElementById('panel-cpanel').classList.remove('open'); 
+        window.currentUserRole = document.getElementById('front-akses') ? document.getElementById('front-akses').value : 'pengunjung';
+    }
+        window.updateTTSUI = function() { document.getElementById('val-vol').innerText = document.getElementById('tts-volume').value; document.getElementById('val-rate').innerText = document.getElementById('tts-rate').value; }
+        window.simpanPengaturanSupabase = function() { alert("Pengaturan TTS Disimpan (Lokal)"); }
+        window.resetPINSupabase = function() { alert("PIN Reset"); }
+        window.syncDataAdmin = function() { fetchAllDataSupabase(); }
+
+        window.tampilkanInfoHotspot = function(nama, target) {
+            alert(`Lokasi: ${nama}`);
         }
 
-        function renderTombolLokasiAsal() {
-            const selectEl = document.getElementById('select-asal-dropdown'); 
-            if(!selectEl) return;
-            selectEl.innerHTML = '<option value="">-- Sentuh untuk Pilih --</option>';
-            dataLokasiAsal.forEach(nama => { 
-                const opt = document.createElement('option');
-                opt.value = nama;
-                opt.innerText = `📍 ${nama}`;
-                selectEl.appendChild(opt);
-            });
-            if(dataLokasiAsal.length > 0 && !lokasiAsal) {
-                lokasiAsal = dataLokasiAsal[0];
-            }
+        window.bukaDropdownTujuan = function() {
+            document.getElementById('search-tujuan').style.display = 'block';
+            document.getElementById('list-tujuan-container').style.display = 'block';
+            document.getElementById('search-tujuan').focus();
+        }
+        window.toggleDropdownTujuan = function() {
+            const lst = document.getElementById('list-tujuan-container');
+            if(lst.style.display === 'block') window.tutupDropdownTujuan();
+            else window.bukaDropdownTujuan();
+        }
+        window.tutupDropdownTujuan = function() {
+            document.getElementById('search-tujuan').style.display = 'none';
+            document.getElementById('list-tujuan-container').style.display = 'none';
         }
 
-        window.pilihLokasiSekarang = function(nama, mainSuara = true) {
-            lokasiAsal = nama;
-            document.getElementById('lbl-titik-awal-aktif').innerText = lokasiAsal;
-            document.getElementById('view-asal').style.display = 'none';
-            document.getElementById('view-tujuan').style.display = 'flex';
-            document.getElementById('search-tujuan').value = "";
-            window.filterTujuan(); 
-            if(mainSuara) { window.bicara(`Titik awal diatur ke ${lokasiAsal}. Silakan cari ruangan tujuan Anda.`); }
+        window.inisialisasiDaftarTujuan = function() {
+            window.renderTombolTujuan();
         }
-
-        window.kembaliPilihAsal = function() {
-            document.getElementById('view-tujuan').style.display = 'none';
-            document.getElementById('view-asal').style.display = 'block';
-            document.getElementById('select-asal-dropdown').value = ""; document.getElementById('custom-tujuan-btn').innerText = "-- Sentuh untuk Pilih Ruangan --"; // Reset dropdown visual
-            window.bicara(`Silakan pilih kembali titik awal Anda.`);
-        }
-
+        
         window.renderTombolTujuan = function() {
             const listContainer = document.getElementById('list-tujuan-container'); 
             if(!listContainer) return;
@@ -1548,315 +1207,159 @@
             let tujuanArr = [];
             for (let nama in dataRute) { 
                 let routeAkses = dataRute[nama].akses ? dataRute[nama].akses.toLowerCase() : "pengunjung";
-                // RBAC rule
                 if (routeAkses === 'staff' && window.currentUserRole === 'pengunjung') {
-                    continue; // hide staff routes from pengunjung
+                    continue; 
                 }
                 tujuanArr.push({ nama: nama, data: dataRute[nama] }); 
             }
+            tujuanArr.sort((a,b) => a.nama.localeCompare(b.nama));
             
-            tujuanArr.sort((a, b) => {
-                let numA = parseInt(a.data.nomor) || extractNumber(a.nama);
-                let numB = parseInt(b.data.nomor) || extractNumber(b.nama);
-                if (numA === numB) return a.nama.localeCompare(b.nama);
-                return numA - numB;
-            });
-
             tujuanArr.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'tujuan-item-option tujuan-item';
+                let roleClass = item.data.akses === 'Staff' ? 'akses-staff' : 'akses-umum';
+                let btn = document.createElement('div');
+                btn.className = 'tujuan-item-option';
+                btn.innerHTML = `<span>${item.nama}</span> <span style="font-size:10px; padding:2px 5px; border-radius:4px; background:#D4AF37; color:#111;">${item.data.akses || 'Pengunjung'}</span>`;
                 btn.onclick = () => window.pilihTujuan(item.nama);
-                
-                const nomor = item.data.nomor ? `<span class="span-nomor">[${item.data.nomor}]</span>` : '';
-                const roleClass = (item.data.akses.toLowerCase() === 'pengunjung') ? 'badge-pengunjung' : 'badge-non';
-                
-                btn.innerHTML = `
-                    <div>
-                        ${nomor} <span class="nama-tujuan">${item.nama}</span>
-                    </div>
-                    <div class="badge-akses ${roleClass}">${item.data.akses}</div>
-                `;
                 listContainer.appendChild(btn);
             });
         }
-
+        
         window.filterTujuan = function(autoOpen = false) {
-            if (autoOpen) window.bukaDropdownTujuan();
+            if(autoOpen) window.bukaDropdownTujuan();
             let input = document.getElementById('search-tujuan').value.toLowerCase();
             let listContainer = document.getElementById('list-tujuan-container');
-            let options = listContainer.getElementsByClassName('tujuan-item');
-            
-            for (let i = 0; i < options.length; i++) {
-                let txtValue = options[i].innerText || options[i].textContent;
-                if (txtValue.toLowerCase().indexOf(input) > -1) {
-                    options[i].style.display = "";
-                } else {
-                    options[i].style.display = "none";
-                }
+            let options = listContainer.getElementsByClassName('tujuan-item-option');
+            for(let i=0; i<options.length; i++) {
+                let txtValue = options[i].textContent || options[i].innerText;
+                options[i].style.display = txtValue.toLowerCase().indexOf(input) > -1 ? "" : "none";
             }
         }
 
-        // ==========================================
-        // KALKULASI KOORDINAT RUTE LOKASI
-        // ==========================================
-        function getCoordinatesForLokasi(namaLokasi) {
-            if (!namaLokasi) return null;
-            const cleanNama = namaLokasi.toLowerCase().trim();
-
-            // 1. Cek langsung ke map_hotspots berdasarkan target_lokasi atau nama_bangunan
-            const hsDirect = dataHotspots.find(h => 
-                (h.target_lokasi && h.target_lokasi.toLowerCase().trim() === cleanNama) ||
-                (h.nama_bangunan && h.nama_bangunan.toLowerCase().trim() === cleanNama)
-            );
-            if (hsDirect) {
-                return {
-                    x: parseFloat(hsDirect.pos_left) + (parseFloat(hsDirect.width) / 2),
-                    y: parseFloat(hsDirect.pos_top) + (parseFloat(hsDirect.height) / 2)
-                };
-            }
-
-            // 2. Cek kecocokan parsial di map_hotspots
-            const hsPartial = dataHotspots.find(h => 
-                (h.nama_bangunan && (cleanNama.includes(h.nama_bangunan.toLowerCase().trim()) || h.nama_bangunan.toLowerCase().trim().includes(cleanNama))) ||
-                (h.target_lokasi && (cleanNama.includes(h.target_lokasi.toLowerCase().trim()) || h.target_lokasi.toLowerCase().trim().includes(cleanNama)))
-            );
-            if (hsPartial) {
-                return {
-                    x: parseFloat(hsPartial.pos_left) + (parseFloat(hsPartial.width) / 2),
-                    y: parseFloat(hsPartial.pos_top) + (parseFloat(hsPartial.height) / 2)
-                };
-            }
-
-            // 3. Titik patokan umum denah rumah sakit
-            if (cleanNama.includes('depan') || cleanNama.includes('gerbang utama') || cleanNama.includes('pintu masuk') || cleanNama.includes('lobi')) {
-                return { x: 50, y: 92 };
-            }
-            if (cleanNama.includes('belakang') || cleanNama.includes('gerbang belakang')) {
-                return { x: 48, y: 14 };
-            }
-            if (cleanNama.includes('tengah') || cleanNama.includes('gerbang tengah')) {
-                return { x: 50, y: 55 };
-            }
-            if (cleanNama.includes('igd') || cleanNama.includes('darurat')) {
-                return { x: 62, y: 78 };
-            }
-            if (cleanNama.includes('mcu')) {
-                return { x: 38, y: 75 };
-            }
-            if (cleanNama.includes('parkir')) {
-                return { x: 45, y: 90 };
-            }
-
-            // Default titik tengah bawah
-            return { x: 50, y: 90 };
+        window.pilihLokasiSekarang = function(asal) {
+            lokasiAsal = asal;
+            document.getElementById('view-asal').style.display = 'none';
+            document.getElementById('view-tujuan').style.display = 'block';
+            window.inisialisasiDaftarTujuan();
         }
-
-        window.toggleDropdownTujuan = function() {
-            document.getElementById('list-tujuan-container').classList.toggle('show');
+        window.kembaliPilihAsal = function() {
+            document.getElementById('view-tujuan').style.display = 'none';
+            document.getElementById('view-asal').style.display = 'block';
         }
-
-        window.bukaDropdownTujuan = function() {
-            document.getElementById('list-tujuan-container').classList.add('show');
-        }
-
-        window.tutupDropdownTujuan = function() {
-            document.getElementById('list-tujuan-container').classList.remove('show');
+        
+        window.getCoordinatesForLokasi = function(nama) {
+            const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama);
+            if(hs) return {x: hs.x_pos, y: hs.y_pos};
+            return null;
         }
 
         window.pilihTujuan = function(tujuan) {
             window.tutupDropdownTujuan();
+            lokasiTujuan = tujuan;
             document.getElementById('custom-tujuan-btn').innerText = tujuan;
-
-            lokasiTujuan = tujuan; 
-            const ruteDefault = dataRute[tujuan] || {};
             
-            // Reset state input supaya rapi kembali setelah rute dipilih
-            document.getElementById('search-tujuan').value = "";
-            window.filterTujuan();
+            let matchMatrix = dataMatrixRute.find(m => m.lokasi_asal === lokasiAsal && m.lokasi_tujuan === tujuan);
+            let ruteDefault = dataRute[tujuan] || {};
             
-            // 1. Cari apakah ada relasi di rute_matrix untuk pasangan (lokasiAsal ➔ tujuan)
-            const matchMatrix = dataMatrixRute.find(m => 
-                m.nama_asal && m.nama_tujuan &&
-                m.nama_asal.trim().toLowerCase() === lokasiAsal.trim().toLowerCase() && 
-                m.nama_tujuan.trim().toLowerCase() === tujuan.trim().toLowerCase()
-            );
-
             let instruksiFinal = "";
             let gambarFinal = "";
-            let isKhusus = false;
-
-            if (matchMatrix && matchMatrix.instruksi && matchMatrix.instruksi.trim() !== "") {
-                instruksiFinal = matchMatrix.instruksi.trim();
-                gambarFinal = (matchMatrix.gambar_tanda && matchMatrix.gambar_tanda.trim() !== "")
-                    ? matchMatrix.gambar_tanda.trim()
-                    : (ruteDefault.gambarTanda || "");
-                isKhusus = true;
+            
+            if (matchMatrix && matchMatrix.instruksi) {
+                instruksiFinal = matchMatrix.instruksi;
+                gambarFinal = matchMatrix.gambar_tanda || ruteDefault.gambarTanda || "";
             } else {
-                // Fallback rute standar direktori tujuan
-                if (ruteDefault.instruksi && ruteDefault.instruksi.trim() !== "") {
-                    instruksiFinal = ruteDefault.instruksi.trim();
-                } else {
-                    instruksiFinal = `Dari ${lokasiAsal || 'titik awal Anda'}, ikuti panduan lorong menuju ${tujuan}.`;
-                }
+                instruksiFinal = ruteDefault.instruksi || `Panduan lorong menuju ${tujuan}.`;
                 gambarFinal = ruteDefault.gambarTanda || "";
             }
-
-            // [RBAC] Apply custom sign if available
+            
             if (window.customSigns && window.customSigns[tujuan]) {
                 gambarFinal = window.customSigns[tujuan];
             }
             window.lokasiTujuanTerakhir = tujuan;
-
-            // 2. Perbarui tampilan Badge Relasi & Status di Popup
-            const badgeAsalEl = document.getElementById('popup-badge-asal');
-            const badgeTujuanEl = document.getElementById('popup-badge-tujuan');
-            const badgeStatusEl = document.getElementById('popup-badge-status');
-            const popupBadgeBox = document.getElementById('popup-rute-badge');
-
-            if (badgeAsalEl) badgeAsalEl.innerText = lokasiAsal || "Titik Awal";
-            if (badgeTujuanEl) badgeTujuanEl.innerText = tujuan;
             
-            if (isKhusus) {
-                if (badgeStatusEl) {
-                    badgeStatusEl.innerText = "✨ Rute Matriks Spesifik";
-                    badgeStatusEl.style.background = "#27ae60";
-                }
-                if (popupBadgeBox) popupBadgeBox.style.borderColor = "#27ae60";
-            } else {
-                if (badgeStatusEl) {
-                    badgeStatusEl.innerText = "📌 Rute Panduan Umum";
-                    badgeStatusEl.style.background = "#8B0000";
-                }
-                if (popupBadgeBox) popupBadgeBox.style.borderColor = "#D4AF37";
-            }
-
-            // 3. Perbarui Teks & Foto Patokan di Popup
-            const teksArahan = `Dari ${lokasiAsal || 'lokasi Anda saat ini'}, ${instruksiFinal}. Di akhir rute, Anda dapat melihat tanda patokan pada layar.`;
-            document.getElementById('teks-instruksi').innerText = teksArahan;
-            
+            document.getElementById('teks-instruksi').innerText = instruksiFinal;
             const imgTanda = document.getElementById('gambar-tanda');
-            // RBAC Edit Button
-            if (window.currentUserRole === 'admin') {
-                document.getElementById('admin-edit-sign-container').style.display = 'block';
+            
+            if (window.currentUserRole === 'admin' || window.currentUserRole === 'superadmin') {
+                if(document.getElementById('admin-edit-sign-container')) document.getElementById('admin-edit-sign-container').style.display = 'block';
             } else {
-                document.getElementById('admin-edit-sign-container').style.display = 'none';
+                if(document.getElementById('admin-edit-sign-container')) document.getElementById('admin-edit-sign-container').style.display = 'none';
             }
-            if (gambarFinal) {
+            
+            if(gambarFinal) {
                 imgTanda.src = gambarFinal;
                 imgTanda.style.display = 'block';
             } else {
                 imgTanda.style.display = 'none';
             }
-
-            // 4. Perbarui Titik Awal & Akhir Jalur Animasi SVG
-            const coordAsal = getCoordinatesForLokasi(lokasiAsal);
-            const coordTujuan = getCoordinatesForLokasi(tujuan);
+            
+            const coordAsal = window.getCoordinatesForLokasi(lokasiAsal);
+            const coordTujuan = window.getCoordinatesForLokasi(tujuan);
             
             if (coordAsal && coordTujuan) {
                 document.getElementById('route-line').setAttribute('x1', coordAsal.x + '%');
                 document.getElementById('route-line').setAttribute('y1', coordAsal.y + '%');
                 document.getElementById('route-line').setAttribute('x2', coordTujuan.x + '%');
                 document.getElementById('route-line').setAttribute('y2', coordTujuan.y + '%');
-                
                 document.getElementById('route-start').setAttribute('cx', coordAsal.x + '%');
                 document.getElementById('route-start').setAttribute('cy', coordAsal.y + '%');
                 document.getElementById('route-end').setAttribute('cx', coordTujuan.x + '%');
                 document.getElementById('route-end').setAttribute('cy', coordTujuan.y + '%');
-                
-                document.getElementById('route-line').setAttribute('stroke', isKhusus ? '#00a8ff' : '#D4AF37');
-                document.getElementById('route-end').setAttribute('fill', '#4cd137');
                 document.getElementById('route-svg').style.display = 'block';
+            } else {
+                document.getElementById('route-svg').style.display = 'none';
             }
-
-            // 5. Eksekusi Pembacaan Suara TTS
-            lastNavSpeechText = teksArahan;
-            document.getElementById('nav-popup').style.display = 'flex'; 
-            window.bicara(teksArahan);
+            
+            document.getElementById('nav-popup').style.display = 'flex';
+            lastNavSpeechText = instruksiFinal;
+            window.bicara(instruksiFinal);
         }
 
-        window.ulangSuaraRute = function() {
-            if (lastNavSpeechText) {
-                window.bicara(lastNavSpeechText);
+        window.bicara = function(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'id-ID';
+                msg.volume = settingTTS.volume;
+                msg.rate = settingTTS.rate;
+                window.speechSynthesis.speak(msg);
             }
         }
-
-        window.putarEvakuasi = function() {
-            document.getElementById('nav-popup').style.display = 'none'; 
-            document.getElementById('evakuasi-popup').style.display = 'flex'; 
-            
-            window.bicara("Perhatian! Ini adalah instruksi evakuasi darurat. Dari lokasi Anda saat ini, ikuti jalur evakuasi hijau menuju titik kumpul. Jika membawa pasien atau korban, ikuti jalur kuning menuju I G D. Perhatikan rambu APAR di sekitar gedung. Harap tetap tenang dan jangan berlari.");
-            
-            document.getElementById('route-line').setAttribute('stroke', '#27ae60');
-            document.getElementById('route-end').setAttribute('fill', '#e84118');
-        }
-
+        window.ulangSuaraRute = function() { window.bicara(lastNavSpeechText); }
         window.telahSampai = function() {
             window.tutupModal('nav-popup');
-            window.bicara(`Anda telah tiba di ${lokasiTujuan}, senang bisa membantu Anda.`, () => { 
-                document.getElementById('survey-popup').style.display = 'flex'; 
-                window.bicara("Selanjutnya silakan beri ulasan Anda, terima kasih.");
+            document.getElementById('route-svg').style.display = 'none';
+            document.getElementById('survey-popup').style.display = 'flex';
+        }
+        window.putarEvakuasi = function() { window.bicara("Perhatian, ini adalah jalur evakuasi darurat. Ikuti petunjuk panah berwarna hijau menyala di lantai menuju titik kumpul terdekat."); }
+        window.renderHotspotsToMap = function() {
+            document.querySelectorAll('.hotspot-dot').forEach(el => el.remove());
+            const wrapper = document.getElementById('interactive-map');
+            if(!wrapper) return;
+            dataHotspots.forEach(hs => {
+                const dot = document.createElement('div');
+                dot.className = 'hotspot-dot';
+                dot.style.left = hs.x_pos + '%';
+                dot.style.top = hs.y_pos + '%';
+                dot.onclick = () => window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi);
+                wrapper.appendChild(dot);
             });
         }
+        window.resetPosisiPeta = function() { } 
 
-        // ==========================================
-        // Q&A / STT RECOGNITION
-        // ==========================================
-        let recognizer, isRecording = false, activeInputTarget = null; 
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognizer = new SR(); recognizer.lang = 'id-ID'; recognizer.continuous = false; recognizer.interimResults = false;
-            recognizer.onresult = (event) => {
-                const teksSuara = event.results[0][0].transcript;
-                if(activeInputTarget === 'QA') prosesPertanyaanQA(teksSuara);
-                else if (activeInputTarget === 'Survey') document.getElementById('ulasan-teks').value += teksSuara + " ";
-            };
-            recognizer.onend = () => { stopRekam(); };
-        }
-
-        window.toggleQARekam = function() {
-            if(!recognizer) return alert("Browser tidak mendukung pengenalan suara.");
-            activeInputTarget = 'QA';
-            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-qa-rekam').classList.add('recording'); }
-        }
-        window.toggleSurveyRekam = function() {
-            if(!recognizer) return alert("Browser tidak mendukung pengenalan suara.");
-            activeInputTarget = 'Survey';
-            if(isRecording) stopRekam(); else { recognizer.start(); isRecording = true; document.getElementById('btn-survey-rekam').classList.add('recording'); }
-        }
-        function stopRekam() { if(recognizer) recognizer.stop(); isRecording = false; document.querySelectorAll('.btn-mic').forEach(m => m.classList.remove('recording')); }
-
-        window.bukaModalQA = function() {
-            document.getElementById('qa-modal').style.display = 'flex';
-            document.getElementById('qa-chat').innerHTML = '<div class="chat-bubble chat-bot">Halo! Silakan gunakan mikrofon untuk bertanya.</div>';
-            window.bicara("Ada yang bisa saya bantu informasikan?");
-        }
-
-        function prosesPertanyaanQA(pertanyaan) {
-            const chatArea = document.getElementById('qa-chat');
-            chatArea.innerHTML += `<div class="chat-bubble chat-user">${pertanyaan}</div>`;
-            let jawaban = "Maaf, saya belum memahami pertanyaan tersebut."; let q = pertanyaan.toLowerCase();
-            
-            if (q.includes("jam besuk") || q.includes("jenguk")) jawaban = "Jam besuk pasien adalah pukul 10.00 hingga 12.00, dan sore pukul 16.00 hingga 18.00.";
-            else if (q.includes("toilet") || q.includes("wc")) jawaban = "Toilet umum berada di dekat lobi administrasi dan di ujung lorong poli.";
-            else if (q.includes("jadwal dokter")) jawaban = "Jadwal dokter spesialis dapat dilihat di loket administrasi utama.";
-
-            setTimeout(() => { chatArea.innerHTML += `<div class="chat-bubble chat-bot">${jawaban}</div>`; chatArea.scrollTop = chatArea.scrollHeight; window.bicara(jawaban); }, 400);
-        }
-
+        window.bukaSurveyPopup = function() { document.getElementById('survey-popup').style.display = 'flex'; }
+        
         window.kirimSurveySupabase = async function() {
             const teks = document.getElementById('ulasan-teks').value.trim();
-            const ratingEl = document.querySelector('input[name="rating"]:checked');
+            let ratingEl = document.querySelector('input[name="rating"]:checked');
             const rating = ratingEl ? parseInt(ratingEl.value) : null;
             const informatif = document.getElementById('chk-informatif').checked;
             const kemudahan = document.getElementById('chk-kemudahan').checked;
             const pelayanan = document.getElementById('chk-pelayanan').checked;
 
-            if (!rating && !teks && !informatif && !kemudahan && !pelayanan) {
-                return alert("Silakan berikan setidaknya satu penilaian atau ulasan.");
-            }
+            if(!teks && !rating) { return alert("Silakan berikan rating atau ulasan Anda."); }
 
-            // Kemas data dalam satu object JSON payload
             const payload = {
+                nama_pengulas: window.currentUserName || "Tanpa Nama",
                 ulasan_teks: teks,
                 rating: rating,
                 informatif: informatif,
@@ -1865,6 +1368,16 @@
             };
 
             await supabase.from('survey_kepuasan').insert([payload]);
+            window.tutupModal('survey-popup');
+            window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
+
+            document.getElementById('ulasan-teks').value = ""; 
+            if(ratingEl) ratingEl.checked = false;
+            document.getElementById('chk-informatif').checked = false;
+            document.getElementById('chk-kemudahan').checked = false;
+            document.getElementById('chk-pelayanan').checked = false;
+        }
+
             
             window.tutupModal('survey-popup');
             window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
@@ -1895,6 +1408,7 @@
               app = initializeApp(config);
               auth = getAuth(app);
               db = getFirestore(app, config.firestoreDatabaseId);
+              loadLogoFirebase();
 
               onAuthStateChanged(auth, async (user) => {
                   if (user) {
@@ -1946,6 +1460,7 @@
           signOut(auth);
       }
 
+      
       function loadCustomSigns() {
           const q = query(collection(db, "signs"));
           onSnapshot(q, (snapshot) => {
@@ -1958,9 +1473,44 @@
               console.error("Gagal memuat tanda kustom: ", error);
           });
       }
+      
+      async function loadLogoFirebase() {
+          try {
+              const d = await getDoc(doc(db, "settings", "general"));
+              if(d.exists() && d.data().logo_url) {
+                  const url = d.data().logo_url;
+                  document.getElementById('landing-logo-img').src = url;
+                  document.getElementById('landing-logo-img').style.display = 'block';
+                  document.getElementById('landing-logo-emoji').style.display = 'none';
+                  if(document.getElementById('admin-logo-url')) document.getElementById('admin-logo-url').value = url;
+              } else {
+                  document.getElementById('landing-logo-img').style.display = 'none';
+                  document.getElementById('landing-logo-emoji').style.display = 'block';
+              }
+          } catch(e) { console.warn("Load logo err", e); }
+      }
+      
+      window.simpanLogoFirebase = async function() {
+          const url = document.getElementById('admin-logo-url').value.trim();
+          try {
+              if (url) {
+                  await setDoc(doc(db, "settings", "general"), { logo_url: url }, { merge: true });
+                  document.getElementById('landing-logo-img').src = url;
+                  document.getElementById('landing-logo-img').style.display = 'block';
+                  document.getElementById('landing-logo-emoji').style.display = 'none';
+                  alert("Logo berhasil diperbarui!");
+              } else {
+                  await setDoc(doc(db, "settings", "general"), { logo_url: "" }, { merge: true });
+                  document.getElementById('landing-logo-img').style.display = 'none';
+                  document.getElementById('landing-logo-emoji').style.display = 'block';
+                  alert("Logo dikembalikan ke Emoji default.");
+              }
+          } catch (e) { alert("Gagal menyimpan logo: " + e.message); }
+      }
+
 
       window.adminSaveSign = async function(locationId, imageUrl) {
-          if (window.currentUserRole !== 'admin') {
+          if (window.currentUserRole !== 'admin' && window.currentUserRole !== 'superadmin' && window.currentUserRole !== 'administrator') {
               alert("Akses Ditolak: Hanya Administrator yang dapat mengubah foto tanda.");
               return;
           }
@@ -1969,7 +1519,7 @@
               await setDoc(doc(db, "signs", locationId), {
                   locationId: locationId,
                   imageUrl: imageUrl,
-                  updatedBy: auth.currentUser.uid
+                  updatedBy: window.currentUserName || 'Admin'
               });
               alert("Foto tanda berhasil diperbarui!");
           } catch (e) {
