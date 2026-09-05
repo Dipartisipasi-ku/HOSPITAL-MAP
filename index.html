@@ -764,7 +764,7 @@
 
     <!-- SCRIPT UTAMA MODULE -->
     <script type="module">
-        import supabase from './supabase_config.js';
+        
 
         let systemPIN = '123456789012';
         let settingTTS = { volume: 1.0, rate: 0.9 };
@@ -934,84 +934,90 @@
         // ==========================================
         // FETCH DATA SUPABASE
         // ==========================================
-        window.fetchAllDataSupabase = async function() {
+        
+        
+        window.fetchAllDataFirebase = async function() {
             try {
                 document.getElementById('sync-indicator').style.display = 'block';
-
-                const { data: set } = await supabase.from('app_settings').select('*').eq('id', 1).single();
-                if (set) { systemPIN = set.pin; settingTTS.volume = parseFloat(set.tts_volume); settingTTS.rate = parseFloat(set.tts_rate); }
-
-                const { data: mapData } = await supabase.from('map_image').select('*').eq('id', 1).single();
-                const imgEl = document.getElementById('main-map-image');
-                const warnEl = document.getElementById('no-map-warning');
                 
-                if (mapData && mapData.image_url) {
-                    imgEl.src = mapData.image_url; imgEl.style.display = 'block'; warnEl.style.display = 'none';
+                let timeoutHint = setTimeout(() => {
+                    const textEl = document.getElementById('loading-text');
+                    if (textEl && textEl.style.display !== 'none') {
+                        textEl.innerText = "⏳ Sedang memuat database... (Memastikan koneksi)";
+                    }
+                }, 4000);
+
+                // Settings
+                const setDocSnap = await getDoc(doc(db, 'settings', 'general'));
+                if (setDocSnap.exists()) { 
+                    const set = setDocSnap.data();
+                    if(set.pin) systemPIN = set.pin; 
+                    if(set.tts_volume) settingTTS.volume = parseFloat(set.tts_volume); 
+                    if(set.tts_rate) settingTTS.rate = parseFloat(set.tts_rate); 
+                }
+
+                const mapEl = document.getElementById('main-map-image');
+                const warnEl = document.getElementById('no-map-warning');
+                if (setDocSnap.exists() && setDocSnap.data().map_url) {
+                    mapEl.src = setDocSnap.data().map_url; 
+                    mapEl.style.display = 'block'; warnEl.style.display = 'none';
                     document.getElementById('upload-map-container').style.display = 'none';
                     document.getElementById('btn-hapus-peta').style.display = 'block';
                     document.getElementById('map-status').innerText = "Peta cloud aktif digunakan.";
                 } else {
-                    imgEl.style.display = 'none'; warnEl.style.display = 'block';
+                    mapEl.style.display = 'none'; warnEl.style.display = 'block';
                     document.getElementById('upload-map-container').style.display = 'block';
                     document.getElementById('btn-hapus-peta').style.display = 'none';
                     document.getElementById('map-status').innerText = "Peta belum diunggah.";
                 }
 
                 // Ambil Asal
-                const { data: asal } = await supabase.from('lokasi_asal').select('nama_lokasi');
-                if (asal) {
-                    dataLokasiAsal = asal.map(a => a.nama_lokasi);
-                    dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b)); // Urut Cerdas
-                }
+                const asalSnap = await getDocs(collection(db, 'locations_origin'));
+                dataLokasiAsal = [];
+                asalSnap.forEach(doc => dataLokasiAsal.push(doc.id));
+                dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b));
 
                 // Ambil Tujuan
-                const { data: tujuan } = await supabase.from('lokasi_tujuan').select('*');
-                if (tujuan) {
-                    dataRute = {};
-                    tujuan.forEach(t => { dataRute[t.nama_lokasi] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor }; });
+                const tujuanSnap = await getDocs(collection(db, 'locations_target'));
+                dataRute = {};
+                tujuanSnap.forEach(docSnap => {
+                    const t = docSnap.data();
+                    dataRute[docSnap.id] = { akses: t.akses, instruksi: t.instruksi, gambarTanda: t.gambar_tanda, nomor: t.nomor };
+                });
+
+                // Ambil Hotspots
+                const hotspotsSnap = await getDocs(collection(db, 'map_hotspots'));
+                dataHotspots = [];
+                hotspotsSnap.forEach(docSnap => {
+                    dataHotspots.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                dataHotspots.sort((a,b) => {
+                    let numA = parseInt(a.nomor) || extractNumber(a.nama_bangunan);
+                    let numB = parseInt(b.nomor) || extractNumber(b.nama_bangunan);
+                    if (numA === numB) return a.nama_bangunan.localeCompare(b.nama_bangunan);
+                    return numA - numB;
+                });
+
+                // Ambil Matriks
+                const matrixSnap = await getDocs(collection(db, 'route_matrix'));
+                dataMatrixRute = [];
+                matrixSnap.forEach(docSnap => {
+                    dataMatrixRute.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Ambil Survey
+                const surveySnap = await getDocs(collection(db, 'satisfaction_surveys'));
+                let totalRating = 0; let totalUlasan = 0;
+                surveySnap.forEach(docSnap => {
+                    const s = docSnap.data();
+                    if(s.rating) { totalRating += s.rating; totalUlasan++; }
+                });
+                if (totalUlasan > 0) {
+                    document.getElementById('landing-rating-val').innerText = (totalRating / totalUlasan).toFixed(1);
+                    document.getElementById('landing-rating-count').innerText = totalUlasan;
                 }
 
-                // Ambil Hotspot
-                const { data: hotspots } = await supabase.from('map_hotspots').select('*');
-                if (hotspots) {
-                    dataHotspots = hotspots;
-                    dataHotspots.sort((a,b) => {
-                        let numA = parseInt(a.nomor) || extractNumber(a.nama_bangunan);
-                        let numB = parseInt(b.nomor) || extractNumber(b.nama_bangunan);
-                        if (numA === numB) return a.nama_bangunan.localeCompare(b.nama_bangunan);
-                        return numA - numB;
-                    });
-                }
-
-                // Ambil Matriks Rute (Asal ➔ Tujuan)
-                try {
-                    const { data: matrixData, error: matrixErr } = await supabase.from('rute_matrix').select('*');
-                    if (!matrixErr && matrixData) {
-                        dataMatrixRute = matrixData;
-                    } else {
-                        dataMatrixRute = [];
-                    }
-                } catch (e) {
-                    console.warn("Gagal memuat rute_matrix:", e);
-                    dataMatrixRute = [];
-                }
-
-                
-                // Ambil Data Survey Kepuasan
-                try {
-                    const { data: surveys } = await supabase.from('survey_kepuasan').select('rating');
-                    if (surveys) {
-                        let totalRating = 0; let totalUlasan = 0;
-                        surveys.forEach(s => { if(s.rating) { totalRating += s.rating; totalUlasan++; } });
-                        if (totalUlasan > 0) {
-                            document.getElementById('landing-rating-val').innerText = (totalRating / totalUlasan).toFixed(1);
-                            document.getElementById('landing-rating-count').innerText = totalUlasan;
-                        }
-                    }
-                } catch(e) { console.warn("Gagal memuat survey:", e); }
-                
-                // Update Landing Status
-
+                clearTimeout(timeoutHint);
                 document.getElementById('loading-text').style.display = 'none';
                 document.getElementById('front-form-container').style.display = 'block';
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
@@ -1020,13 +1026,13 @@
                 document.getElementById('sync-indicator').style.display = 'none';
             } catch (error) {
                 console.error(error);
-                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek API Key.";
+                document.getElementById('loading-text').innerText = "Gagal memuat database! Cek koneksi Anda.";
                 document.getElementById('sync-indicator').style.display = 'none';
             }
         }
-        
-        document.getElementById('start-overlay').style.pointerEvents = "none";
-        window.onload = fetchAllDataSupabase;
+        window.fetchAllDataSupabase = window.fetchAllDataFirebase; // Alias for backward compatibility
+
+        window.onload = fetchAllDataFirebase;
 
         // ==========================================
         // C-PANEL: RENDER LISTS & CRUD
@@ -1389,14 +1395,15 @@
             document.getElementById('chk-kemudahan').checked = false;
             document.getElementById('chk-pelayanan').checked = false;
         }
-    </script>
     
+    </script>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-      import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
+      import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDocs, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+      
       let app, auth, db;
+      
       window.currentUserRole = "pengunjung"; 
       window.customSigns = {};
 
@@ -1408,6 +1415,21 @@
               app = initializeApp(config);
               auth = getAuth(app);
               db = getFirestore(app, config.firestoreDatabaseId);
+              
+              // Expose for CRUD
+              window.db = db;
+              window.auth = auth;
+              window.doc = doc;
+              window.getDoc = getDoc;
+              window.setDoc = setDoc;
+              window.collection = collection;
+              window.onSnapshot = onSnapshot;
+              window.query = query;
+              window.getDocs = getDocs;
+              window.updateDoc = updateDoc;
+              window.deleteDoc = deleteDoc;
+              window.addDoc = addDoc;
+
               loadLogoFirebase();
 
               onAuthStateChanged(auth, async (user) => {

@@ -8,5 +8,20 @@ service cloud.firestore {
     match /settings/{settingId} {
       allow read, write: if true;
     }
+    match /locations_origin/{id} {
+      allow read, write: if true;
+    }
+    match /locations_target/{id} {
+      allow read, write: if true;
+    }
+    match /map_hotspots/{id} {
+      allow read, write: if true;
+    }
+    match /route_matrix/{id} {
+      allow read, write: if true;
+    }
+    match /satisfaction_surveys/{id} {
+      allow read, write: if true;
+    }
   }
 }
