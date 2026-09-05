@@ -1,0 +1,6 @@
+{
+  "name": "RS Atma Husada Mahakam - Denah Digital",
+  "description": "Sistem Navigasi & Denah Evakuasi Digital RSJD Atma Husada Mahakam",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
