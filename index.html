@@ -108,8 +108,8 @@
         @keyframes moveDash { to { stroke-dashoffset: -24; } }
 
         /* Overlay Hotspot */
-        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 70; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
-        #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; }
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
+        #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; z-index: 1001; }
 
         .hotspot { position: absolute; background: rgba(212, 175, 55, 0.25); border: 2px dashed #D4AF37; cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 75; line-height: normal; }
         .hotspot:hover { background: rgba(139, 0, 0, 0.5); border-color: #FFD700; transform: scale(1.03); z-index: 80; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
@@ -117,9 +117,10 @@
         /* Label Nomor: Hitam Putih Sesuai Permintaan */
         .hotspot-label { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            min-width: 24px; padding: 3px 5px; background: #FFFFFF; color: #000000; 
-            border: 2px solid #000000; border-radius: 4px; font-size: 13px; font-weight: 900; 
+            min-width: 14px; padding: 2px 4px; background: #FFFFFF; color: #000000; 
+            border: 1px solid #000000; border-radius: 4px; font-size: clamp(8px, 2vw, 11px); font-weight: 900; 
             line-height: 1; text-align: center; pointer-events: none; 
+            max-width: 90%; max-height: 90%; display: flex; justify-content: center; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
         }
         
         .hotspot-tooltip { 
@@ -269,6 +270,14 @@
             .popup-content h2 { font-size: 20px; }
             .instruksi-teks { font-size: 15px; }
             .sign-image { max-height: 180px; }
+
+            /* Perbaikan C-Panel di Mobile (HP) */
+            .admin-panel { width: 100%; right: -100%; padding: 20px 15px; z-index: 4000; }
+            .admin-header h2 { font-size: 20px; }
+            .admin-section { padding: 10px; gap: 8px; }
+            .admin-section h3 { font-size: 14px; }
+            .admin-section input, .admin-section select, .admin-section textarea { padding: 8px; font-size: 14px; }
+            .flex-row { flex-direction: column; align-items: stretch; gap: 5px; }
         }
     </style>
 </head>
@@ -1084,7 +1093,7 @@
 
         window.editFormMatrix = function(id) {
             editMatrixId = id;
-            const m = dataMatrixRute.find(item => item.id === id);
+            const m = dataMatrixRute.find(item => item.id == id);
             if (!m) return;
             
             document.getElementById('label-mode-matrix').innerText = "Mode: [ EDIT DATA ]";
@@ -1183,7 +1192,7 @@
         }
 
         window.hapusMatrix = async function(id) {
-            const target = dataMatrixRute.find(m => m.id === id);
+            const target = dataMatrixRute.find(m => m.id == id);
             const label = target ? `[${target.nama_asal} ➔ ${target.nama_tujuan}]` : "rute ini";
             if (!confirm(`Hapus ${label} dari matriks rute?`)) return;
 
@@ -1228,7 +1237,7 @@
         let isDrawingArea = false, drawStartX = 0, drawStartY = 0; let drawOverlay, drawBox, mapImg;
         window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hs').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hs').innerText = "➕ Simpan"; document.getElementById('hs-nama').value = ""; document.getElementById('hs-target').value = ""; document.getElementById('hs-top').value = ""; document.getElementById('hs-left').value = ""; document.getElementById('hs-width').value = ""; document.getElementById('hs-height').value = ""; const p = document.getElementById('hotspot-preview'); if(p) p.remove(); }
         window.editFormHotspot = function(id) {
-            editHotspotId = id; const hs = dataHotspots.find(h => h.id === id);
+            editHotspotId = id; const hs = dataHotspots.find(h => h.id == id);
             if(hs) { document.getElementById('label-mode-hs').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hs').innerText = "💾 Update"; document.getElementById('hs-nama').value = hs.nama_bangunan; document.getElementById('hs-target').value = hs.target_lokasi || ""; document.getElementById('hs-top').value = hs.pos_top; document.getElementById('hs-left').value = hs.pos_left; document.getElementById('hs-width').value = hs.width; document.getElementById('hs-height').value = hs.height; window.previewHotspot(); }
         }
         window.simpanHotspotSupabase = async function() {
@@ -1246,10 +1255,96 @@
             alert("Tarik kursor (klik & geser) di atas denah untuk mencetak area hotspot.");
         };
 
+        let isDraggingPreview = false, isResizingPreview = false, startPreviewX = 0, startPreviewY = 0;
+        let startHsLeft = 0, startHsTop = 0, startHsWidth = 0, startHsHeight = 0;
+
         window.previewHotspot = function() {
-            const top = document.getElementById('hs-top').value || 0; const left = document.getElementById('hs-left').value || 0; const w = document.getElementById('hs-width').value || 10; const h = document.getElementById('hs-height').value || 10;
+            const top = parseFloat(document.getElementById('hs-top').value) || 0; 
+            const left = parseFloat(document.getElementById('hs-left').value) || 0; 
+            const w = parseFloat(document.getElementById('hs-width').value) || 10; 
+            const h = parseFloat(document.getElementById('hs-height').value) || 10;
+            
             let p = document.getElementById('hotspot-preview');
-            if(!p) { p = document.createElement('div'); p.id = 'hotspot-preview'; p.style.position = 'absolute'; p.style.background = 'rgba(212, 175, 55, 0.45)'; p.style.border = '2px solid #8B0000'; p.style.zIndex = '999'; document.getElementById('interactive-map').appendChild(p); }
+            if(!p) { 
+                p = document.createElement('div'); 
+                p.id = 'hotspot-preview'; 
+                p.style.position = 'absolute'; 
+                p.style.background = 'rgba(212, 175, 55, 0.45)'; 
+                p.style.border = '2px solid #8B0000'; 
+                p.style.zIndex = '999'; 
+                p.style.cursor = 'move'; 
+                p.style.pointerEvents = 'auto'; // allow dragging
+
+                let handle = document.createElement('div');
+                handle.className = 'hs-resize-handle';
+                handle.style.position = 'absolute'; 
+                handle.style.bottom = '-6px'; 
+                handle.style.right = '-6px'; 
+                handle.style.width = '16px'; 
+                handle.style.height = '16px'; 
+                handle.style.background = '#8B0000'; 
+                handle.style.border = '2px solid #FFF'; 
+                handle.style.borderRadius = '50%'; 
+                handle.style.cursor = 'nwse-resize'; 
+                handle.style.zIndex = '1000';
+                p.appendChild(handle);
+                
+                document.getElementById('interactive-map').appendChild(p);
+
+                function getPos(e) { return (e.touches && e.touches.length > 0) ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+                
+                function startDragAction(e, type) {
+                    if (isDrawingArea) return;
+                    e.stopPropagation(); // prevent map panning
+                    const pos = getPos(e);
+                    startPreviewX = pos.x; 
+                    startPreviewY = pos.y;
+                    startHsLeft = parseFloat(document.getElementById('hs-left').value) || 0;
+                    startHsTop = parseFloat(document.getElementById('hs-top').value) || 0;
+                    startHsWidth = parseFloat(document.getElementById('hs-width').value) || 10;
+                    startHsHeight = parseFloat(document.getElementById('hs-height').value) || 10;
+                    if(type === 'move') isDraggingPreview = true;
+                    if(type === 'resize') isResizingPreview = true;
+                }
+
+                p.addEventListener('mousedown', (e) => { if(e.target !== handle) startDragAction(e, 'move'); });
+                p.addEventListener('touchstart', (e) => { if(e.target !== handle) startDragAction(e, 'move'); }, {passive: false});
+                
+                handle.addEventListener('mousedown', (e) => startDragAction(e, 'resize'));
+                handle.addEventListener('touchstart', (e) => startDragAction(e, 'resize'), {passive: false});
+
+                function onPreviewMove(e) {
+                    if(!isDraggingPreview && !isResizingPreview) return;
+                    e.preventDefault(); e.stopPropagation(); // Prevent scroll/pan
+                    const pos = getPos(e);
+                    const rect = document.querySelector('.map-wrapper img').getBoundingClientRect();
+                    let dX = ((pos.x - startPreviewX) / rect.width) * 100;
+                    let dY = ((pos.y - startPreviewY) / rect.height) * 100;
+
+                    if(isDraggingPreview) {
+                        let nL = startHsLeft + dX; let nT = startHsTop + dY;
+                        document.getElementById('hs-left').value = nL.toFixed(2);
+                        document.getElementById('hs-top').value = nT.toFixed(2);
+                        p.style.left = `${nL}%`; p.style.top = `${nT}%`;
+                    } else if(isResizingPreview) {
+                        let nW = startHsWidth + dX; let nH = startHsHeight + dY;
+                        if(nW < 1) nW = 1; if(nH < 1) nH = 1;
+                        document.getElementById('hs-width').value = nW.toFixed(2);
+                        document.getElementById('hs-height').value = nH.toFixed(2);
+                        p.style.width = `${nW}%`; p.style.height = `${nH}%`;
+                    }
+                }
+                
+                function onPreviewEnd(e) {
+                    isDraggingPreview = false; 
+                    isResizingPreview = false;
+                }
+
+                window.addEventListener('mousemove', onPreviewMove);
+                window.addEventListener('touchmove', onPreviewMove, {passive: false});
+                window.addEventListener('mouseup', onPreviewEnd);
+                window.addEventListener('touchend', onPreviewEnd);
+            }
             p.style.top = `${top}%`; p.style.left = `${left}%`; p.style.width = `${w}%`; p.style.height = `${h}%`;
         }
 
@@ -1273,6 +1368,31 @@
         // ==========================================
         // APLIKASI PENGUNJUNG (NAVIGASI & UI)
         // ==========================================
+        window.tampilkanInfoHotspot = function(nama_bangunan, target_lokasi) {
+            const nama = nama_bangunan || "Area Tidak Dikenal";
+            document.getElementById('hs-info-nama').innerText = nama;
+            
+            const actionContainer = document.getElementById('hs-info-action');
+            if (actionContainer) {
+                actionContainer.innerHTML = "";
+                // Jika area ini valid untuk dijadikan titik awal, beri tombol untuk jadikan titik awal
+                if (target_lokasi && dataLokasiAsal.includes(target_lokasi) && document.getElementById('view-asal').style.display !== 'none') {
+                    const btnAsal = document.createElement('button');
+                    btnAsal.className = 'btn-primary';
+                    btnAsal.style.marginTop = '10px';
+                    btnAsal.innerHTML = `📍 Jadikan Titik Awal`;
+                    btnAsal.onclick = () => {
+                        window.tutupModal('hotspot-info-popup');
+                        window.pilihLokasiSekarang(target_lokasi);
+                    };
+                    actionContainer.appendChild(btnAsal);
+                }
+            }
+            
+            document.getElementById('hotspot-info-popup').style.display = 'flex';
+            window.bicara(`Ini adalah area ${nama}.`);
+        }
+
         function renderHotspotsToMap() {
             const container = document.getElementById('interactive-map');
             container.querySelectorAll('.hotspot').forEach(el => el.remove());
@@ -1296,16 +1416,14 @@
                     document.getElementById('route-svg').style.display = 'none'; // Sembunyikan garis animasi
                     
                     if (document.getElementById('view-asal').style.display !== 'none') {
-                        if (hs.target_lokasi && dataLokasiAsal.includes(hs.target_lokasi)) {
-                            window.pilihLokasiSekarang(hs.target_lokasi);
-                        } else {
-                            window.bicara(`Ini adalah area ${hs.nama_bangunan}. Silakan gunakan daftar di menu kiri untuk memilih titik awal.`);
-                        }
+                        // Jika belum memilih titik awal -> tampilkan popup info
+                        window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi);
                     } else {
+                        // Jika sudah memilih titik awal -> klik di peta jadi tujuan
                         if (hs.target_lokasi && dataRute[hs.target_lokasi]) {
                             window.pilihTujuan(hs.target_lokasi);
                         } else { 
-                            window.bicara(`Ini adalah area ${hs.nama_bangunan}.`); 
+                            window.tampilkanInfoHotspot(hs.nama_bangunan, hs.target_lokasi); 
                         }
                     }
                 };
