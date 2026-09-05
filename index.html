@@ -306,55 +306,32 @@
             border-style: solid;
         }
 
-        /* Toolbar / Sidebar Ditutup Default: Hanya menyisakan Titik Awal */
-        .sidebar.is-collapsed #view-tujuan {
-            display: none !important;
+        /* Toolbar / Sidebar Pemilihan Rute Mengisi Rapi di Bawah Toolbar */
+        @media (max-width: 950px) {
+            .sidebar.is-collapsed #view-tujuan {
+                display: none !important;
+            }
+            .sidebar.is-collapsed #container-titik-awal {
+                display: block !important;
+            }
+            .sidebar.is-collapsed #btn-buka-tujuan-prompt {
+                display: flex !important;
+            }
         }
-        .sidebar.is-collapsed #container-titik-awal {
-            display: block !important;
-        }
-        .sidebar.is-collapsed #btn-buka-tujuan-prompt {
-            display: flex !important;
+        @media (min-width: 951px) {
+            #btn-buka-tujuan-prompt {
+                display: none !important;
+            }
+            .btn-top-hud.btn-top-toggle {
+                display: none !important;
+            }
+            #view-tujuan {
+                display: flex !important;
+            }
         }
         .sidebar:not(.is-collapsed) #btn-buka-tujuan-prompt {
             display: none !important;
         }
-
-        /* Active Route Chip (Compact Bar) */
-        .active-route-chip {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #181818; border: 1.5px solid #D4AF37; border-radius: 8px;
-            padding: 8px 12px; margin-bottom: 10px; gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .route-chip-info {
-            display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; cursor: pointer;
-        }
-        .chip-badge-asal {
-            background: #252525; color: #DDD; font-size: 11px; padding: 3px 7px; border-radius: 4px; font-weight: bold; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; border: 1px dashed rgba(212,175,55,0.45); transition: 0.2s;
-        }
-        .chip-badge-asal:hover { background: #383838; border-color: #D4AF37; color: #D4AF37; }
-        .chip-arrow {
-            color: #D4AF37; font-weight: bold; font-size: 12px;
-        }
-        .chip-badge-tujuan {
-            background: #8B0000; color: #FFF; font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: 800; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .route-chip-btns {
-            display: flex; gap: 5px; align-items: center; flex: none;
-        }
-        .btn-chip-origin {
-            background: #1f1f1f; color: #D4AF37; border: 1.5px solid #D4AF37; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;
-        }
-        .btn-chip-origin:hover { background: #8B0000; color: #fff; border-color: #8B0000; }
-        .btn-chip-guide {
-            background: #D4AF37; color: #111; border: none; padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap;
-        }
-        .btn-chip-guide:hover { background: #b89628; }
-        .btn-chip-edit {
-            background: #2a2a2a; color: #ccc; border: 1px solid #555; padding: 5px 7px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; white-space: nowrap;
-        }
-        .btn-chip-edit:hover { background: #444; color: #fff; }
 
         /* Running Text Pengembang (Marquee Bergerak Lebih Lambat & Terpusat Center) */
         /* Running Text Pengembang (Hanya 1 Teks Aktif, Berulang Hanya Setelah Tulisan Lewat Utuh, Tidak Beruntun) */
@@ -609,14 +586,6 @@
             .sidebar.is-collapsed #container-titik-awal {
                 display: block !important;
             }
-            
-            .active-route-chip {
-                width: 100%;
-                max-width: 100%;
-                box-sizing: border-box;
-                flex-wrap: wrap;
-                gap: 6px;
-            }
 
             .map-view { 
                 width: 100% !important; 
@@ -787,51 +756,34 @@
 
     <div class="app-container">
         <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
-        <div class="sidebar is-collapsed" id="main-sidebar">
+        <div class="sidebar" id="main-sidebar">
             <div class="sidebar-header-row">
                 <h2 class="header-title">🗺️ SMART NAV</h2>
                 <div class="sidebar-top-actions">
                     <button type="button" class="btn-top-hud" onclick="bukaModalQA()" title="Tanya Jawab Seputar RS">💬 Tanya</button>
                     <button type="button" class="btn-top-hud" onclick="bukaModalLogin()" title="Akses C-Panel Admin">⚙️ C-Panel</button>
-                    <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Buka / Tutup Pilihan Tujuan">▼ Tujuan</button>
-                </div>
-            </div>
-
-            <!-- Ringkasan Rute Aktif (Compact Chip saat rute berjalan atau panel tertutup) -->
-            <div id="active-route-chip" class="active-route-chip" style="display: none;">
-                <div class="route-chip-info" onclick="bukaModalNavigasiAktif()" title="Klik untuk membuka panduan rute">
-                    <span class="chip-badge-asal" id="chip-asal-text" onclick="event.stopPropagation(); ubahTitikAwal();" title="Klik untuk ubah titik awal">Pilih Asal</span>
-                    <span class="chip-arrow">➔</span>
-                    <span class="chip-badge-tujuan" id="chip-tujuan-text">Poli</span>
-                </div>
-                <div class="route-chip-btns">
-                    <button type="button" class="btn-chip-origin" id="btn-chip-ubah-asal" onclick="ubahTitikAwal()" title="Reset dan kembali memilih Titik Awal">↺ Ubah Asal</button>
-                    <button type="button" class="btn-chip-guide" onclick="bukaModalNavigasiAktif()">🧭 Panduan</button>
-                    <button type="button" class="btn-chip-edit" onclick="expandSidebarPanel()">🎯 Tujuan</button>
+                    <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Buka / Tutup Pilihan Tujuan">▲ Tutup</button>
                 </div>
             </div>
 
             <div id="auth-panel" style="display: none !important;"></div>
 
-            <!-- Konten Pemilihan Rute (Dapat di-collapse di mobile dan desktop) -->
-            <div id="sidebar-collapsible-body" class="sidebar-body" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-                <!-- PILIHAN TITIK AWAL (Tetap tampil saat toolbar tutup) -->
-                <div id="container-titik-awal" style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom: 8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-                        <label class="target-label" style="color:#D4AF37; margin:0; display: block; font-size: 12px;">📍 TITIK AWAL ANDA:</label>
-                        <button type="button" id="btn-reset-asal" onclick="ubahTitikAwal()" style="background:rgba(212, 175, 55, 0.15); border:1px solid #D4AF37; color:#D4AF37; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:4px; cursor:pointer;" title="Reset dan kembali ke memilih titik awal">↺ Ubah / Reset</button>
-                    </div>
+            <!-- Konten Pemilihan Rute (Mengisi Langsung di Bawah Toolbar) -->
+            <div id="sidebar-collapsible-body" class="sidebar-body" style="display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 10px; margin-top: 4px;">
+                <!-- PILIHAN TITIK AWAL -->
+                <div id="container-titik-awal" style="background:#181818; padding:10px 12px; border-radius:8px; border:1px solid #D4AF37;">
+                    <label class="target-label" style="color:#D4AF37; margin:0 0 6px 0; display: block; font-size: 12px; font-weight: bold;">📍 TITIK AWAL ANDA:</label>
                     <select id="select-asal-dropdown" class="origin-select" onchange="window.pilihLokasiSekarang(this.value);" style="width: 100%; padding: 8px 10px; border-radius: 6px; background: #222; color: #fff; border: 1px solid #444; font-size: 13px; font-weight: bold; cursor: pointer;">
                         <option value="">-- Pilih Titik Awal --</option>
                     </select>
                 </div>
 
-                <!-- Tombol Cepat Buka Pilihan Tujuan saat Toolbar Tutup -->
+                <!-- Tombol Cepat Buka Pilihan Tujuan saat Toolbar Tutup (hanya jika di-collapse pada mobile) -->
                 <button type="button" id="btn-buka-tujuan-prompt" class="btn-prompt-expand" onclick="expandSidebarPanel()">🎯 Pilih Tujuan / Ruangan ▼</button>
 
-                <!-- PILIHAN TUJUAN (Disembunyikan saat toolbar tutup) -->
+                <!-- PILIHAN TUJUAN -->
                 <div id="view-tujuan" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
-                    <label class="target-label" style="font-size: 12px; margin-bottom: 4px; display: block;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
+                    <label class="target-label" style="font-size: 12px; margin-bottom: 6px; display: block; color: #E0E0E0; font-weight: bold;">🎯 PILIH TUJUAN (Atau sentuh area di peta):</label>
                     <input type="text" id="search-tujuan" class="search-box" placeholder="🔍 Cari nama ruangan / poli..." onkeyup="filterTujuan(true)" style="padding: 10px; margin-bottom: 8px;" onclick="bukaDropdownTujuan()">
 
                     <!-- Custom Dropdown untuk Tujuan -->
@@ -1139,9 +1091,8 @@
             
             <!-- Badge Relasi Rute Asal ➔ Tujuan -->
             <div id="popup-rute-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid #D4AF37; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:bold; color:#8B0000; margin-bottom:12px; flex-wrap:wrap; justify-content:center;">
-                <span onclick="ubahTitikAwalDariPopup()" style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Klik untuk reset dan pilih kembali titik awal">
+                <span style="display:inline-flex; align-items:center; gap:4px;">
                     📍 <span id="popup-badge-asal">Titik Awal</span>
-                    <span style="font-size:11px; text-decoration:underline; color:#D4AF37; margin-left:2px;">(↺ Ubah/Reset)</span>
                 </span>
                 <span style="color:#D4AF37; font-size:16px;">➔</span>
                 <span>🎯 <span id="popup-badge-tujuan">Lokasi Tujuan</span></span>
@@ -1154,7 +1105,6 @@
                 <button type="button" class="btn-primary" style="background:#D4AF37; color:#111; margin-bottom:5px;" onclick="promptEditSign()">✏️ Admin: Ubah Foto Tanda</button>
             </div>
             
-            <button type="button" class="btn-primary" style="background:#1e1e1e; color:#D4AF37; border:1.5px solid #D4AF37; margin-top:5px; padding:10px; font-size:14px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="ubahTitikAwalDariPopup()">↺ Reset & Pilih Kembali Titik Awal</button>
             <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
             <button type="button" class="btn-primary" style="background:#181818; color:#bbb; border-color:#333; margin-top:5px; padding:10px; font-size:14px;" onclick="panduanBalikKeAsal()">🔙 Baca Panduan Kembali ke Titik Awal</button>
 
@@ -1595,6 +1545,7 @@
                 dataLokasiAsal = [];
                 (asalArr || []).forEach(row => dataLokasiAsal.push(row.nama_lokasi));
                 dataLokasiAsal.sort((a, b) => extractNumber(a) - extractNumber(b));
+                if (typeof window.renderDropdownAsal === 'function') window.renderDropdownAsal();
 
                 // Ambil Tujuan (lokasi_tujuan)
                 const { data: tujuanArr, error: tujErr } = await supabase.from('lokasi_tujuan').select('*');
@@ -2127,16 +2078,6 @@
             const elTuj = document.getElementById('popup-badge-tujuan');
             if (elTuj) elTuj.innerText = tujuan;
             
-            // Update Active Route Chip
-            const chip = document.getElementById('active-route-chip');
-            if (chip) {
-                chip.style.display = 'flex';
-                const chipAsal = document.getElementById('chip-asal-text');
-                if (chipAsal) chipAsal.innerText = lokasiAsal || "Titik Awal";
-                const chipTuj = document.getElementById('chip-tujuan-text');
-                if (chipTuj) chipTuj.innerText = tujuan;
-            }
-            
             // Pada layar mobile, perkecil panel bila membuka modal navigasi agar denah tidak terhalang
             if (window.innerWidth <= 950 && bukaModal) {
                 window.collapseSidebarPanel();
@@ -2624,8 +2565,46 @@
         });
 
         // ==========================================
-        // TITIK AWAL CONTROL
+        // TITIK AWAL CONTROL & DROPDOWN POPULATION
         // ==========================================
+        const fallbackLokasiAsal = [
+            "Pintu Masuk (Gerbang Utama)",
+            "Pintu Masuk (Gerbang Belakang)",
+            "Pintu Keluar (Gerbang Tengah)",
+            "Parkir Depan",
+            "Parkir Belakang",
+            "Rekam Medik - Ruang Tunggu Pendaftaran",
+            "Ruang Tunggu Poliklinik Psikiatri",
+            "Ruang Tunggu M C U",
+            "I G D / Instalasi Gawat Darurat",
+            "Pos Keamanan Pintu Gerbang Depan",
+            "Pos Keamanan Belakang",
+            "Pos Keamanan Tengah",
+            "Pos Keamanan di I G D",
+            "Pos Keamanan M C U"
+        ];
+
+        window.renderDropdownAsal = function() {
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (!selectAsal) return;
+            const currentVal = lokasiAsal || selectAsal.value || '';
+            
+            selectAsal.innerHTML = '<option value="">-- Pilih Titik Awal --</option>';
+            
+            const list = (dataLokasiAsal && dataLokasiAsal.length > 0) ? dataLokasiAsal : fallbackLokasiAsal;
+            list.forEach((nama) => {
+                const opt = document.createElement('option');
+                opt.value = nama;
+                opt.innerText = nama;
+                if (nama === currentVal) opt.selected = true;
+                selectAsal.appendChild(opt);
+            });
+            
+            if (currentVal) {
+                selectAsal.value = currentVal;
+            }
+        };
+
         window.pilihLokasiSekarang = function(asal, ucapkan = true) {
             lokasiAsal = asal || '';
             const selectAsal = document.getElementById('select-asal-dropdown');
@@ -2635,9 +2614,6 @@
             const lbl = document.getElementById('lbl-titik-awal-aktif');
             if (lbl) lbl.innerText = asal || "-";
 
-            // Perbarui label titik awal pada chip & badge
-            const chipAsal = document.getElementById('chip-asal-text');
-            if (chipAsal) chipAsal.innerText = asal || "Pilih Asal";
             const popupAsal = document.getElementById('popup-badge-asal');
             if (popupAsal) popupAsal.innerText = asal || "Belum dipilih";
 
@@ -2645,7 +2621,7 @@
                 // Pembacaan suara pemilihan titik awal
                 if (ucapkan && window.bicara) {
                     if (lokasiTujuan) {
-                        window.bicara(`Titik awal diubah menjadi: ${asal}. Menghitung kembali rute menuju ${lokasiTujuan}.`);
+                        window.bicara(`Titik awal diatur dari: ${asal}. Menghitung kembali rute menuju ${lokasiTujuan}.`);
                     } else {
                         window.bicara(`Titik awal Anda diatur dari: ${asal}. Silakan pilih lokasi tujuan.`);
                     }
@@ -2670,53 +2646,21 @@
         };
 
         window.ubahTitikAwal = function() {
-            // 1. Pastikan sidebar terbuka dan area titik awal terlihat
-            window.expandSidebarPanel();
-
-            // 2. Reset variabel state titik awal
             lokasiAsal = '';
-
-            // 3. Reset dropdown pilihan titik awal ke default kosong
             const selectAsal = document.getElementById('select-asal-dropdown');
             if (selectAsal) {
-                // Pastikan opsi default tersedia
-                if (!selectAsal.querySelector('option[value=""]')) {
-                    const optDefault = document.createElement('option');
-                    optDefault.value = '';
-                    optDefault.innerText = '-- Pilih Titik Awal --';
-                    selectAsal.prepend(optDefault);
-                }
                 selectAsal.value = '';
                 selectAsal.focus();
                 selectAsal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                selectAsal.style.transition = 'all 0.3s ease';
-                selectAsal.style.boxShadow = '0 0 16px #D4AF37';
-                selectAsal.style.borderColor = '#FFD700';
-                setTimeout(() => {
-                    selectAsal.style.boxShadow = '';
-                    selectAsal.style.borderColor = '#444';
-                }, 2500);
             }
 
-            // 4. Reset teks label dan indikator chip
             const lbl = document.getElementById('lbl-titik-awal-aktif');
             if (lbl) lbl.innerText = "-";
-            const chipAsal = document.getElementById('chip-asal-text');
-            if (chipAsal) chipAsal.innerText = "Pilih Asal";
             const popupAsal = document.getElementById('popup-badge-asal');
             if (popupAsal) popupAsal.innerText = "Belum dipilih";
 
-            // 5. Sembunyikan garis rute denah karena titik awal telah dikosongkan
             const routeSvg = document.getElementById('route-svg');
             if (routeSvg) routeSvg.style.display = 'none';
-
-            // 6. Notifikasi umpan balik suara & visual
-            if (window.tampilkanToast) {
-                window.tampilkanToast("↺ Titik awal telah direset. Silakan pilih kembali titik awal Anda.");
-            }
-            if (window.bicara) {
-                window.bicara("Titik awal telah direset. Silakan pilih kembali titik awal Anda.");
-            }
         };
 
         window.ubahTitikAwalDariPopup = function() {
@@ -2725,7 +2669,14 @@
         };
 
         window.kembaliPilihAsal = function() {
-            window.ubahTitikAwal();
+            window.renderDropdownAsal();
+            lokasiAsal = '';
+            const selectAsal = document.getElementById('select-asal-dropdown');
+            if (selectAsal) selectAsal.value = '';
+            const lbl = document.getElementById('lbl-titik-awal-aktif');
+            if (lbl) lbl.innerText = "-";
+            const popupAsal = document.getElementById('popup-badge-asal');
+            if (popupAsal) popupAsal.innerText = "Belum dipilih";
         };
 
         // ==========================================
@@ -3009,6 +2960,7 @@
 
         setupDrawOverlay();
         loadLogoSupabase();
+        if (typeof window.renderDropdownAsal === 'function') window.renderDropdownAsal();
         fetchAllDataSupabase();
     </script>
 
