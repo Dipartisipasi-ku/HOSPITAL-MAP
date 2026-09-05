@@ -157,22 +157,37 @@
         .path-anim { animation: moveDash 1.2s linear infinite; filter: drop-shadow(0px 0px 5px rgba(0, 168, 255, 0.9)); }
         @keyframes moveDash { to { stroke-dashoffset: -24; } }
 
-        /* Overlay Hotspot */
-        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.2); border-radius: 10px; }
-        #draw-box { position: absolute; border: 2px solid #D4AF37; background: rgba(212, 175, 55, 0.4); display: none; pointer-events: none; z-index: 1001; }
+        /* Overlay Hotspot Bening & Transparan (Tidak menutupi/mengubah warna asli bangunan di peta) */
+        #draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; cursor: crosshair; display: none; touch-action: none; background: rgba(0,0,0,0.15); border-radius: 10px; }
+        #draw-box { position: absolute; border: 2px dashed #D4AF37; background: rgba(255, 255, 255, 0.15); display: none; pointer-events: none; z-index: 1001; }
 
-        .hotspot { position: absolute; background: rgba(212, 175, 55, 0.25); border: 2px dashed #D4AF37; cursor: pointer; transition: all 0.2s ease; border-radius: 4px; z-index: 75; line-height: normal; }
-        .hotspot:hover { background: rgba(139, 0, 0, 0.5); border-color: #FFD700; transform: scale(1.03); z-index: 80; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+        .hotspot { 
+            position: absolute; 
+            background: transparent; 
+            border: 1px dashed rgba(212, 175, 55, 0.4); 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            border-radius: 4px; 
+            z-index: 75; 
+            line-height: normal; 
+        }
+        .hotspot:hover { 
+            background: rgba(255, 255, 255, 0.15); 
+            border: 2px solid #FFD700; 
+            transform: scale(1.02); 
+            z-index: 80; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+        }
         .hotspot.hotspot-active-cinematic {
-            background: rgba(212, 175, 55, 0.65) !important;
-            border: 2.5px solid #FFFFFF !important;
-            box-shadow: 0 0 25px #FFD700, 0 0 45px rgba(212, 175, 55, 0.9) !important;
+            background: rgba(255, 255, 255, 0.18) !important;
+            border: 2.5px solid #FFD700 !important;
+            box-shadow: 0 0 20px #FFD700, inset 0 0 8px rgba(255, 215, 0, 0.4) !important;
             z-index: 95 !important;
             animation: pulseHotspotCinematic 1.2s infinite alternate ease-in-out !important;
         }
         @keyframes pulseHotspotCinematic {
             0% { transform: scale(1); filter: brightness(1); }
-            100% { transform: scale(1.12); filter: brightness(1.25); }
+            100% { transform: scale(1.08); filter: brightness(1.2); }
         }
         
         /* Label Nomor: Hitam Putih Sesuai Permintaan */
@@ -931,10 +946,26 @@
                 <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormHotspot()">Batal</button>
             </div>
             
-            <input type="text" id="hs-nama" placeholder="Nama Bangunan (Misal: IGD)">
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Nomor Gedung (Denah):</label>
+            <input type="number" id="hs-nomor" placeholder="Nomor Gedung (Contoh: 1, 10, 35)">
+
+            <label style="font-size:12px; color:#C0C0C0;">Nama Bangunan / Ruangan:</label>
+            <input type="text" id="hs-nama" placeholder="Nama Bangunan (Misal: INSTALASI GAWAT DARURAT)">
+
+            <label style="font-size:12px; color:#C0C0C0;">Tautkan ke Direktori Rute Tujuan:</label>
             <select id="hs-target"></select> 
+
+            <label style="font-size:12px; color:#C0C0C0;">⚠️ Keterangan Tempat Berisiko (K3):</label>
+            <select id="hs-resiko">
+                <option value="Kecelakaan Kerja, Kebakaran / Ledakan">🟦 Cyan: Kecelakaan Kerja, Kebakaran / Ledakan</option>
+                <option value="Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan">🟩 Hijau Pucat / Kuning: Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan</option>
+                <option value="Kecelakaan Kerja, Infeksius">🟢 Hijau Terang: Kecelakaan Kerja, Infeksius</option>
+                <option value="Tegangan Tinggi, Kecelakaan Kerja, Kebakaran Akibat Kerja">🟥 Merah: Tegangan Tinggi, Kecelakaan Kerja, Kebakaran Akibat Kerja</option>
+                <option value="Penyakit Akibat Kerja, Kebakaran">🟪 Magenta / Pink: Penyakit Akibat Kerja, Kebakaran</option>
+                <option value="Lahan Parkir">⬜ Putih: Lahan Parkir / Area Bebas</option>
+            </select>
             
-            <button type="button" class="btn-save-admin" style="background: #D4AF37; color: #111; width: 100%; margin-bottom: 5px;" onclick="mulaiGambarHotspot()">🖱️ Tarik & Gambar Area di Peta</button>
+            <button type="button" class="btn-save-admin" style="background: #D4AF37; color: #111; width: 100%; margin: 8px 0 5px 0;" onclick="mulaiGambarHotspot()">🖱️ Tarik & Gambar Area di Peta</button>
             
             <label>Koordinat Persentase (%):</label>
             <div class="flex-row">
@@ -1096,7 +1127,7 @@
     </div>
 
     <!-- POPUP NAVIGASI RUTE UTAMA (Khusus Rute Tujuan) -->
-    <div class="popup-overlay" id="nav-popup">
+    <div class="popup-overlay" id="nav-popup" onclick="if(event.target===this) tutupModal('nav-popup')">
         <div class="popup-content">
             <h2 style="color: #8B0000; margin-bottom: 8px; border-bottom: 2px solid #D4AF37; padding-bottom: 8px;">📍 Rute Navigasi Tujuan</h2>
             
@@ -1229,60 +1260,162 @@
         let lastNavSpeechText = "";
 
         // ==========================================
-        // HELPER DETAIL RISIKO K3 & WARNA AREA
+        // HELPER DETAIL RISIKO K3 & WARNA AREA (SESUAI DENAH K3 & SUPABASE)
         // ==========================================
-        window.dapatkanDetailRisiko = function(rute, targetName = "") {
-            const rawWarna = ((rute && rute.namaWarna && rute.namaWarna !== '-') ? rute.namaWarna : '').toLowerCase().trim();
-            const rawDot = ((rute && rute.warnaDot && rute.warnaDot !== '-') ? rute.warnaDot : '').toLowerCase().trim();
-            const nameLower = (targetName || '').toLowerCase();
+        window.dapatkanDetailRisiko = function(rute, targetName = "", hs = null) {
+            let nomorGedung = null;
+            let explicitRisk = "";
+            let foundHs = hs;
 
-            if (nameLower.includes('parkir')) {
-                return { warna: 'Putih', keterangan: 'Lahan Parkir dan Area Terbuka Bebas', kode_hex: '#ffffff', textColor: '#111' };
+            // 1. Temukan data hotspot dari parameter hs atau pencarian di dataHotspots
+            if (!foundHs && dataHotspots && dataHotspots.length > 0 && targetName) {
+                const nameLower = (targetName || '').toLowerCase().trim();
+                const numMatch = targetName.match(/^(\d+)/);
+                if (numMatch) {
+                    const parsedNum = parseInt(numMatch[1]);
+                    foundHs = dataHotspots.find(h => parseInt(h.nomor) === parsedNum);
+                }
+                if (!foundHs) {
+                    foundHs = dataHotspots.find(h => {
+                        const hName = (h.nama_bangunan || '').toLowerCase().trim();
+                        const hTarget = (h.target_lokasi || '').toLowerCase().trim();
+                        return hName === nameLower || hTarget === nameLower || 
+                               (hName && nameLower.includes(hName)) || 
+                               (hTarget && nameLower.includes(hTarget));
+                    });
+                }
             }
-            if (nameLower.includes('genset') || nameLower.includes('oksigen') || nameLower.includes('b3') || nameLower.includes('tegangan')) {
+
+            if (foundHs) {
+                if (foundHs.nomor !== undefined && foundHs.nomor !== null && foundHs.nomor !== '') {
+                    nomorGedung = parseInt(foundHs.nomor);
+                }
+                if (foundHs.keterangan_resiko) {
+                    explicitRisk = Array.isArray(foundHs.keterangan_resiko) ? foundHs.keterangan_resiko[0] : foundHs.keterangan_resiko;
+                }
+            }
+
+            if (!explicitRisk && rute && rute.keterangan_resiko) {
+                explicitRisk = Array.isArray(rute.keterangan_resiko) ? rute.keterangan_resiko[0] : rute.keterangan_resiko;
+            }
+
+            // 2. Pemetaan Berdasarkan Nomor Gedung dan Standar Warna K3 Denah
+            if (nomorGedung) {
+                // 🟨 KUNING: 16 (Radiologi), 17 (CT Scan), 18 (Elektromedis), 40 (Laboratorium)
+                if ([16, 17, 18, 40].includes(nomorGedung)) {
+                    return {
+                        warna: 'Kuning',
+                        keterangan: explicitRisk || 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan',
+                        kode_hex: '#ffff00',
+                        textColor: '#111'
+                    };
+                }
+                // 🟥 MERAH: 6, 7, 21, 30, 31, 32, 33, 37, 43
+                if ([6, 7, 21, 30, 31, 32, 33, 37, 43].includes(nomorGedung)) {
+                    return {
+                        warna: 'Merah',
+                        keterangan: explicitRisk || 'Tegangan Tinggi, Kecelakaan Kerja, Kebakaran Akibat Kerja',
+                        kode_hex: '#ff0000',
+                        textColor: '#fff'
+                    };
+                }
+                // 🟪 MAGENTA / PINK: 25, 38, 39
+                if ([25, 38, 39].includes(nomorGedung)) {
+                    return {
+                        warna: 'Magenta / Pink',
+                        keterangan: explicitRisk || 'Penyakit Akibat Kerja, Kebakaran',
+                        kode_hex: '#ff00ff',
+                        textColor: '#fff'
+                    };
+                }
+                // 🟢 HIJAU TERANG: 5, 8, 9, 20, 28
+                if ([5, 8, 9, 20, 28].includes(nomorGedung)) {
+                    return {
+                        warna: 'Hijau Terang',
+                        keterangan: explicitRisk || 'Kecelakaan Kerja, Infeksius',
+                        kode_hex: '#00ff00',
+                        textColor: '#111'
+                    };
+                }
+                // 🟦 CYAN / BIRU MUDA: 1, 10, 11, 12, 13, 14, 15, 29, 36, 41, 44
+                if ([1, 10, 11, 12, 13, 14, 15, 29, 36, 41, 44].includes(nomorGedung)) {
+                    return {
+                        warna: 'Cyan / Biru Muda',
+                        keterangan: explicitRisk || 'Kecelakaan Kerja, Kebakaran / Ledakan',
+                        kode_hex: '#00ffff',
+                        textColor: '#111'
+                    };
+                }
+                // 🟩 HIJAU PUCAT: 2, 3, 4, 19, 22, 23, 24, 26, 27, 34, 35, 45
+                if ([2, 3, 4, 19, 22, 23, 24, 26, 27, 34, 35, 45].includes(nomorGedung)) {
+                    return {
+                        warna: 'Hijau Pucat',
+                        keterangan: explicitRisk || 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan',
+                        kode_hex: '#85e0a3',
+                        textColor: '#111'
+                    };
+                }
+                // ⬜ PUTIH: 42, 46, 47
+                if ([42, 46, 47].includes(nomorGedung)) {
+                    return {
+                        warna: 'Putih',
+                        keterangan: explicitRisk || 'Lahan Parkir',
+                        kode_hex: '#ffffff',
+                        textColor: '#111'
+                    };
+                }
+            }
+
+            // 3. Jika nomor gedung tidak ada, periksa explicitRisk dari tabel
+            if (explicitRisk) {
+                const rLower = explicitRisk.toLowerCase();
+                if (rLower.includes('tegangan')) {
+                    return { warna: 'Merah', keterangan: explicitRisk, kode_hex: '#ff0000', textColor: '#fff' };
+                }
+                if (rLower.includes('penyakit akibat')) {
+                    return { warna: 'Magenta / Pink', keterangan: explicitRisk, kode_hex: '#ff00ff', textColor: '#fff' };
+                }
+                if (rLower.includes('parkir')) {
+                    return { warna: 'Putih', keterangan: explicitRisk, kode_hex: '#ffffff', textColor: '#111' };
+                }
+                if (rLower.includes('kebakaran') && rLower.includes('infeksius')) {
+                    const nLower = (targetName || '').toLowerCase();
+                    if (nLower.includes('radiologi') || nLower.includes('ct scan') || nLower.includes('elektromedis') || nLower.includes('laboratorium')) {
+                        return { warna: 'Kuning', keterangan: explicitRisk, kode_hex: '#ffff00', textColor: '#111' };
+                    }
+                    return { warna: 'Hijau Pucat', keterangan: explicitRisk, kode_hex: '#85e0a3', textColor: '#111' };
+                }
+                if (rLower.includes('infeksius') && !rLower.includes('kebakaran')) {
+                    return { warna: 'Hijau Terang', keterangan: explicitRisk, kode_hex: '#00ff00', textColor: '#111' };
+                }
+                if (rLower.includes('kebakaran') || rLower.includes('ledakan')) {
+                    return { warna: 'Cyan / Biru Muda', keterangan: explicitRisk, kode_hex: '#00ffff', textColor: '#111' };
+                }
+                return { warna: 'Kuning', keterangan: explicitRisk, kode_hex: '#ffff00', textColor: '#111' };
+            }
+
+            // 4. Prioritas pemetaan spesifik nama lokasi / fungsi gedung
+            const nameLower = (targetName || '').toLowerCase().trim();
+            if (nameLower.includes('parkir') || nameLower.includes('gerbang')) {
+                return { warna: 'Putih', keterangan: 'Lahan Parkir', kode_hex: '#ffffff', textColor: '#111' };
+            }
+            if (nameLower.includes('genset') || nameLower.includes('oksigen') || nameLower.includes('limbah') || nameLower.includes('ipsrs') || nameLower.includes('ipal') || nameLower.includes('gizi') || nameLower.includes('cssd') || nameLower.includes('laundry')) {
                 return { warna: 'Merah', keterangan: 'Tegangan Tinggi, Kecelakaan Kerja, Kebakaran Akibat Kerja', kode_hex: '#ff0000', textColor: '#fff' };
             }
-
-            let matched = null;
-            if (dataKeteranganRisiko && dataKeteranganRisiko.length > 0) {
-                matched = dataKeteranganRisiko.find(kr => {
-                    const w = (kr.warna || '').toLowerCase();
-                    const hex = (kr.kode_hex || '').toLowerCase();
-                    if (rawWarna && (w.includes(rawWarna) || rawWarna.includes(w))) return true;
-                    if (rawDot && (hex === rawDot || rawDot.includes(hex) || hex.includes(rawDot))) return true;
-                    return false;
-                });
-            }
-
-            if (matched) {
-                return {
-                    warna: matched.warna,
-                    keterangan: matched.keterangan,
-                    kode_hex: matched.kode_hex || '#f1c40f',
-                    textColor: (matched.kode_hex === '#ffffff' || matched.warna.toLowerCase().includes('putih') || matched.warna.toLowerCase().includes('kuning')) ? '#111' : '#fff'
-                };
-            }
-
-            if (rawWarna.includes('merah') || rawDot.includes('ff0000') || rawDot.includes('e74c3c')) {
-                return { warna: 'Merah', keterangan: 'Tegangan Tinggi, Kecelakaan Kerja, Kebakaran Akibat Kerja', kode_hex: '#ff0000', textColor: '#fff' };
-            }
-            if (rawWarna.includes('pucat') || rawDot.includes('85e0a3')) {
-                return { warna: 'Hijau Pucat', keterangan: 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#85e0a3', textColor: '#111' };
-            }
-            if (rawWarna.includes('hijau') || rawDot.includes('05c46b') || rawDot.includes('00ff00') || rawDot.includes('2ecc71')) {
-                return { warna: 'Hijau Terang', keterangan: 'Kecelakaan Kerja, Infeksius', kode_hex: '#00ff00', textColor: '#fff' };
-            }
-            if (rawWarna.includes('cyan') || rawWarna.includes('biru') || rawDot.includes('00ffff') || rawDot.includes('00d2d3')) {
-                return { warna: 'Cyan / Biru Muda', keterangan: 'Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#00ffff', textColor: '#111' };
-            }
-            if (rawWarna.includes('pink') || rawWarna.includes('magenta') || rawDot.includes('ff00ff')) {
+            if (nameLower.includes('napza (klinik') || nameLower.includes('farmasi')) {
                 return { warna: 'Magenta / Pink', keterangan: 'Penyakit Akibat Kerja, Kebakaran', kode_hex: '#ff00ff', textColor: '#fff' };
             }
-            if (rawWarna.includes('putih') || rawDot.includes('ffffff')) {
-                return { warna: 'Putih', keterangan: 'Lahan Parkir dan Area Terbuka Bebas', kode_hex: '#ffffff', textColor: '#111' };
+            if (nameLower.includes('radiologi') || nameLower.includes('ct scan') || nameLower.includes('elektromedis') || nameLower.includes('laboratorium')) {
+                return { warna: 'Kuning', keterangan: 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#ffff00', textColor: '#111' };
+            }
+            if (nameLower.includes('rawat inap') || nameLower.includes('kasuari') || nameLower.includes('upip') || nameLower.includes('cendrawasih') || nameLower.includes('punai') || nameLower.includes('gelatik') || nameLower.includes('enggang') || nameLower.includes('tiung') || nameLower.includes('pergam') || nameLower.includes('belibis') || nameLower.includes('icu') || nameLower.includes('disabilitas') || nameLower.includes('elang')) {
+                return { warna: 'Hijau Pucat', keterangan: 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#85e0a3', textColor: '#111' };
+            }
+            if (nameLower.includes('guest house') || nameLower.includes('kantin') || nameLower.includes('jenazah') || nameLower.includes('gudang perlengkapan')) {
+                return { warna: 'Hijau Terang', keterangan: 'Kecelakaan Kerja, Infeksius', kode_hex: '#00ff00', textColor: '#111' };
             }
 
-            return { warna: 'Kuning', keterangan: 'Infeksius, Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#ffff00', textColor: '#111' };
+            return { warna: 'Cyan / Biru Muda', keterangan: 'Kecelakaan Kerja, Kebakaran / Ledakan', kode_hex: '#00ffff', textColor: '#111' };
         };
 
         // ==========================================
@@ -1300,11 +1433,41 @@
         window.tutupModal = function(id) { 
             const el = document.getElementById(id);
             if(el) el.style.display = 'none'; 
-            window.speechSynthesis.cancel();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             
             // Hentikan suara dan sembunyikan animasi jalur jika popup navigasi/evakuasi tertutup
             if(id === 'nav-popup' || id === 'evakuasi-popup' || id === 'qa-modal' || id === 'survey-popup' || id === 'hotspot-info-popup') {
-                document.getElementById('route-svg').style.display = 'none';
+                const routeSvg = document.getElementById('route-svg');
+                if (routeSvg) routeSvg.style.display = 'none';
+            }
+
+            // Kembalikan peta ke Mode Flat / 2D dan siapkan pilihan titik awal saat popup ditutup
+            if (id === 'nav-popup' || id === 'survey-popup') {
+                if (typeof window.aturModePeta === 'function') {
+                    window.aturModePeta('FLAT');
+                }
+                currentZoom = 1;
+                panX = 0;
+                panY = 0;
+                rotasiPeta = 0;
+                terapkanTransformasiPeta(true);
+
+                document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('hotspot-active-cinematic'));
+
+                if (id === 'nav-popup') {
+                    // Buka panel sidebar & fokuskan ke pemilihan titik awal
+                    if (typeof window.expandSidebarPanel === 'function') {
+                        window.expandSidebarPanel();
+                    }
+                    const selectAsal = document.getElementById('select-asal-dropdown');
+                    if (selectAsal) {
+                        selectAsal.focus();
+                        selectAsal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                    if (window.tampilkanToast) {
+                        window.tampilkanToast("📍 Peta kembali ke mode 2D. Silakan pilih titik awal Anda.");
+                    }
+                }
             }
         }
         
@@ -1813,12 +1976,86 @@
             }
         }
 
-        window.resetFormHotspot = function() { editHotspotId = null; document.getElementById('label-mode-hotspot').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-hotspot').innerText = "➕ Simpan Hotspot"; document.getElementById('hs-bangunan').value = ""; document.getElementById('hs-x').value = ""; document.getElementById('hs-y').value = ""; document.getElementById('hs-nomor').value = ""; document.getElementById('hs-target').value = ""; }
-        window.editFormHotspot = function(id) { editHotspotId = id; const hs = dataHotspots.find(h => h.id == id); if(!hs) return; document.getElementById('label-mode-hotspot').innerText = "Mode: [ EDIT DATA ]"; document.getElementById('btn-save-hotspot').innerText = "💾 Update"; document.getElementById('hs-bangunan').value = hs.nama_bangunan; document.getElementById('hs-x').value = hs.x_pos; document.getElementById('hs-y').value = hs.y_pos; document.getElementById('hs-nomor').value = hs.nomor || ""; document.getElementById('hs-target').value = hs.target_lokasi || ""; }
+        window.resetFormHotspot = function() {
+            editHotspotId = null;
+            const lbl = document.getElementById('label-mode-hs') || document.getElementById('label-mode-hotspot');
+            if (lbl) lbl.innerText = "Mode: [ Tambah Baru ]";
+            const btn = document.getElementById('btn-save-hs') || document.getElementById('btn-save-hotspot');
+            if (btn) btn.innerText = "➕ Simpan";
+            const elNama = document.getElementById('hs-nama') || document.getElementById('hs-bangunan');
+            if (elNama) elNama.value = "";
+            const elNo = document.getElementById('hs-nomor');
+            if (elNo) elNo.value = "";
+            const elTg = document.getElementById('hs-target');
+            if (elTg) elTg.value = "";
+            const elResiko = document.getElementById('hs-resiko');
+            if (elResiko) elResiko.selectedIndex = 0;
+            const elTop = document.getElementById('hs-top'); if (elTop) elTop.value = "";
+            const elLeft = document.getElementById('hs-left'); if (elLeft) elLeft.value = "";
+            const elW = document.getElementById('hs-width'); if (elW) elW.value = "";
+            const elH = document.getElementById('hs-height'); if (elH) elH.value = "";
+        }
+
+        window.editFormHotspot = function(id) {
+            editHotspotId = id;
+            const hs = dataHotspots.find(h => h.id == id);
+            if(!hs) return;
+            const lbl = document.getElementById('label-mode-hs') || document.getElementById('label-mode-hotspot');
+            if (lbl) lbl.innerText = "Mode: [ EDIT DATA ]";
+            const btn = document.getElementById('btn-save-hs') || document.getElementById('btn-save-hotspot');
+            if (btn) btn.innerText = "💾 Update";
+            const elNama = document.getElementById('hs-nama') || document.getElementById('hs-bangunan');
+            if (elNama) elNama.value = hs.nama_bangunan || "";
+            const elNo = document.getElementById('hs-nomor');
+            if (elNo) elNo.value = hs.nomor || "";
+            const elTg = document.getElementById('hs-target');
+            if (elTg) elTg.value = hs.target_lokasi || "";
+            
+            const elResiko = document.getElementById('hs-resiko');
+            if (elResiko) {
+                const resVal = Array.isArray(hs.keterangan_resiko) ? hs.keterangan_resiko[0] : (hs.keterangan_resiko || "");
+                if (resVal) {
+                    elResiko.value = resVal;
+                }
+            }
+
+            const elTop = document.getElementById('hs-top'); if (elTop) elTop.value = (hs.pos_top !== undefined) ? hs.pos_top : (hs.y_pos || "");
+            const elLeft = document.getElementById('hs-left'); if (elLeft) elLeft.value = (hs.pos_left !== undefined) ? hs.pos_left : (hs.x_pos || "");
+            const elW = document.getElementById('hs-width'); if (elW) elW.value = hs.width || "";
+            const elH = document.getElementById('hs-height'); if (elH) elH.value = hs.height || "";
+        }
+
         window.simpanHotspotSupabase = async function() {
-            const b = document.getElementById('hs-bangunan').value.trim(); const x = parseFloat(document.getElementById('hs-x').value); const y = parseFloat(document.getElementById('hs-y').value); const no = document.getElementById('hs-nomor').value.trim(); const tg = document.getElementById('hs-target').value;
-            if(!b || isNaN(x) || isNaN(y)) return alert("Data tidak valid!");
-            const payload = { nama_bangunan: b, pos_left: x, pos_top: y, nomor: no, target_lokasi: tg };
+            const elNama = document.getElementById('hs-nama') || document.getElementById('hs-bangunan');
+            const b = elNama ? elNama.value.trim() : "";
+            const elTop = document.getElementById('hs-top');
+            const elLeft = document.getElementById('hs-left');
+            const y = elTop ? parseFloat(elTop.value) : NaN;
+            const x = elLeft ? parseFloat(elLeft.value) : NaN;
+            const elW = document.getElementById('hs-width');
+            const elH = document.getElementById('hs-height');
+            const w = elW && elW.value ? parseFloat(elW.value) : null;
+            const h = elH && elH.value ? parseFloat(elH.value) : null;
+            const elNo = document.getElementById('hs-nomor');
+            const no = elNo ? elNo.value.trim() : "";
+            const elTg = document.getElementById('hs-target');
+            const tg = elTg ? elTg.value : "";
+            const elResiko = document.getElementById('hs-resiko');
+            const resiko = elResiko ? elResiko.value : "";
+
+            if(!b || isNaN(x) || isNaN(y)) return alert("Lengkapi data nama dan koordinat peta!");
+            
+            const payload = { 
+                nama_bangunan: b, 
+                pos_left: x, 
+                pos_top: y, 
+                nomor: no ? parseInt(no) : null, 
+                target_lokasi: tg,
+                keterangan_resiko: resiko ? [resiko] : null
+            };
+            if (w) payload.width = w;
+            if (h) payload.height = h;
+
             let res;
             if (editHotspotId) {
                 res = await supabase.from('map_hotspots').update(payload).eq('id', editHotspotId);
@@ -1826,7 +2063,8 @@
                 res = await supabase.from('map_hotspots').insert(payload);
             }
             if (res && res.error) return alert("Gagal menyimpan hotspot: " + res.error.message);
-            window.resetFormHotspot(); await fetchAllDataSupabase();
+            window.resetFormHotspot();
+            await fetchAllDataSupabase();
         }
         window.hapusHotspot = async function(id) {
             if(confirm("Hapus hotspot?")) {
@@ -2171,7 +2409,7 @@
             return null;
         }
 
-        window.pilihTujuan = function(tujuan, bukaModal = true, bacaSuara = true) {
+        window.pilihTujuan = function(tujuan, bukaModal = true, bacaSuara = true, isHotspotClick = false) {
             window.tutupDropdownTujuan();
             lokasiTujuan = tujuan;
             document.getElementById('custom-tujuan-btn').innerHTML = `${tujuan} <span style="float:right; font-size:10px; margin-top:2px;">▼</span>`;
@@ -2273,7 +2511,19 @@
                 document.getElementById('route-svg').style.display = 'none';
             }
             
-            const teksSuaraLengkap = `${instruksiFinal}. Ini adalah area yang bisa diakses oleh ${aksesLisan}, dan merupakan area berwarna ${detailRisiko.warna}, yaitu area dengan risiko ${detailRisiko.keterangan}.`;
+            // Format TTS Sesuai Permintaan:
+            // 1. Jika dari klik Hotspot (isHotspotClick = true), bacakan instruksi rute beserta detail akses, warna, dan risiko K3 + patokan foto dilayar.
+            // 2. Jika dari pemilihan lokasi tujuan biasa (dropdown / search), bacakan rute saja tanpa info risiko/evakuasi + tambahkan "sampai anda melihat patokan/tanda seperti foto dilayar".
+            let teksSuaraLengkap = "";
+            const akhiranPatokan = "sampai anda melihat patokan/tanda seperti foto dilayar.";
+            const bersihInstruksi = instruksiFinal.trim().replace(/\.+$/, '');
+            
+            if (isHotspotClick) {
+                teksSuaraLengkap = `${bersihInstruksi}, ${akhiranPatokan} Ini adalah area yang bisa diakses oleh ${aksesLisan}, dan merupakan area berwarna ${detailRisiko.warna}, yaitu area dengan risiko ${detailRisiko.keterangan}.`;
+            } else {
+                teksSuaraLengkap = `${bersihInstruksi}, ${akhiranPatokan}`;
+            }
+
             lastNavSpeechText = teksSuaraLengkap;
 
             if (bukaModal) {
@@ -2336,6 +2586,17 @@
             const routeSvg = document.getElementById('route-svg');
             if (routeSvg) routeSvg.style.display = 'none';
 
+            // Kembalikan peta ke Mode Flat / 2D
+            if (typeof window.aturModePeta === 'function') {
+                window.aturModePeta('FLAT');
+            }
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            rotasiPeta = 0;
+            terapkanTransformasiPeta(true);
+            document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('hotspot-active-cinematic'));
+
             const tujuan = window.lokasiTujuanTerakhir || lokasiTujuan || "lokasi tujuan Anda";
             const ucapanTiba = `Anda telah tiba di ${tujuan}, senang bisa membantu anda.`;
             const ucapanUlasan = `selanjutnya silahkan beri ulasan anda, terima kasih`;
@@ -2380,7 +2641,7 @@
             const buildingName = hs.nama_bangunan || hs.target_lokasi || "Area Gedung";
             const nomorGedung = hs.nomor || hs.nomor_gedung || "";
             const rute = dataRute[targetName] || dataRute[buildingName] || {};
-            const detailRisiko = window.dapatkanDetailRisiko(rute, targetName || buildingName);
+            const detailRisiko = window.dapatkanDetailRisiko(rute, targetName || buildingName, hs);
             const aksesRaw = rute.akses || (detailRisiko.warna === 'Merah' ? 'Khusus Staf & Petugas' : 'Pengunjung, Pasien & Staf');
             const isKhususStaff = aksesRaw.toLowerCase().includes('staff') || aksesRaw.toLowerCase().includes('petugas') || aksesRaw.toLowerCase().includes('karyawan') || aksesRaw.toLowerCase().includes('khusus');
             const aksesLisan = isKhususStaff ? "khusus staf dan petugas rumah sakit" : "pengunjung dan pasien";
@@ -2389,94 +2650,103 @@
             document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('hotspot-active-cinematic'));
             if (clickedEl) clickedEl.classList.add('hotspot-active-cinematic');
 
-            // Cek apakah titik awal sudah dipilih
-            if (!lokasiAsal || lokasiAsal.trim() === "") {
-                // 1. Transisi ke Mode 3D
-                window.aturModePeta('3D');
+            // Sembunyikan popup navigasi & matikan suara sementara selama proses transisi kamera berjalan
+            const navPopup = document.getElementById('nav-popup');
+            if (navPopup) navPopup.style.display = 'none';
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            const routeSvg = document.getElementById('route-svg');
+            if (routeSvg) routeSvg.style.display = 'none';
 
-                // 2. Zoom Kamera Sinematik Otomatis ke Hotspot yang Dipilih
-                const mapImg = document.getElementById('main-map-image');
-                const mapW = (mapImg && mapImg.offsetWidth) ? mapImg.offsetWidth : 1000;
-                const mapH = (mapImg && mapImg.offsetHeight) ? mapImg.offsetHeight : 650;
-                const hx = (hs.pos_left !== undefined) ? hs.pos_left : (hs.x_pos || 50);
-                const hy = (hs.pos_top !== undefined) ? hs.pos_top : (hs.y_pos || 50);
-                
-                currentZoom = 2.4;
-                panX = -((hx / 100) - 0.5) * mapW * 1.35;
-                panY = -((hy / 100) - 0.5) * mapH * 0.95;
-                terapkanTransformasiPeta(true);
+            // 1. Transisi ke Mode 3D
+            window.aturModePeta('3D');
 
-                // Pada layar mobile, perkecil sidebar panel agar peta 3D terlihat luas
-                if (window.innerWidth <= 950 && typeof window.collapseSidebarPanel === 'function') {
-                    window.collapseSidebarPanel();
-                }
+            // 2. Zoom Kamera Sinematik Otomatis ke Hotspot yang Dipilih
+            const mapImg = document.getElementById('main-map-image');
+            const mapW = (mapImg && mapImg.offsetWidth) ? mapImg.offsetWidth : 1000;
+            const mapH = (mapImg && mapImg.offsetHeight) ? mapImg.offsetHeight : 650;
+            const hx = (hs.pos_left !== undefined) ? hs.pos_left : (hs.x_pos || 50);
+            const hy = (hs.pos_top !== undefined) ? hs.pos_top : (hs.y_pos || 50);
+            
+            currentZoom = 2.4;
+            panX = -((hx / 100) - 0.5) * mapW * 1.35;
+            panY = -((hy / 100) - 0.5) * mapH * 0.95;
+            terapkanTransformasiPeta(true);
 
-                // 3. Tampilkan Popup Navigasi Rute dengan Info Lengkap K3 & Status Titik Awal
-                const elAsal = document.getElementById('popup-badge-asal');
-                if (elAsal) elAsal.innerText = "Belum Dipilih (Pilih di Panel Asal)";
-                const elTuj = document.getElementById('popup-badge-tujuan');
-                if (elTuj) elTuj.innerText = targetName || buildingName;
-                const elStatus = document.getElementById('popup-badge-status');
-                if (elStatus) elStatus.innerText = "Kamera 3D Aktif";
-
-                const deskripsiLokasi = (nomorGedung ? `<b>Gedung Nomor ${nomorGedung}:</b> ` : '') + `<b>${buildingName}</b><br><span style="font-size:13.5px; color:#444; margin-top:4px; display:inline-block;">📍 Silakan pilih titik awal Anda pada panel navigasi sebelah kiri untuk menampilkan garis rute dan panduan lorong menuju lokasi ini.</span>`;
-                document.getElementById('teks-instruksi').innerHTML = deskripsiLokasi;
-
-                const imgTanda = document.getElementById('gambar-tanda');
-                let gambarFinal = rute.gambarTanda || (window.customSigns && window.customSigns[targetName]) || "";
-                if (gambarFinal) {
-                    imgTanda.src = gambarFinal;
-                    imgTanda.style.display = 'block';
-                } else {
-                    imgTanda.style.display = 'none';
-                }
-
-                // Perbarui Info Card Akses, Warna & Risiko K3
-                const elAksesBadge = document.getElementById('popup-akses-badge');
-                if (elAksesBadge) {
-                    if (isKhususStaff) {
-                        elAksesBadge.innerHTML = `🔒 Akses: Khusus Staf & Petugas`;
-                        elAksesBadge.style.background = 'rgba(231, 76, 60, 0.15)';
-                        elAksesBadge.style.color = '#c0392b';
-                        elAksesBadge.style.borderColor = '#e74c3c';
-                    } else {
-                        elAksesBadge.innerHTML = `👥 Akses: Pengunjung & Pasien`;
-                        elAksesBadge.style.background = 'rgba(39, 174, 96, 0.15)';
-                        elAksesBadge.style.color = '#1e824c';
-                        elAksesBadge.style.borderColor = '#27ae60';
-                    }
-                }
-
-                const elWarnaBadge = document.getElementById('popup-warna-badge');
-                if (elWarnaBadge) {
-                    elWarnaBadge.innerHTML = `🎨 Area ${detailRisiko.warna}`;
-                    elWarnaBadge.style.background = detailRisiko.kode_hex === '#ffffff' ? '#f0f0f0' : `${detailRisiko.kode_hex}33`;
-                    elWarnaBadge.style.color = detailRisiko.textColor === '#fff' ? '#8B0000' : '#111';
-                    elWarnaBadge.style.borderColor = detailRisiko.kode_hex;
-                }
-
-                const elResikoTeks = document.getElementById('popup-resiko-teks');
-                if (elResikoTeks) {
-                    elResikoTeks.innerText = detailRisiko.keterangan;
-                }
-
-                // Sembunyikan garis rute dulu karena belum ada titik asal
-                const routeSvg = document.getElementById('route-svg');
-                if (routeSvg) routeSvg.style.display = 'none';
-
-                // Tampilkan Popup Navigasi
-                document.getElementById('nav-popup').style.display = 'flex';
-
-                // 4. Bacakan Info Melalui TTS (Speech) Sesuai Permintaan
-                const ucapanSinematik = `Anda memilih ${nomorGedung ? 'gedung ' + nomorGedung + ', ' : ''}${buildingName}. Ini adalah area yang bisa diakses oleh ${aksesLisan}, dan merupakan area berwarna ${detailRisiko.warna}, yaitu area dengan risiko ${detailRisiko.keterangan}. Silakan pilih titik awal Anda pada panel navigasi untuk menampilkan panduan rute.`;
-                lastNavSpeechText = ucapanSinematik;
-                if (window.bicara) {
-                    window.bicara(ucapanSinematik);
-                }
-            } else {
-                // Titik awal sudah dipilih: Langsung jalankan navigasi rute lengkap
-                window.pilihTujuan(targetName || buildingName, true, true);
+            // Pada layar mobile, perkecil sidebar panel agar peta 3D terlihat luas
+            if (window.innerWidth <= 950 && typeof window.collapseSidebarPanel === 'function') {
+                window.collapseSidebarPanel();
             }
+
+            // 3. SETELAH SELESAI ZOOM (Delay ~500ms): Baru munculkan popup info dan bacakan segera
+            setTimeout(() => {
+                if (!lokasiAsal || lokasiAsal.trim() === "") {
+                    // Titik awal belum dipilih: Tampilkan Popup Info Gedung, Hak Akses & Risiko K3
+                    const elAsal = document.getElementById('popup-badge-asal');
+                    if (elAsal) elAsal.innerText = "Belum Dipilih (Pilih di Panel Asal)";
+                    const elTuj = document.getElementById('popup-badge-tujuan');
+                    if (elTuj) elTuj.innerText = targetName || buildingName;
+                    const elStatus = document.getElementById('popup-badge-status');
+                    if (elStatus) elStatus.innerText = "Kamera 3D Aktif";
+
+                    const deskripsiLokasi = (nomorGedung ? `<b>Gedung Nomor ${nomorGedung}:</b> ` : '') + `<b>${buildingName}</b><br><span style="font-size:13.5px; color:#444; margin-top:4px; display:inline-block;">📍 Silakan pilih titik awal Anda pada panel navigasi sebelah kiri untuk menampilkan garis rute dan panduan lorong menuju lokasi ini.</span>`;
+                    document.getElementById('teks-instruksi').innerHTML = deskripsiLokasi;
+
+                    const imgTanda = document.getElementById('gambar-tanda');
+                    let gambarFinal = rute.gambarTanda || (window.customSigns && window.customSigns[targetName]) || "";
+                    if (gambarFinal) {
+                        imgTanda.src = gambarFinal;
+                        imgTanda.style.display = 'block';
+                    } else {
+                        imgTanda.style.display = 'none';
+                    }
+
+                    // Perbarui Info Card Akses, Warna & Risiko K3
+                    const elAksesBadge = document.getElementById('popup-akses-badge');
+                    if (elAksesBadge) {
+                        if (isKhususStaff) {
+                            elAksesBadge.innerHTML = `🔒 Akses: Khusus Staf & Petugas`;
+                            elAksesBadge.style.background = 'rgba(231, 76, 60, 0.15)';
+                            elAksesBadge.style.color = '#c0392b';
+                            elAksesBadge.style.borderColor = '#e74c3c';
+                        } else {
+                            elAksesBadge.innerHTML = `👥 Akses: Pengunjung & Pasien`;
+                            elAksesBadge.style.background = 'rgba(39, 174, 96, 0.15)';
+                            elAksesBadge.style.color = '#1e824c';
+                            elAksesBadge.style.borderColor = '#27ae60';
+                        }
+                    }
+
+                    const elWarnaBadge = document.getElementById('popup-warna-badge');
+                    if (elWarnaBadge) {
+                        elWarnaBadge.innerHTML = `🎨 Area ${detailRisiko.warna}`;
+                        elWarnaBadge.style.background = detailRisiko.kode_hex === '#ffffff' ? '#f0f0f0' : `${detailRisiko.kode_hex}33`;
+                        elWarnaBadge.style.color = detailRisiko.textColor === '#fff' ? '#8B0000' : '#111';
+                        elWarnaBadge.style.borderColor = detailRisiko.kode_hex;
+                    }
+
+                    const elResikoTeks = document.getElementById('popup-resiko-teks');
+                    if (elResikoTeks) {
+                        elResikoTeks.innerText = detailRisiko.keterangan;
+                    }
+
+                    // Sembunyikan garis rute dulu karena belum ada titik asal
+                    const routeSvg = document.getElementById('route-svg');
+                    if (routeSvg) routeSvg.style.display = 'none';
+
+                    // Tampilkan Popup Navigasi
+                    document.getElementById('nav-popup').style.display = 'flex';
+
+                    // 4. Bacakan Info Melalui TTS (Speech) Segera
+                    const ucapanSinematik = `Anda memilih ${nomorGedung ? 'gedung ' + nomorGedung + ', ' : ''}${buildingName}. Ini adalah area yang bisa diakses oleh ${aksesLisan}, dan merupakan area berwarna ${detailRisiko.warna}, yaitu area dengan risiko ${detailRisiko.keterangan}. Silakan pilih titik awal Anda pada panel navigasi untuk menampilkan panduan rute.`;
+                    lastNavSpeechText = ucapanSinematik;
+                    if (window.bicara) {
+                        window.bicara(ucapanSinematik);
+                    }
+                } else {
+                    // Titik awal sudah dipilih: Langsung jalankan navigasi rute lengkap dengan info risiko & akses K3
+                    window.pilihTujuan(targetName || buildingName, true, true, true);
+                }
+            }, 500);
         };
 
         window.renderHotspotsToMap = function() {
@@ -2556,6 +2826,17 @@
 
             window.tutupModal('survey-popup');
             window.bicara("Terima kasih atas ulasan yang Anda berikan."); 
+
+            // Kembalikan peta ke Mode Flat / 2D
+            if (typeof window.aturModePeta === 'function') {
+                window.aturModePeta('FLAT');
+            }
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            rotasiPeta = 0;
+            terapkanTransformasiPeta(true);
+            document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('hotspot-active-cinematic'));
 
             document.getElementById('ulasan-teks').value = ""; 
             if(ratingEl) ratingEl.checked = false;
