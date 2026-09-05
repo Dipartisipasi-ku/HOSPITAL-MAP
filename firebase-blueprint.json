@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile containing role",
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["admin", "staff", "pengunjung"],
+          "description": "Role of the user"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": ["role"]
+    },
+    "Sign": {
+      "title": "Sign",
+      "description": "Custom sign image for a location",
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string"
+        },
+        "locationId": {
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "required": ["imageUrl", "locationId", "updatedBy"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "signs/{signId}": {
+      "schema": { "$ref": "#/entities/Sign" },
+      "description": "Custom signs overriding defaults"
+    }
+  }
+}

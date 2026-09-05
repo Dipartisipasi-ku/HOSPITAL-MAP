@@ -320,6 +320,20 @@
         <!-- Panel Kiri (Navigasi Pengunjung Terpadu) -->
         <div class="sidebar">
             <h2 class="header-title">🗺️ Navigasi Pintar</h2>
+            <div id="auth-panel" style="background:#181818; padding:12px; border-radius:8px; border:1px solid #D4AF37; margin-bottom:15px; color: #E0E0E0; font-size: 13px;">
+                <div id="logged-out-view" style="display: flex; align-items: center;">
+                    <button onclick="loginWithGoogle()" style="background:#D4AF37; color:#111; padding: 6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Masuk / Login</button>
+                    <span style="margin-left: 10px; font-size: 11px;">Akses default: Pengunjung</span>
+                </div>
+                <div id="logged-in-view" style="display: none; justify-content: space-between; align-items: center;">
+                    <div>
+                        Halo, <b id="user-email-lbl"></b><br>
+                        Peran: <span id="user-role-badge" style="background:#8B0000; padding:2px 6px; border-radius:4px; color:#D4AF37; font-size:10px;">Pengunjung</span>
+                    </div>
+                    <button onclick="logout()" style="background:#444; color:#fff; padding: 4px 8px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size: 11px;">Keluar</button>
+                </div>
+            </div>
+
             
             <!-- VIEW 1: Pilih Titik Awal -->
             <div id="view-asal">
@@ -628,6 +642,9 @@
 
             <div class="instruksi-teks" id="teks-instruksi"></div>
             <img id="gambar-tanda" class="sign-image" src="" alt="Tanda Lokasi">
+            <div id="admin-edit-sign-container" style="display: none; text-align: center; margin-bottom: 15px;">
+                <button type="button" class="btn-primary" style="background:#D4AF37; color:#111; margin-bottom:5px;" onclick="promptEditSign()">✏️ Admin: Ubah Foto Tanda</button>
+            </div>
             
             <button type="button" class="btn-primary" style="background:#111; color:#D4AF37; border-color:#D4AF37; margin-top:5px; padding:10px; font-size:14px;" onclick="ulangSuaraRute()">🔊 Ulangi Suara Panduan</button>
 
@@ -1523,13 +1540,20 @@
             window.bicara(`Silakan pilih kembali titik awal Anda.`);
         }
 
-        function renderTombolTujuan() {
+        window.renderTombolTujuan = function() {
             const listContainer = document.getElementById('list-tujuan-container'); 
             if(!listContainer) return;
             listContainer.innerHTML = '';
             
             let tujuanArr = [];
-            for (let nama in dataRute) { tujuanArr.push({ nama: nama, data: dataRute[nama] }); }
+            for (let nama in dataRute) { 
+                let routeAkses = dataRute[nama].akses ? dataRute[nama].akses.toLowerCase() : "pengunjung";
+                // RBAC rule
+                if (routeAkses === 'staff' && window.currentUserRole === 'pengunjung') {
+                    continue; // hide staff routes from pengunjung
+                }
+                tujuanArr.push({ nama: nama, data: dataRute[nama] }); 
+            }
             
             tujuanArr.sort((a, b) => {
                 let numA = parseInt(a.data.nomor) || extractNumber(a.nama);
@@ -1677,6 +1701,12 @@
                 gambarFinal = ruteDefault.gambarTanda || "";
             }
 
+            // [RBAC] Apply custom sign if available
+            if (window.customSigns && window.customSigns[tujuan]) {
+                gambarFinal = window.customSigns[tujuan];
+            }
+            window.lokasiTujuanTerakhir = tujuan;
+
             // 2. Perbarui tampilan Badge Relasi & Status di Popup
             const badgeAsalEl = document.getElementById('popup-badge-asal');
             const badgeTujuanEl = document.getElementById('popup-badge-tujuan');
@@ -1705,6 +1735,12 @@
             document.getElementById('teks-instruksi').innerText = teksArahan;
             
             const imgTanda = document.getElementById('gambar-tanda');
+            // RBAC Edit Button
+            if (window.currentUserRole === 'admin') {
+                document.getElementById('admin-edit-sign-container').style.display = 'block';
+            } else {
+                document.getElementById('admin-edit-sign-container').style.display = 'none';
+            }
             if (gambarFinal) {
                 imgTanda.src = gambarFinal;
                 imgTanda.style.display = 'block';
@@ -1841,6 +1877,109 @@
             document.getElementById('chk-pelayanan').checked = false;
         }
     </script>
+    
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      let app, auth, db;
+      window.currentUserRole = "pengunjung"; 
+      window.customSigns = {};
+
+      async function initFirebase() {
+          try {
+              const res = await fetch('./firebase-applet-config.json');
+              if(!res.ok) throw new Error("Config not found");
+              const config = await res.json();
+              app = initializeApp(config);
+              auth = getAuth(app);
+              db = getFirestore(app, config.firestoreDatabaseId);
+
+              onAuthStateChanged(auth, async (user) => {
+                  if (user) {
+                      const userDoc = await getDoc(doc(db, "users", user.uid));
+                      if (!userDoc.exists()) {
+                          await setDoc(doc(db, "users", user.uid), {
+                              role: 'pengunjung',
+                              email: user.email
+                          });
+                          window.currentUserRole = 'pengunjung';
+                      } else {
+                          window.currentUserRole = userDoc.data().role || 'pengunjung';
+                      }
+                      
+                      document.getElementById('logged-out-view').style.display = 'none';
+                      document.getElementById('logged-in-view').style.display = 'flex';
+                      document.getElementById('user-email-lbl').innerText = user.email;
+                      document.getElementById('user-role-badge').innerText = window.currentUserRole.toUpperCase();
+                      
+                      loadCustomSigns();
+                  } else {
+                      window.currentUserRole = 'pengunjung';
+                      document.getElementById('logged-out-view').style.display = 'flex';
+                      document.getElementById('logged-in-view').style.display = 'none';
+                  }
+                  
+                  // Re-render routes
+                  if(typeof window.renderTombolTujuan === 'function') {
+                      window.renderTombolTujuan();
+                  }
+                  if(typeof window.inisialisasiDaftarTujuan === 'function') {
+                      window.inisialisasiDaftarTujuan();
+                  }
+                  if(document.getElementById('search-tujuan').value !== "") {
+                      window.filterTujuan(true);
+                  }
+              });
+          } catch (err) {
+              console.error("Firebase init failed", err);
+          }
+      }
+
+      window.loginWithGoogle = function() {
+          const provider = new GoogleAuthProvider();
+          signInWithPopup(auth, provider).catch(err => alert("Gagal masuk: " + err.message));
+      }
+
+      window.logout = function() {
+          signOut(auth);
+      }
+
+      function loadCustomSigns() {
+          const q = query(collection(db, "signs"));
+          onSnapshot(q, (snapshot) => {
+              window.customSigns = {};
+              snapshot.forEach((docSnap) => {
+                  const data = docSnap.data();
+                  window.customSigns[data.locationId] = data.imageUrl;
+              });
+          }, (error) => {
+              console.error("Gagal memuat tanda kustom: ", error);
+          });
+      }
+
+      window.adminSaveSign = async function(locationId, imageUrl) {
+          if (window.currentUserRole !== 'admin') {
+              alert("Akses Ditolak: Hanya Administrator yang dapat mengubah foto tanda.");
+              return;
+          }
+          if(!imageUrl) return;
+          try {
+              await setDoc(doc(db, "signs", locationId), {
+                  locationId: locationId,
+                  imageUrl: imageUrl,
+                  updatedBy: auth.currentUser.uid
+              });
+              alert("Foto tanda berhasil diperbarui!");
+          } catch (e) {
+              alert("Gagal menyimpan foto: " + e.message);
+          }
+      }
+
+      initFirebase();
+    </script>
+
     <script src="security.js"></script>
 </body>
 </html>
