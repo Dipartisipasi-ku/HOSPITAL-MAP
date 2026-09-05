@@ -1028,7 +1028,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, getDo
                 document.getElementById('front-form-container').style.display = 'block';
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
                 
-                renderHotspotsToMap(); renderAllAdminLists();
+                renderHotspotsToMap(); renderAllAdminLists(); if(typeof window.inisialisasiDaftarTujuan === 'function') window.inisialisasiDaftarTujuan(); if(typeof window.renderTombolTujuan === 'function') window.renderTombolTujuan(); if(typeof window.kembaliPilihAsal === 'function') window.kembaliPilihAsal();
                 document.getElementById('sync-indicator').style.display = 'none';
             } catch (error) { console.error(error); if(typeof timeoutHint !== 'undefined') clearTimeout(timeoutHint); document.getElementById('loading-text').innerText = 'Gagal memuat database! Cek koneksi Anda (' + error.message + ').';
                 document.getElementById('sync-indicator').style.display = 'none';
