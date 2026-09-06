@@ -79,6 +79,16 @@
         .tujuan-list::-webkit-scrollbar { width: 6px; }
         .tujuan-list::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 3px; }
 
+        /* Integrated Route Matrix Table Styles */
+        .matrix-table-row:hover {
+            background: rgba(0, 168, 255, 0.12) !important;
+            cursor: pointer;
+        }
+        .selected-route-row {
+            background: rgba(0, 168, 255, 0.22) !important;
+            border-left: 4px solid #00a8ff !important;
+        }
+
         .btn-pilihan { 
             background: #FFFFFF; color: #111111; padding: 14px; border: 2px solid #BDC3C7; 
             border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; 
@@ -331,15 +341,42 @@
         }
 
         /* ------------------------------------------- */
-        /* HUD KONTROL PETA & TOP TOOLBAR (SEJAJAR LANDSCAPE) */
+        /* HUD KONTROL PETA & TOP TOOLBAR (SEJAJAR LANDSCAPE WITH ADAPTIVE HOLDER) */
         /* ------------------------------------------- */
+        .map-toolbar-holder {
+            position: absolute; 
+            top: 14px; 
+            right: 14px; 
+            z-index: 140;
+            max-width: calc(100% - 28px);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            box-sizing: border-box;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
         .map-top-toolbar {
-            position: absolute; top: 16px; right: 16px; z-index: 140;
+            pointer-events: auto;
+            position: relative;
+            top: 0;
+            right: 0;
+            z-index: 140;
             display: flex; flex-direction: row; align-items: center; gap: 6px;
             background: rgba(17, 17, 17, 0.92); padding: 5px 10px; border-radius: 28px;
             border: 1.5px solid #D4AF37; box-shadow: 0 8px 24px rgba(0,0,0,0.65);
             backdrop-filter: blur(8px);
             user-select: none; -webkit-user-select: none;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            white-space: nowrap;
+        }
+        .map-top-toolbar::-webkit-scrollbar {
+            display: none;
         }
         .map-zoom-controls {
             display: flex; flex-direction: row; align-items: center; gap: 6px;
@@ -774,20 +811,27 @@
                 box-sizing: border-box;
             }
             
-            /* Toolbar Kontrol Denah Sejajar Landscape di Bagian Atas Peta untuk Mobile */
+            /* Toolbar Kontrol Denah Sejajar Landscape dengan Container Adaptif */
+            .map-toolbar-holder {
+                top: 8px !important;
+                right: 8px !important;
+                max-width: calc(100% - 16px) !important;
+            }
             .map-top-toolbar {
-                top: 10px !important;
-                right: 10px !important;
+                top: 0 !important;
+                right: 0 !important;
                 bottom: auto !important;
-                padding: 4px 8px !important;
-                gap: 5px !important;
-                border-radius: 24px !important;
+                padding: 4px 6px !important;
+                gap: 4px !important;
+                border-radius: 20px !important;
                 box-shadow: 0 6px 20px rgba(0,0,0,0.8) !important;
+                max-width: 100% !important;
             }
             .btn-zoom-ctrl, .btn-quick-ctrl {
-                width: 36px !important;
-                height: 36px !important;
-                font-size: 15px !important;
+                width: 34px !important;
+                height: 34px !important;
+                font-size: 14px !important;
+                flex-shrink: 0 !important;
             }
             .toolbar-divider-v {
                 height: 18px !important;
@@ -988,20 +1032,22 @@
                 <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- MAP TOP TOOLBAR (Sejajar Secara Landscape di Atas Peta Sesuai Gambar 1) -->
-            <div class="map-top-toolbar" id="map-top-toolbar">
-                <div class="map-zoom-controls" id="map-zoom-toolbar">
-                    <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah" aria-label="Perbesar Denah">➕</button>
-                    <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(-0.2)" title="Perkecil Denah" aria-label="Perkecil Denah">➖</button>
-                </div>
-                <div class="toolbar-divider-v"></div>
-                <div class="map-aux-controls" id="map-aux-toolbar">
-                    <!-- Toggle Overlay Garis Rute & Titik Kumpul -->
-                    <button type="button" class="btn-quick-ctrl" id="btn-toggle-garis-rute" onclick="window.toggleGarisRuteVisibilitas()" title="Tampilkan / Sembunyikan Garis Rute Navigasi" style="background:#00a8ff; color:#000; border-color:#00ffff;">🛣️</button>
-                    <button type="button" class="btn-quick-ctrl" id="btn-toggle-titik-kumpul" onclick="toggleOverlayTitikKumpul()" title="Tampilkan / Sembunyikan Overlay Titik Kumpul (Assembly Point)" style="background:#107C41; color:#FFF; border-color:#2ecc71;">🟢</button>
-                    <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
-                    <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
-                    <button type="button" class="btn-quick-ctrl" id="btn-hud-expand" onclick="toggleHud()" title="Rotasi & Opsi Lanjutan">🧭</button>
+            <!-- MAP TOP TOOLBAR WITH ADAPTIVE HOLDER CONTAINER -->
+            <div class="map-toolbar-holder" id="map-toolbar-holder">
+                <div class="map-top-toolbar" id="map-top-toolbar">
+                    <div class="map-zoom-controls" id="map-zoom-toolbar">
+                        <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah" aria-label="Perbesar Denah">➕</button>
+                        <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(-0.2)" title="Perkecil Denah" aria-label="Perkecil Denah">➖</button>
+                    </div>
+                    <div class="toolbar-divider-v"></div>
+                    <div class="map-aux-controls" id="map-aux-toolbar">
+                        <!-- Toggle Overlay Garis Rute & Titik Kumpul -->
+                        <button type="button" class="btn-quick-ctrl" id="btn-toggle-garis-rute" onclick="window.toggleGarisRuteVisibilitas()" title="Tampilkan / Sembunyikan Garis Rute Navigasi" style="background:#00a8ff; color:#000; border-color:#00ffff;">🛣️</button>
+                        <button type="button" class="btn-quick-ctrl" id="btn-toggle-titik-kumpul" onclick="toggleOverlayTitikKumpul()" title="Tampilkan / Sembunyikan Overlay Titik Kumpul (Assembly Point)" style="background:#107C41; color:#FFF; border-color:#2ecc71;">🟢</button>
+                        <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
+                        <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
+                        <button type="button" class="btn-quick-ctrl" id="btn-hud-expand" onclick="toggleHud()" title="Rotasi & Opsi Lanjutan">🧭</button>
+                    </div>
                 </div>
             </div>
 
@@ -1199,23 +1245,23 @@
 
         <!-- Section Matriks Rute (Titik Awal ➔ Lokasi Tujuan) -->
         <div class="admin-section" id="section-matrix">
-            <h3 style="color: #D4AF37;">🔀 Matriks Rute (Asal ➔ Tujuan)</h3>
+            <h3 style="color: #D4AF37;">🔀 Matriks & Jalur Rute (Asal ➔ Tujuan)</h3>
             <p style="font-size:12px; color:#bbb; margin: 2px 0 8px 0; line-height: 1.4;">
-                Atur panduan arah khusus dari <b>1 Titik Awal ke banyak Tujuan</b> atau <b>banyak Titik Awal ke 1 Tujuan</b>.
+                Tabel integrasi rute asal ➔ tujuan dengan jalur belokan (waypoints). Klik rute pada tabel untuk menampilkan dan mempratinjau jalurnya di peta.
             </p>
 
             <!-- Search Filter Matriks -->
             <input type="text" id="filter-matrix" placeholder="🔍 Cari rute asal / tujuan..." oninput="filterMatrixList()" style="margin-bottom:6px; font-size:12px; padding:8px 10px;">
 
-            <!-- Daftar Matriks Tersimpan -->
-            
-            <!-- Daftar Matriks Tersimpan -->
+            <!-- Ekspor & Impor CSV -->
             <div style="display:flex; gap: 6px; margin-bottom: 10px;">
                 <button class="btn-save-admin" style="flex:1; background: #2c3e50; border-color: #34495e; font-size:11px;" onclick="exportMatrixCSV()">📥 Ekspor CSV</button>
                 <input type="file" id="csv-file-matrix" accept=".csv" style="display:none;" onchange="importMatrixCSV(event)">
                 <button class="btn-save-admin" style="flex:1; background: #8B0000; border-color: #5c0000; font-size:11px;" onclick="document.getElementById('csv-file-matrix').click()">📤 Impor CSV</button>
             </div>
-            <div class="data-list" id="list-matrix" style="max-height: 180px;"></div>
+            
+            <!-- Tabel Integrasi Matriks Rute & Jalur -->
+            <div class="data-list" id="list-matrix" style="max-height: 320px; overflow-y: auto; background: #0b0b0b; border-radius: 8px; border: 1px solid #333; margin-bottom: 10px;"></div>
 
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top:8px;">
@@ -1722,8 +1768,8 @@
                 }
                 if (!foundHs) {
                     foundHs = dataHotspots.find(h => {
-                        const hName = (h.nama_bangunan || '').toLowerCase().trim();
-                        const hTarget = (h.target_lokasi || '').toLowerCase().trim();
+                        const hName = String(h.nama_bangunan || '').toLowerCase().trim();
+                        const hTarget = String(h.target_lokasi || '').toLowerCase().trim();
                         return hName === nameLower || hTarget === nameLower || 
                                (hName && nameLower.includes(hName)) || 
                                (hTarget && nameLower.includes(hTarget));
@@ -2120,7 +2166,7 @@
         function startMousePan(e) {
             if (isDrawingArea || window.isRouteEditMode || window.isPickingRouteWaypoint || window.isDraggingWaypoint) return;
             if (e.button !== 0) return; // Hanya klik kiri
-            if (e.target.closest('.map-controls-hud') || e.target.closest('.map-top-toolbar') || 
+            if (e.target.closest('.map-controls-hud') || e.target.closest('.map-toolbar-holder') || e.target.closest('.map-top-toolbar') || 
                 e.target.closest('.map-zoom-controls') || e.target.closest('.map-aux-controls') ||
                 e.target.closest('.map-quick-toolbar') || e.target.closest('.credit-dev-badge')) return;
             
@@ -2163,7 +2209,7 @@
         if (mapView) {
             mapView.addEventListener('touchstart', (e) => {
                 if (isDrawingArea || window.isRouteEditMode || window.isPickingRouteWaypoint || window.isDraggingWaypoint) return;
-                if (e.target.closest('.map-controls-hud') || e.target.closest('.map-top-toolbar') || 
+                if (e.target.closest('.map-controls-hud') || e.target.closest('.map-toolbar-holder') || e.target.closest('.map-top-toolbar') || 
                     e.target.closest('.map-zoom-controls') || e.target.closest('.map-aux-controls') || 
                     e.target.closest('.map-quick-toolbar') || e.target.closest('.credit-dev-badge')) return;
 
@@ -2449,6 +2495,97 @@
             routeSvg.style.display = 'block';
         };
 
+        window.cariMatrixRute = function(asal, tujuan) {
+            if (!dataMatrixRute || !asal || !tujuan) return null;
+            const cleanAsal = String(asal).trim().toLowerCase();
+            const cleanTujuan = String(tujuan).trim().toLowerCase();
+
+            return dataMatrixRute.find(m => {
+                const mAsal = String(m.lokasi_asal || m.nama_asal || '').trim().toLowerCase();
+                const mTujuan = String(m.lokasi_tujuan || m.nama_tujuan || '').trim().toLowerCase();
+
+                const asalMatch = (mAsal === cleanAsal) || (mAsal.length > 2 && cleanAsal.includes(mAsal)) || (cleanAsal.length > 2 && mAsal.includes(cleanAsal));
+                const tujuanMatch = (mTujuan === cleanTujuan) || (mTujuan.length > 2 && cleanTujuan.includes(mTujuan)) || (cleanTujuan.length > 2 && mTujuan.includes(cleanTujuan));
+
+                return asalMatch && tujuanMatch;
+            }) || null;
+        };
+
+        window.syncAndFilterLokasiAsalDenganHotspots = function() {
+            if (!dataHotspots || dataHotspots.length === 0) return;
+
+            let hotspotNamesSet = new Set();
+            dataHotspots.forEach(h => {
+                let nBang = String(h.nama_bangunan || '').trim();
+                let tLok = String(h.target_lokasi || '').trim();
+                let nGed = String(h.nomor_gedung || h.nomor || '').trim();
+
+                if (nBang) hotspotNamesSet.add(nBang);
+                if (tLok) hotspotNamesSet.add(tLok);
+                if (nGed && nBang && !nBang.startsWith(nGed)) {
+                    hotspotNamesSet.add(`${nGed} - ${nBang}`);
+                }
+            });
+
+            // Filter dataLokasiAsal: hanya yang memiliki titik hotspot aktif di peta
+            let filteredAsal = (dataLokasiAsal || []).filter(asalName => {
+                if (!asalName) return false;
+                let clean = String(asalName).trim().toLowerCase();
+                return dataHotspots.some(h => {
+                    let nBang = String(h.nama_bangunan || '').trim().toLowerCase();
+                    let tLok = String(h.target_lokasi || '').trim().toLowerCase();
+                    let nGed = String(h.nomor_gedung || h.nomor || '').trim().toLowerCase();
+                    let cleanNumMatch = clean.match(/\d+/);
+                    let numStr = cleanNumMatch ? cleanNumMatch[0] : null;
+
+                    if (nBang && (clean === nBang || clean.includes(nBang) || nBang.includes(clean))) return true;
+                    if (tLok && (clean === tLok || clean.includes(tLok) || tLok.includes(clean))) return true;
+                    if (numStr && (nGed === numStr || parseInt(nGed) === parseInt(numStr))) return true;
+                    return false;
+                });
+            });
+
+            // Tambahkan nama hotspot dari dataHotspots yang belum terdaftar di filteredAsal
+            hotspotNamesSet.forEach(hName => {
+                let cleanH = hName.toLowerCase();
+                let exists = filteredAsal.some(a => String(a || '').trim().toLowerCase() === cleanH);
+                if (!exists) {
+                    filteredAsal.push(hName);
+                }
+            });
+
+            // Urutkan secara terstruktur berdasarkan nomor gedung
+            filteredAsal.sort((a, b) => {
+                let numA = extractNumber(a);
+                let numB = extractNumber(b);
+                if (numA !== numB) return numA - numB;
+                return a.localeCompare(b);
+            });
+
+            dataLokasiAsal = filteredAsal;
+
+            // Re-render semua dropdown pilihan titik awal
+            if (typeof window.renderDropdownAsal === 'function') {
+                window.renderDropdownAsal();
+            }
+            if (typeof window.renderMatrixAdminList === 'function') {
+                window.renderMatrixAdminList();
+            }
+
+            const edAsal = document.getElementById('editor-route-asal');
+            if (edAsal) {
+                let currVal = edAsal.value;
+                edAsal.innerHTML = '<option value="">-- Pilih Titik Awal --</option>';
+                dataLokasiAsal.forEach(nama => {
+                    let opt = document.createElement('option');
+                    opt.value = nama;
+                    opt.innerText = nama;
+                    if (nama === currVal) opt.selected = true;
+                    edAsal.appendChild(opt);
+                });
+            }
+        };
+
         window.renderGarisRuteSVG = function(coordAsal, coordTujuan, matchMatrix = null) {
             const routeSvg = document.getElementById('route-svg');
             const routePath = document.getElementById('route-path');
@@ -2464,13 +2601,13 @@
                 return;
             }
 
-            if (!coordAsal || !coordTujuan || !routeSvg) {
-                if (routeSvg && !window.tampilkanSemuaJalurMatrix) routeSvg.style.display = 'none';
-                return;
+            let pts = [];
+            // Auto lookup matchMatrix if not explicitly passed
+            if (!matchMatrix && typeof lokasiAsal !== 'undefined' && typeof lokasiTujuan !== 'undefined' && lokasiAsal && lokasiTujuan) {
+                matchMatrix = window.cariMatrixRute(lokasiAsal, lokasiTujuan);
             }
 
-            let pts = [];
-            // Check if matchMatrix has saved waypoints
+            // Parse waypoints from matchMatrix if available
             if (matchMatrix && matchMatrix.waypoints) {
                 try {
                     let parsed = typeof matchMatrix.waypoints === 'string' ? JSON.parse(matchMatrix.waypoints) : matchMatrix.waypoints;
@@ -2480,16 +2617,33 @@
                 } catch(e){}
             }
 
-            // Fallback to start -> destination
+            // Infer coordinates if missing
+            if (!coordAsal && pts.length >= 1) {
+                coordAsal = { x: parseFloat(pts[0].x), y: parseFloat(pts[0].y) };
+            } else if (!coordAsal && typeof lokasiAsal !== 'undefined' && lokasiAsal) {
+                coordAsal = window.getCoordinatesForLokasi(lokasiAsal);
+            }
+
+            if (!coordTujuan && pts.length >= 2) {
+                coordTujuan = { x: parseFloat(pts[pts.length - 1].x), y: parseFloat(pts[pts.length - 1].y) };
+            } else if (!coordTujuan && typeof lokasiTujuan !== 'undefined' && lokasiTujuan) {
+                coordTujuan = window.getCoordinatesForLokasi(lokasiTujuan);
+            }
+
+            if (!coordAsal || !coordTujuan || !routeSvg) {
+                if (routeSvg && !window.tampilkanSemuaJalurMatrix) routeSvg.style.display = 'none';
+                return;
+            }
+
+            // Fallback points array
             if (pts.length < 2) {
                 pts = [
                     { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
                     { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
                 ];
             } else {
-                // Ensure start and end match current locations
-                pts[0] = { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) };
-                pts[pts.length - 1] = { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) };
+                if (coordAsal) pts[0] = { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) };
+                if (coordTujuan) pts[pts.length - 1] = { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) };
             }
 
             // Build SVG Path 'd' attribute
@@ -2514,26 +2668,32 @@
                 routeStart.setAttribute('cx', pts[0].x);
                 routeStart.setAttribute('cy', pts[0].y);
                 routeStart.setAttribute('r', dotSize);
+                routeStart.setAttribute('fill', '#D4AF37');
+                routeStart.style.display = 'block';
             }
 
             if (routeEnd) {
                 routeEnd.setAttribute('cx', pts[pts.length - 1].x);
                 routeEnd.setAttribute('cy', pts[pts.length - 1].y);
                 routeEnd.setAttribute('r', dotSize);
+                routeEnd.setAttribute('fill', '#2ecc71');
+                routeEnd.style.display = 'block';
             }
 
-            // Animated traveling dot
             if (routeGlowDot && routeDotAnim) {
+                routeGlowDot.setAttribute('cx', pts[0].x);
+                routeGlowDot.setAttribute('cy', pts[0].y);
+                routeGlowDot.setAttribute('r', Math.max(0.8, parseFloat(dotSize) * 0.8));
                 routeGlowDot.setAttribute('fill', color === '#00a8ff' ? '#00ffff' : color);
-                routeGlowDot.setAttribute('r', Math.max(0.8, dotSize * 0.8));
                 routeDotAnim.setAttribute('path', pathD);
+                routeDotAnim.setAttribute('dur', styleType === 'glow' ? '2.5s' : '4s');
                 routeGlowDot.style.display = 'block';
             }
 
             if (handlesGroup && !window.isPickingRouteWaypoint) {
                 if (pts.length > 2) {
                     let turnHtml = pts.slice(1, pts.length - 1).map((p) => {
-                        return `<circle cx="${p.x}" cy="${p.y}" r="0.7" fill="${color}" fill-opacity="0.8" stroke="#ffffff" stroke-width="0.3" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>`;
+                        return `<circle cx="${p.x}" cy="${p.y}" r="${Math.max(0.6, dotSize * 0.6)}" fill="${color}" fill-opacity="0.95" stroke="#ffffff" stroke-width="0.3" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>`;
                     }).join('');
                     handlesGroup.innerHTML = turnHtml;
                 } else {
@@ -3318,6 +3478,9 @@
                 document.getElementById('start-overlay').style.pointerEvents = "auto";
                 
                 renderHotspotsToMap();
+                if (typeof window.syncAndFilterLokasiAsalDenganHotspots === 'function') {
+                    window.syncAndFilterLokasiAsalDenganHotspots();
+                }
                 renderAllAdminLists();
                 if(typeof window.inisialisasiDaftarTujuan === 'function') window.inisialisasiDaftarTujuan();
                 if(typeof window.renderTombolTujuan === 'function') window.renderTombolTujuan();
@@ -3777,6 +3940,92 @@
 
 
         
+        window.pilihDanTampilkanRuteJalur = function(id) {
+            const d = dataMatrixRute.find(m => m.id == id);
+            if (!d) return;
+
+            const asal = d.lokasi_asal || d.nama_asal;
+            const tujuan = d.lokasi_tujuan || d.nama_tujuan;
+
+            // 1. Set global active origin & destination
+            window.lokasiAsal = asal;
+            window.lokasiTujuan = tujuan;
+            window.tampilkanGarisRute = true;
+
+            // 2. Sync visitor dropdowns / badges
+            const elAsalDropdown = document.getElementById('select-asal-dropdown') || document.getElementById('select-lokasi-asal');
+            if (elAsalDropdown) elAsalDropdown.value = asal;
+
+            const btnTujuan = document.getElementById('custom-tujuan-btn');
+            if (btnTujuan) {
+                btnTujuan.innerHTML = `${tujuan} <span style="float:right; font-size:10px; margin-top:2px;">▼</span>`;
+            }
+
+            const elBadgeAsal = document.getElementById('popup-badge-asal');
+            if (elBadgeAsal) elBadgeAsal.innerText = asal;
+            const elBadgeTuj = document.getElementById('popup-badge-tujuan');
+            if (elBadgeTuj) elBadgeTuj.innerText = tujuan;
+
+            // 3. Render SVG route on map with waypoints & styling
+            const coordAsal = window.getCoordinatesForLokasi(asal);
+            const coordTujuan = window.getCoordinatesForLokasi(tujuan);
+            if (typeof window.renderGarisRuteSVG === 'function') {
+                window.renderGarisRuteSVG(coordAsal, coordTujuan, d);
+            }
+
+            // 4. Sync Jalur Editor controls
+            const edAsal = document.getElementById('editor-route-asal');
+            const edTujuan = document.getElementById('editor-route-tujuan');
+            if (edAsal && edTujuan) {
+                edAsal.value = asal;
+                edTujuan.value = tujuan;
+                if (typeof window.muatJalurRuteEditor === 'function') {
+                    window.muatJalurRuteEditor();
+                }
+            }
+
+            // 5. Highlight active row in table
+            document.querySelectorAll('.matrix-table-row').forEach(tr => {
+                tr.style.background = 'none';
+                tr.style.borderLeft = 'none';
+                tr.classList.remove('selected-route-row');
+            });
+            const rowEl = document.getElementById(`matrix-row-${id}`);
+            if (rowEl) {
+                rowEl.style.background = 'rgba(0, 168, 255, 0.22)';
+                rowEl.style.borderLeft = '4px solid #00a8ff';
+                rowEl.classList.add('selected-route-row');
+            }
+
+            // 6. Toast Notification
+            let wptInfo = "Lurus Standard";
+            if (d.waypoints) {
+                try {
+                    let parsed = typeof d.waypoints === 'string' ? JSON.parse(d.waypoints) : d.waypoints;
+                    if (Array.isArray(parsed) && parsed.length >= 3) {
+                        wptInfo = `${parsed.length} Point Custom`;
+                    }
+                } catch(e){}
+            }
+
+            if (window.tampilkanToast) {
+                window.tampilkanToast(`🎯 Rute & Jalur: [ ${asal} ➔ ${tujuan} ] (${wptInfo}) tampil di peta!`);
+            }
+        };
+
+        window.bukaEditorJalurMatrix = function(id) {
+            const d = dataMatrixRute.find(m => m.id == id);
+            if (!d) return;
+
+            window.pilihDanTampilkanRuteJalur(id);
+
+            // Smooth scroll to Jalur Editor section
+            const secEditor = document.getElementById('section-rute-editor');
+            if (secEditor) {
+                secEditor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
         window.renderMatrixAdminList = function() {
             const list = document.getElementById('list-matrix'); if(!list) return; list.innerHTML = '';
             
@@ -3801,11 +4050,92 @@
                 if(divTujuanMulti) divTujuanMulti.innerHTML += `<label style="display:block; padding:4px; font-size:12px; border-bottom:1px solid #333;"><input type="checkbox" value="${nama}" class="chk-tujuan-multi"> ${nama}</label>`;
             });
             
-            // Render list
+            if (!dataMatrixRute || dataMatrixRute.length === 0) {
+                list.innerHTML = `<div style="padding:15px; text-align:center; color:#888; font-size:12px;">Belum ada data rute matriks tersimpan.</div>`;
+                return;
+            }
+
+            // Render Tabel Integrasi Matriks Rute & Jalur
+            let tableHtml = `
+            <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left; background:#111; color:#eee;">
+                <thead>
+                    <tr style="background:#1a1a1a; color:#D4AF37; border-bottom:1px solid #333; position:sticky; top:0; z-index:2;">
+                        <th style="padding:8px 6px; border-right:1px solid #222; width:28%;">📍 Titik Awal</th>
+                        <th style="padding:8px 6px; border-right:1px solid #222; width:28%;">🎯 Lokasi Tujuan</th>
+                        <th style="padding:8px 6px; border-right:1px solid #222; width:24%;">🛣️ Kolom Jalur</th>
+                        <th style="padding:8px 6px; text-align:center; width:20%;">⚡ Aksi / Preview</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
             dataMatrixRute.forEach(d => {
-                list.innerHTML += `<div class="data-item"><div class="data-item-name">${d.lokasi_asal} ➔ ${d.lokasi_tujuan}</div><div class="data-item-actions"><button class="action-btn" title="Edit" onclick="editFormMatrix('${d.id}')">✏️</button><button class="action-btn" title="Hapus" onclick="hapusMatrix('${d.id}')">🗑️</button></div></div>`;
+                const asal = d.lokasi_asal || d.nama_asal || '-';
+                const tujuan = d.lokasi_tujuan || d.nama_tujuan || '-';
+                const color = d.warna_jalur || '#00a8ff';
+                const styleAnim = (d.gaya_animasi === 'glow') ? '🌟 Glow' : '✨ Dash';
+                const lineWidth = d.ketebalan_garis || 1.8;
+
+                // Check waypoints status
+                let wptCount = 0;
+                let hasCustomJalur = false;
+                if (d.waypoints) {
+                    try {
+                        let parsed = typeof d.waypoints === 'string' ? JSON.parse(d.waypoints) : d.waypoints;
+                        if (Array.isArray(parsed) && parsed.length >= 2) {
+                            wptCount = parsed.length;
+                            if (wptCount >= 3) hasCustomJalur = true;
+                        }
+                    } catch(e) {}
+                }
+
+                let jalurBadge = '';
+                if (hasCustomJalur) {
+                    jalurBadge = `
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="background:${color}22; color:${color}; border:1px solid ${color}; padding:2px 5px; border-radius:4px; font-weight:bold; font-size:10px; display:inline-flex; align-items:center; gap:4px; width:fit-content;">
+                            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:${color};"></span> 🛣️ Custom (${wptCount} Pt)
+                        </span>
+                        <span style="font-size:9px; color:#888;">${styleAnim} • ${lineWidth}px</span>
+                    </div>`;
+                } else {
+                    jalurBadge = `
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <span style="background:#222; color:#aaa; border:1px solid #444; padding:2px 5px; border-radius:4px; font-size:10px; display:inline-flex; align-items:center; gap:4px; width:fit-content;">
+                            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:${color};"></span> ➖ Lurus Standard
+                        </span>
+                        <span style="font-size:9px; color:#888;">${styleAnim} • ${lineWidth}px</span>
+                    </div>`;
+                }
+
+                const isSelected = (window.lokasiAsal === asal && window.lokasiTujuan === tujuan);
+                const rowBg = isSelected ? 'background: rgba(0, 168, 255, 0.22); border-left:4px solid #00a8ff;' : 'border-bottom:1px solid #222;';
+
+                tableHtml += `
+                <tr id="matrix-row-${d.id}" class="matrix-table-row ${isSelected ? 'selected-route-row' : ''}" style="${rowBg} transition:background 0.2s;" onclick="window.pilihDanTampilkanRuteJalur('${d.id}')">
+                    <td style="padding:6px; font-weight:bold; color:#fff; border-right:1px solid #222;">
+                        📍 ${asal}
+                    </td>
+                    <td style="padding:6px; font-weight:bold; color:#00ffff; border-right:1px solid #222;">
+                        🎯 ${tujuan}
+                    </td>
+                    <td style="padding:6px; border-right:1px solid #222;">
+                        ${jalurBadge}
+                    </td>
+                    <td style="padding:6px; text-align:center;">
+                        <div style="display:flex; gap:3px; justify-content:center; flex-wrap:wrap;" onclick="event.stopPropagation();">
+                            <button type="button" class="action-btn" title="Pilih & Preview Rute di Peta" style="background:#00a8ff22; color:#00ffff; border:1px solid #00a8ff; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" onclick="window.pilihDanTampilkanRuteJalur('${d.id}')">🎯 Pilih</button>
+                            <button type="button" class="action-btn" title="Edit Jalur Belokan" style="background:#d4af3722; color:#D4AF37; border:1px solid #d4af37; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" onclick="window.bukaEditorJalurMatrix('${d.id}')">🎨 Jalur</button>
+                            <button type="button" class="action-btn" title="Edit Instruksi" style="background:#222; color:#fff; border:1px solid #444; padding:3px 5px; border-radius:4px; font-size:10px; cursor:pointer;" onclick="window.editFormMatrix('${d.id}')">✏️</button>
+                            <button type="button" class="action-btn" title="Hapus Rute" style="background:#8B0000; color:#fff; border:1px solid #5c0000; padding:3px 5px; border-radius:4px; font-size:10px; cursor:pointer;" onclick="window.hapusMatrix('${d.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`;
             });
-        }
+
+            tableHtml += `</tbody></table>`;
+            list.innerHTML = tableHtml;
+        };
         
         window.gantiModeMatrix = function() {
             const mode = document.getElementById('matrix-mode').value;
@@ -3840,15 +4170,82 @@
         
         window.getCoordinatesForLokasi = function(nama) {
             if (!nama) return null;
-            const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama || h.nama === nama);
+            const strNama = String(nama).trim();
+            const cleanNama = strNama.toLowerCase();
+
+            // 1. Direct exact / clean match on dataHotspots
+            let hs = dataHotspots.find(h => {
+                const tLok = h.target_lokasi ? String(h.target_lokasi).trim().toLowerCase() : '';
+                const nBang = h.nama_bangunan ? String(h.nama_bangunan).trim().toLowerCase() : '';
+                const hName = h.nama ? String(h.nama).trim().toLowerCase() : '';
+                const nGed = h.nomor_gedung ? String(h.nomor_gedung).trim().toLowerCase() : '';
+                const nNo = h.nomor ? String(h.nomor).trim().toLowerCase() : '';
+                return tLok === cleanNama || nBang === cleanNama || hName === cleanNama || nGed === cleanNama || nNo === cleanNama;
+            });
+
+            // 2. Partial / Substring / Number match on dataHotspots
+            if (!hs) {
+                const numMatch = cleanNama.match(/\d+/);
+                const numStr = numMatch ? numMatch[0] : null;
+
+                hs = dataHotspots.find(h => {
+                    const tLok = h.target_lokasi ? String(h.target_lokasi).trim().toLowerCase() : '';
+                    const nBang = h.nama_bangunan ? String(h.nama_bangunan).trim().toLowerCase() : '';
+                    const nGed = h.nomor_gedung ? String(h.nomor_gedung).trim() : '';
+                    const nNo = h.nomor ? String(h.nomor).trim() : '';
+
+                    if (cleanNama.includes(tLok) && tLok.length > 2) return true;
+                    if (tLok.includes(cleanNama) && cleanNama.length > 2) return true;
+                    if (cleanNama.includes(nBang) && nBang.length > 2) return true;
+                    if (nBang.includes(cleanNama) && cleanNama.length > 2) return true;
+
+                    if (numStr && (nGed === numStr || nNo === numStr || parseInt(nGed) === parseInt(numStr) || parseInt(nNo) === parseInt(numStr))) return true;
+                    return false;
+                });
+            }
+
             if (hs) return { x: parseFloat(hs.x_pos || hs.pos_left || 50), y: parseFloat(hs.y_pos || hs.pos_top || 50) };
-            
+
+            // 3. Fallback: Check dataRute
+            if (typeof dataRute !== 'undefined' && dataRute) {
+                let rKey = Object.keys(dataRute).find(k => k.trim().toLowerCase() === cleanNama || cleanNama.includes(k.trim().toLowerCase()));
+                if (rKey && dataRute[rKey]) {
+                    let r = dataRute[rKey];
+                    if (r.x_pos || r.pos_left) return { x: parseFloat(r.x_pos || r.pos_left || 50), y: parseFloat(r.y_pos || r.pos_top || 50) };
+                }
+            }
+
+            // 4. Fallback: Check dataMatrixRute waypoints
+            if (typeof dataMatrixRute !== 'undefined' && dataMatrixRute) {
+                let m = dataMatrixRute.find(item => 
+                    (item.lokasi_asal && item.lokasi_asal.trim().toLowerCase() === cleanNama) ||
+                    (item.lokasi_tujuan && item.lokasi_tujuan.trim().toLowerCase() === cleanNama)
+                );
+                if (m && m.waypoints) {
+                    try {
+                        let w = typeof m.waypoints === 'string' ? JSON.parse(m.waypoints) : m.waypoints;
+                        if (Array.isArray(w) && w.length >= 1) {
+                            if (m.lokasi_asal && m.lokasi_asal.trim().toLowerCase() === cleanNama) {
+                                return { x: parseFloat(w[0].x), y: parseFloat(w[0].y) };
+                            } else if (m.lokasi_tujuan && m.lokasi_tujuan.trim().toLowerCase() === cleanNama) {
+                                return { x: parseFloat(w[w.length - 1].x), y: parseFloat(w[w.length - 1].y) };
+                            }
+                        }
+                    } catch(e) {}
+                }
+            }
+
+            // 5. Fallback: Check dataTitikKumpul
             if (typeof dataTitikKumpul !== 'undefined' && dataTitikKumpul) {
-                const tk = dataTitikKumpul.find(t => t.nama_titik === nama || t.nama === nama);
+                const tk = dataTitikKumpul.find(t => {
+                    const tkName = (t.nama_titik || t.nama || '').trim().toLowerCase();
+                    return tkName === cleanNama || cleanNama.includes(tkName);
+                });
                 if (tk) return { x: parseFloat(tk.x_pos || 50), y: parseFloat(tk.y_pos || 50) };
             }
+
             return null;
-        }
+        };
 
         window.pilihTujuan = function(tujuan, bukaModal = true, bacaSuara = true, isHotspotClick = false) {
             window.tutupDropdownTujuan();
@@ -3866,7 +4263,7 @@
                 window.collapseSidebarPanel();
             }
             
-            let matchMatrix = dataMatrixRute.find(m => m.lokasi_asal === lokasiAsal && m.lokasi_tujuan === tujuan);
+            let matchMatrix = window.cariMatrixRute ? window.cariMatrixRute(lokasiAsal, tujuan) : dataMatrixRute.find(m => m.lokasi_asal === lokasiAsal && m.lokasi_tujuan === tujuan);
             let ruteDefault = dataRute[tujuan] || {};
             
             let instruksiFinal = "";
@@ -3955,6 +4352,20 @@
                 document.getElementById('route-svg').style.display = 'block';
             } else {
                 document.getElementById('route-svg').style.display = 'none';
+            }
+
+            if (matchMatrix) {
+                document.querySelectorAll('.matrix-table-row').forEach(tr => {
+                    tr.style.background = 'none';
+                    tr.style.borderLeft = 'none';
+                    tr.classList.remove('selected-route-row');
+                });
+                const rowEl = document.getElementById(`matrix-row-${matchMatrix.id}`);
+                if (rowEl) {
+                    rowEl.style.background = 'rgba(0, 168, 255, 0.22)';
+                    rowEl.style.borderLeft = '4px solid #00a8ff';
+                    rowEl.classList.add('selected-route-row');
+                }
             }
             
             // Format TTS Sesuai Permintaan:
