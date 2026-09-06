@@ -216,12 +216,11 @@
             position: absolute;
             transform: translate(-50%, -50%);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 88;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
             pointer-events: auto;
             box-sizing: border-box;
             flex-shrink: 0;
@@ -234,36 +233,62 @@
             opacity: 1.0 !important;
         }
 
-        /* Posisi Label Fleksibel agar tidak menutupi hotspot/bangunan */
-        .titik-kumpul-marker.pos-atas {
-            flex-direction: column;
+        /* Posisi Label Fleksibel secara Absolut agar jangkar marker tetap presisi 100% pada titik (X%, Y%) */
+        .titik-kumpul-label {
+            position: absolute;
+            background: rgba(16, 124, 65, 0.92);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-sizing: border-box;
+            pointer-events: none; /* Clicks pass through label to hotspot underneath if overlapped */
+            z-index: 90;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
+
+        /* Posisi Label: Di Bawah Marker (Default) */
+        .titik-kumpul-marker .titik-kumpul-label,
+        .titik-kumpul-marker.pos-bawah .titik-kumpul-label {
+            top: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: auto; right: auto;
+        }
+        /* Posisi Label: Di Atas Marker */
         .titik-kumpul-marker.pos-atas .titik-kumpul-label {
-            order: -1;
-            margin-top: 0;
-            margin-bottom: 4px;
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            top: auto; right: auto;
         }
-        .titik-kumpul-marker.pos-kiri {
-            flex-direction: row;
-            align-items: center;
-        }
+        /* Posisi Label: Di Samping Kiri */
         .titik-kumpul-marker.pos-kiri .titik-kumpul-label {
-            order: -1;
-            margin-top: 0;
-            margin-right: 6px;
+            right: calc(100% + 6px);
+            top: 50%;
+            transform: translateY(-50%);
+            left: auto; bottom: auto;
         }
-        .titik-kumpul-marker.pos-kanan {
-            flex-direction: row;
-            align-items: center;
-        }
+        /* Posisi Label: Di Samping Kanan */
         .titik-kumpul-marker.pos-kanan .titik-kumpul-label {
-            margin-top: 0;
-            margin-left: 6px;
+            left: calc(100% + 6px);
+            top: 50%;
+            transform: translateY(-50%);
+            right: auto; bottom: auto;
         }
+        /* Posisi Label: Sembunyi (Tampil saat hover) */
         .titik-kumpul-marker.pos-sembunyi .titik-kumpul-label {
+            top: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s ease;
         }
         .titik-kumpul-marker.pos-sembunyi:hover .titik-kumpul-label {
             opacity: 1;
@@ -279,6 +304,8 @@
         }
 
         .titik-kumpul-icon-box {
+            width: 100%;
+            height: 100%;
             background: rgba(16, 124, 65, 0.88);
             border: 2px solid #FFFFFF;
             border-radius: 8px;
@@ -293,23 +320,6 @@
         .titik-kumpul-icon-box svg {
             fill: #FFFFFF;
             flex-shrink: 0;
-        }
-        .titik-kumpul-label {
-            margin-top: 4px;
-            background: rgba(16, 124, 65, 0.90);
-            color: #FFFFFF;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-sizing: border-box;
-            flex-shrink: 0;
-            pointer-events: none; /* Clicks pass through label to hotspot underneath if overlapped */
         }
         @keyframes pulseAssemblyPoint {
             0% { box-shadow: 0 0 6px rgba(16, 124, 65, 0.5); transform: scale(1); }
@@ -2969,18 +2979,21 @@
                 marker.style.left = tk.x + '%';
                 marker.style.top = tk.y + '%';
                 marker.style.width = size + 'px';
+                marker.style.height = size + 'px';
                 marker.style.minWidth = size + 'px';
+                marker.style.minHeight = size + 'px';
                 marker.style.maxWidth = size + 'px';
+                marker.style.maxHeight = size + 'px';
                 marker.style.flexShrink = '0';
                 marker.title = tk.nama;
 
                 marker.innerHTML = `
-                    <div class="titik-kumpul-icon-box" style="width:${size}px; height:${size}px; min-width:${size}px; min-height:${size}px; max-width:${size}px; max-height:${size}px; flex-shrink:0;">
+                    <div class="titik-kumpul-icon-box">
                         <svg viewBox="0 0 24 24" style="width:${svgSize}px; height:${svgSize}px; min-width:${svgSize}px; min-height:${svgSize}px; flex-shrink:0;">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-3H8l4-4 4 4h-3v3h-2zM7 7h10v2H7V7z"/>
                         </svg>
                     </div>
-                    <div class="titik-kumpul-label" style="font-size:${labelSize}px; white-space:nowrap; flex-shrink:0;">TK ${idx + 1}</div>
+                    <div class="titik-kumpul-label" style="font-size:${labelSize}px;">TK ${idx + 1}</div>
                 `;
 
                 marker.onclick = (e) => {
