@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Denah Digital - RS Atma Husada Mahakam</title>
+    <!-- jsPDF & AutoTable CDN untuk ekspor PDF Log Aktifitas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         /* =========================================
            PALET WARNA TEMA: Maroon, Black, Silver, Gold
@@ -208,6 +211,59 @@
         .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #8B0000 transparent transparent transparent; }
         .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
 
+        /* Titik Kumpul (Assembly Point) Overlay Markers */
+        .titik-kumpul-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 92;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+        }
+        .titik-kumpul-marker:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            z-index: 105;
+        }
+        .titik-kumpul-icon-box {
+            width: 38px;
+            height: 38px;
+            background: #107C41;
+            border: 2.5px solid #FFFFFF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6), 0 0 12px rgba(16, 124, 65, 0.85);
+            animation: pulseAssemblyPoint 1.8s infinite alternate ease-in-out;
+        }
+        .titik-kumpul-icon-box svg {
+            width: 22px;
+            height: 22px;
+            fill: #FFFFFF;
+        }
+        .titik-kumpul-label {
+            margin-top: 4px;
+            background: rgba(16, 124, 65, 0.95);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 12px;
+            border: 1px solid #FFFFFF;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @keyframes pulseAssemblyPoint {
+            0% { box-shadow: 0 0 8px rgba(16, 124, 65, 0.6); transform: scale(1); }
+            100% { box-shadow: 0 0 20px rgba(46, 204, 113, 0.95), 0 0 30px rgba(46, 204, 113, 0.6); transform: scale(1.08); }
+        }
+
         /* ------------------------------------------- */
         /* HUD KONTROL PETA & TOP TOOLBAR (SEJAJAR LANDSCAPE) */
         /* ------------------------------------------- */
@@ -349,9 +405,31 @@
                 display: none !important;
             }
             .btn-top-hud.btn-top-toggle {
-                display: none !important;
+                display: inline-flex !important;
             }
             #view-tujuan {
+                display: flex !important;
+            }
+            .sidebar.is-collapsed {
+                display: none !important;
+            }
+            .btn-hamburger-pc {
+                display: none;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+                background: #8B0000;
+                color: #FFF;
+                border: 1.5px solid #D4AF37;
+                border-radius: 6px;
+                padding: 8px 14px;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            }
+            .sidebar.is-collapsed + .map-view .btn-hamburger-pc {
                 display: flex !important;
             }
         }
@@ -761,18 +839,24 @@
             ⭐ Kepuasan Pengunjung: <strong style="color:#FFD700;" id="landing-rating-val">-</strong>/5 (<span id="landing-rating-count">0</span> Ulasan)
         </div>
         
-        <div id="front-form-container" style="display: none; background: #181818; padding: 20px; border-radius: 10px; margin-top: 15px; border: 1px solid #D4AF37; width: 85%; max-width: 320px; text-align: left;">
+        <div id="front-form-container" style="display: none; background: #181818; padding: 20px; border-radius: 10px; margin-top: 15px; border: 1px solid #D4AF37; width: 85%; max-width: 340px; text-align: left; box-shadow: 0 8px 25px rgba(0,0,0,0.8);">
 
-            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">NAMA ANDA:</label>
-            <input type="text" id="front-nama" placeholder="Masukkan nama..." onkeydown="if(event.key === 'Enter') mulaiAplikasi()" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 15px; box-sizing: border-box; font-size: 14px;">
+            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">👤 NAMA ANDA:</label>
+            <input type="text" id="front-nama" placeholder="Masukkan nama Anda..." onkeydown="if(event.key === 'Enter') mulaiAplikasi()" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 12px; box-sizing: border-box; font-size: 14px;">
             
-            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">AKSES SEBAGAI:</label>
-            <select id="front-akses" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 20px; box-sizing: border-box; font-size: 14px;">
-                <option value="pengunjung">Pengunjung</option>
-                <option value="staff">Staff</option>
+            <label style="color: #D4AF37; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">🛡️ PERAN / AKSES:</label>
+            <select id="front-akses" onchange="window.toggleFrontPinInput(this.value)" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; margin-bottom: 12px; box-sizing: border-box; font-size: 14px; cursor: pointer; font-weight: bold;">
+                <option value="pengunjung">Pengunjung Umum</option>
+                <option value="staf">Staf / Petugas Medis</option>
+                <option value="admin">Administrator / Pengelola</option>
             </select>
+
+            <div id="container-pin-front" style="display: none; margin-bottom: 15px; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #D4AF37;">
+                <label style="color: #FFD700; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block;">🔑 MASUKKAN PIN (6 DIGIT):</label>
+                <input type="password" id="front-pin" maxlength="6" placeholder="******" onkeydown="if(event.key === 'Enter') mulaiAplikasi()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #111; color: #FFF; box-sizing: border-box; font-size: 16px; letter-spacing: 4px; font-weight: bold; text-align: center;">
+            </div>
             
-            <button onclick="mulaiAplikasi()" style="width: 100%; padding: 14px; border-radius: 6px; border: none; background: #D4AF37; color: #111; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase;">MASUK / MULAI</button>
+            <button onclick="mulaiAplikasi()" style="width: 100%; padding: 14px; border-radius: 6px; border: none; background: #D4AF37; color: #111; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.background='#FFD700'" onmouseout="this.style.background='#D4AF37'">MASUK / MULAI</button>
         </div>
         
         <p id="loading-text" class="badge-status" style="margin-top: 20px;">⏳ Menghubungkan ke Server Database...</p>
@@ -788,6 +872,8 @@
                 <div class="sidebar-top-actions">
                     <button type="button" class="btn-top-hud" onclick="bukaModalQA()" title="Tanya Jawab Seputar RS">💬 Tanya</button>
                     <button type="button" class="btn-top-hud" onclick="bukaModalLogin()" title="Akses C-Panel Admin">⚙️ C-Panel</button>
+                    <button type="button" class="btn-top-hud" id="btn-fullscreen-toggle" onclick="toggleLayarPenuh()" title="Toggle Layar Penuh">⛶ Layar Penuh</button>
+                    <button type="button" class="btn-top-hud" style="background:#8B0000; color:#FFF; border-color:#FFD700;" onclick="keluarAplikasi()" title="Keluar / Akhiri Sesi">🚪 Keluar</button>
                     <button type="button" id="btn-toggle-sidebar" class="btn-top-hud btn-top-toggle" onclick="toggleSidebarPanel()" title="Buka / Tutup Pilihan Tujuan">▲ Tutup</button>
                 </div>
             </div>
@@ -823,13 +909,14 @@
 
         <!-- Area Denah Interaktif -->
         <div class="map-view" id="map-container-view">
+            <button type="button" id="btn-hamburger-pc" class="btn-hamburger-pc" onclick="toggleSidebarPanel()" title="Buka Sidebar Navigasi">☰ Navigasi</button>
             
             <div class="no-map-warning" id="no-map-warning">
                 ⚠️ GAMBAR PETA TIDAK TERSEDIA<br>
                 <span style="font-size:15px; color:#E0E0E0; font-weight:normal;">Silakan unggah berkas peta denah melalui C-Panel.</span>
             </div>
 
-            <!-- MAP TOP TOOLBAR (Sejajar Secara Landscape di Atas Peta) -->
+            <!-- MAP TOP TOOLBAR (Sejajar Secara Landscape di Atas Peta Sesuai Gambar 1) -->
             <div class="map-top-toolbar" id="map-top-toolbar">
                 <div class="map-zoom-controls" id="map-zoom-toolbar">
                     <button type="button" class="btn-zoom-ctrl" onclick="zoomPeta(0.2)" title="Perbesar Denah" aria-label="Perbesar Denah">➕</button>
@@ -837,6 +924,8 @@
                 </div>
                 <div class="toolbar-divider-v"></div>
                 <div class="map-aux-controls" id="map-aux-toolbar">
+                    <!-- Toggle Overlay Titik Kumpul Sejajar dengan Zoom -->
+                    <button type="button" class="btn-quick-ctrl" id="btn-toggle-titik-kumpul" onclick="toggleOverlayTitikKumpul()" title="Tampilkan / Sembunyikan Overlay Titik Kumpul (Assembly Point)" style="background:#107C41; color:#FFF; border-color:#2ecc71;">🟢</button>
                     <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
                     <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
                     <button type="button" class="btn-quick-ctrl" id="btn-hud-expand" onclick="toggleHud()" title="Rotasi & Opsi Lanjutan">🧭</button>
@@ -1083,6 +1172,84 @@
             </div>
         </div>
 
+        <!-- Section Titik Kumpul (Assembly Points) -->
+        <div class="admin-section" id="section-titik-kumpul" style="border-color: #107C41;">
+            <h3 style="color: #2ecc71;">🟢 Marker Titik Kumpul (Assembly Point)</h3>
+            <div class="data-list" id="list-titik-kumpul"></div>
+            <hr style="border-color:#333; margin:10px 0;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="color:#D4AF37; font-weight:bold;" id="label-mode-tk">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormTitikKumpul()">Batal</button>
+            </div>
+            
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Nama Titik Kumpul:</label>
+            <input type="text" id="tk-nama" placeholder="Misal: Titik Kumpul 1 (Depan Poliklinik & IGD)">
+
+            <button type="button" class="btn-save-admin" style="background: #107C41; color: #FFF; width: 100%; margin: 8px 0 5px 0; border-color: #2ecc71;" onclick="mulaiPilihKoordinatTK()">🖱️ Klik Lokasi di Peta untuk Set Koordinat</button>
+
+            <label style="font-size:12px; color:#C0C0C0;">Koordinat Posisi Persentase (%):</label>
+            <div class="flex-row">
+                <div><input type="number" id="tk-x" placeholder="X (%)" step="0.1"></div>
+                <div><input type="number" id="tk-y" placeholder="Y (%)" step="0.1"></div>
+            </div>
+
+            <button class="btn-save-admin" style="width: 100%; margin-top: 8px;" id="btn-save-tk" onclick="simpanTitikKumpul()">💾 Simpan Titik Kumpul</button>
+
+            <!-- Slider Ukuran Marker Titik Kumpul -->
+            <div style="margin-top: 12px; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #333;">
+                <label style="font-size:12px; color:#D4AF37; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📐 Ukuran Marker Titik Kumpul:</span>
+                    <span id="val-size-tk" style="color:#2ecc71; font-weight:900;">38px</span>
+                </label>
+                <input type="range" id="slider-size-tk" min="16" max="65" value="38" style="width:100%; margin-top:6px; cursor:pointer;" oninput="window.ubahUkuranMarkerTK(this.value)">
+            </div>
+        </div>
+
+        <!-- Section Hak Akses Role & Pengaturan PIN (Khusus SuperAdmin) -->
+        <div class="admin-section" id="section-role-permissions" style="border-color: #D4AF37; display: none;">
+            <h3 style="color: #FFD700;">🔐 Manajemen Role & Hak Akses Fitur</h3>
+            <p style="font-size:11px; color:#aaa; margin-bottom:10px;">Atur PIN login 6 digit dan centang hak akses fitur untuk setiap role (Admin & Staf).</p>
+            
+            <div style="background:#222; padding:10px; border-radius:6px; border:1px solid #444; margin-bottom:12px;">
+                <label style="font-size:12px; color:#D4AF37; font-weight:bold; display:block; margin-bottom:4px;">🔑 PIN Admin / Staf (6 Angka):</label>
+                <input type="text" id="input-pin-admin-6" placeholder="Misal: 123456" maxlength="6" style="letter-spacing:3px; font-weight:bold; font-size:14px;">
+                
+                <label style="font-size:12px; color:#FFD700; font-weight:bold; display:block; margin-top:8px; margin-bottom:4px;">👑 PIN SuperAdmin (6 Angka):</label>
+                <input type="text" id="input-pin-super-6" placeholder="Misal: 999999" maxlength="6" style="letter-spacing:3px; font-weight:bold; font-size:14px;">
+
+                <button class="btn-save-admin" style="background:#D4AF37; color:#111; font-weight:bold; margin-top:8px;" onclick="window.simpanPinRole()">💾 Update PIN Akses</button>
+            </div>
+
+            <h4 style="color:#FFF; font-size:13px; margin-bottom:6px;">📋 Matriks Ceklist Akses Fitur C-Panel:</h4>
+            <div style="max-height: 200px; overflow-y: auto; background:#111; padding:8px; border-radius:6px; border:1px solid #333;">
+                <table style="width:100%; font-size:11px; color:#DDD; border-collapse:collapse;">
+                    <thead>
+                        <tr style="border-bottom:1px solid #444; color:#D4AF37; text-align:left;">
+                            <th style="padding:4px;">Fitur / Modul</th>
+                            <th style="padding:4px; text-align:center;">Admin</th>
+                            <th style="padding:4px; text-align:center;">Staf</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-role-permissions">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-save-admin" style="width:100%; margin-top:8px; background:#107C41; border-color:#2ecc71;" onclick="window.simpanHakAksesRole()">💾 Simpan Ceklist Role</button>
+        </div>
+
+        <!-- Section Log Aktifitas Sistem -->
+        <div class="admin-section" id="section-log-aktivitas" style="border-color: #2980b9;">
+            <h3 style="color: #3498db;">📜 Log Aktifitas Pengguna</h3>
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <button class="btn-save-admin" style="flex:1; background:#27ae60; border-color:#2ecc71; font-size:11px; margin:0;" onclick="window.downloadLogPDF()">📄 Download PDF Log</button>
+                <button class="btn-cancel-admin" style="padding:6px 10px; font-size:11px; margin:0;" onclick="window.hapusSemuaLog()">🗑️ Bersihkan</button>
+            </div>
+            <input type="text" id="filter-log" placeholder="🔍 Cari nama, role, atau aksi log..." oninput="window.renderListLogAdmin()" style="font-size:12px; margin-bottom:6px;">
+            <div class="data-list" id="list-log-admin" style="max-height: 220px; overflow-y:auto; font-size:11px;"></div>
+        </div>
+
         <!-- Section TTS & Keamanan -->
         <div class="admin-section" id="section-tts">
             <h3>🎛️ Pengaturan Suara (TTS)</h3>
@@ -1119,10 +1286,26 @@
     <!-- POPUP INFO HOTSPOT KLIK BEBAS -->
     <div class="popup-overlay" id="hotspot-info-popup">
         <div class="popup-content" style="max-width: 440px;">
-            <h2 style="color: #D4AF37; margin-bottom: 5px;">🏢 Informasi Area</h2>
-            <h3 id="hs-info-nama" style="font-size: 22px; color: #8B0000; margin-bottom: 18px; font-weight: 800;">Nama Bangunan</h3>
+            <h2 style="color: #D4AF37; margin-bottom: 5px;">🏢 Informasi Area & Pemetaan K3</h2>
+            <h3 id="hs-info-nama" style="font-size: 22px; color: #8B0000; margin-bottom: 12px; font-weight: 800;">Nama Bangunan</h3>
+            
+            <!-- Keterangan Risiko K3 Hotspot Langsung dari Database map_hotspot -->
+            <div id="hs-info-k3-card" style="background:#FFFFFF; border:1.5px solid #D4AF37; padding:10px 14px; border-radius:10px; margin-bottom:14px; text-align:left; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                    <span id="hs-info-akses-badge" style="display:inline-flex; align-items:center; gap:5px; background:rgba(39,174,96,0.15); color:#1e824c; border:1.5px solid #27ae60; padding:3px 10px; border-radius:12px; font-weight:800; font-size:12px;">
+                        👥 Akses: Pengunjung & Pasien
+                    </span>
+                    <span id="hs-info-warna-badge" style="display:inline-flex; align-items:center; gap:5px; background:rgba(212,175,55,0.15); color:#8B0000; border:1.5px solid #D4AF37; padding:3px 10px; border-radius:12px; font-weight:800; font-size:12px;">
+                        🎨 Area K3
+                    </span>
+                </div>
+                <div style="color:#222; font-size:13px; line-height:1.45; border-top:1px dashed #D4AF37; padding-top:6px;">
+                    <span style="color:#8B0000; font-weight:bold;">⚠️ Tingkat Risiko K3:</span> <span id="hs-info-resiko-teks" style="font-weight:600; color:#333;">-</span>
+                </div>
+            </div>
+
             <div id="hs-info-action"></div>
-            <button class="btn-primary btn-danger" style="margin-top:12px;" onclick="tutupModal('hotspot-info-popup')">❌ Tutup</button>
+            <button class="btn-primary btn-danger" style="margin-top:8px;" onclick="tutupModal('hotspot-info-popup')">❌ Tutup</button>
         </div>
     </div>
 
@@ -1754,6 +1937,25 @@
             mapView.addEventListener('touchcancel', endTouch, { passive: true });
         }
 
+        if (mapWrapper) {
+            mapWrapper.addEventListener('click', (e) => {
+                if (typeof isPickingTKCoord !== 'undefined' && isPickingTKCoord) {
+                    e.stopPropagation();
+                    const rect = mapWrapper.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    const elX = document.getElementById('tk-x');
+                    const elY = document.getElementById('tk-y');
+                    if (elX) elX.value = x.toFixed(1);
+                    if (elY) elY.value = y.toFixed(1);
+                    isPickingTKCoord = false;
+                    if (window.tampilkanToast) {
+                        window.tampilkanToast(`📍 Koordinat TK di-set: X ${x.toFixed(1)}%, Y ${y.toFixed(1)}%`);
+                    }
+                }
+            });
+        }
+
         // ==========================================
         // FETCH DATA SUPABASE
         // ==========================================
@@ -1929,6 +2131,7 @@
             tujuanKeys.forEach(nama => { selectTarget.innerHTML += `<option value="${nama}">${nama}</option>`; });
 
             if(window.renderMatrixAdminList) window.renderMatrixAdminList();
+            if(window.renderListTitikKumpulAdmin) window.renderListTitikKumpulAdmin();
         }
 
         window.resetFormAsal = function() { editAsalName = null; document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru"; document.getElementById('admin-nama-asal').value = ""; }
@@ -2554,15 +2757,303 @@
         }
 
         
+        // ==========================================
+        // TITIK KUMPUL (ASSEMBLY POINT) OVERLAY & CRUD
+        // ==========================================
+        let tampilkanTitikKumpul = true;
+        let idEditTK = null;
+        let isPickingTKCoord = false;
+
+        let dataTitikKumpul = [];
+        try {
+            const savedTK = localStorage.getItem('dataTitikKumpul');
+            if (savedTK) dataTitikKumpul = JSON.parse(savedTK);
+        } catch(e) {}
+
+        if (!dataTitikKumpul || dataTitikKumpul.length === 0) {
+            dataTitikKumpul = [
+                { id: 'tk-1', nama: 'Titik Kumpul 1 (Depan Poliklinik & IGD)', x: 18, y: 32 },
+                { id: 'tk-2', nama: 'Titik Kumpul 2 (Area Parkir & Lapangan)', x: 82, y: 72 },
+                { id: 'tk-3', nama: 'Titik Kumpul 3 (Halaman Tengah)', x: 50, y: 48 }
+            ];
+        }
+
+        window.renderListTitikKumpulAdmin = function() {
+            const listEl = document.getElementById('list-titik-kumpul');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            if (dataTitikKumpul.length === 0) {
+                listEl.innerHTML = '<div style="color:#888; font-size:12px; font-style:italic;">Belum ada marker titik kumpul.</div>';
+                return;
+            }
+            dataTitikKumpul.forEach((tk, idx) => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:#222; margin-bottom:5px; border-radius:4px; border:1px solid #333;';
+                div.innerHTML = `
+                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:8px;">
+                        <strong style="color:#2ecc71;">TK ${idx + 1}: ${tk.nama}</strong>
+                        <div style="font-size:11px; color:#aaa;">X: ${tk.x}%, Y: ${tk.y}%</div>
+                    </div>
+                    <div style="display:flex; gap:4px; flex-shrink:0;">
+                        <button type="button" class="btn-mini-action" onclick="editTitikKumpul('${tk.id}')">✏️ Edit</button>
+                        <button type="button" class="btn-delete-admin" style="padding:2px 6px; font-size:11px; margin:0;" onclick="hapusTitikKumpul('${tk.id}')">🗑️ Hapus</button>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        };
+
+        window.simpanTitikKumpul = function() {
+            const nama = document.getElementById('tk-nama').value.trim();
+            const x = parseFloat(document.getElementById('tk-x').value);
+            const y = parseFloat(document.getElementById('tk-y').value);
+
+            if (!nama || isNaN(x) || isNaN(y)) {
+                alert("Mohon lengkapi Nama, Koordinat X, dan Koordinat Y.");
+                return;
+            }
+
+            if (idEditTK) {
+                const index = dataTitikKumpul.findIndex(t => t.id === idEditTK);
+                if (index !== -1) {
+                    dataTitikKumpul[index] = { id: idEditTK, nama, x, y };
+                }
+            } else {
+                const newId = 'tk-' + Date.now();
+                dataTitikKumpul.push({ id: newId, nama, x, y });
+            }
+
+            try {
+                localStorage.setItem('dataTitikKumpul', JSON.stringify(dataTitikKumpul));
+            } catch(e) {}
+
+            if (window.tampilkanToast) window.tampilkanToast("💾 Titik Kumpul berhasil disimpan!");
+            window.resetFormTitikKumpul();
+            window.renderListTitikKumpulAdmin();
+            window.renderOverlayTitikKumpul();
+        };
+
+        window.editTitikKumpul = function(id) {
+            const item = dataTitikKumpul.find(t => t.id === id);
+            if (!item) return;
+            idEditTK = id;
+            document.getElementById('tk-nama').value = item.nama;
+            document.getElementById('tk-x').value = item.x;
+            document.getElementById('tk-y').value = item.y;
+            document.getElementById('label-mode-tk').innerText = `Mode: [ Edit TK ${item.nama} ]`;
+        };
+
+        window.hapusTitikKumpul = function(id) {
+            if (!confirm("Yakin ingin menghapus titik kumpul ini?")) return;
+            dataTitikKumpul = dataTitikKumpul.filter(t => t.id !== id);
+            try {
+                localStorage.setItem('dataTitikKumpul', JSON.stringify(dataTitikKumpul));
+            } catch(e) {}
+            window.renderListTitikKumpulAdmin();
+            window.renderOverlayTitikKumpul();
+            if (window.tampilkanToast) window.tampilkanToast("🗑️ Titik Kumpul dihapus!");
+        };
+
+        window.resetFormTitikKumpul = function() {
+            idEditTK = null;
+            document.getElementById('tk-nama').value = '';
+            document.getElementById('tk-x').value = '';
+            document.getElementById('tk-y').value = '';
+            document.getElementById('label-mode-tk').innerText = 'Mode: [ Tambah Baru ]';
+            isPickingTKCoord = false;
+        };
+
+        window.mulaiPilihKoordinatTK = function() {
+            isPickingTKCoord = true;
+            if (window.tampilkanToast) window.tampilkanToast("🖱️ Klik lokasi di denah peta untuk menentukan posisi Titik Kumpul");
+        };
+
+        window.renderOverlayTitikKumpul = function() {
+            document.querySelectorAll('.titik-kumpul-marker').forEach(el => el.remove());
+            if (!tampilkanTitikKumpul) return;
+
+            const mapWrapper = document.getElementById('interactive-map');
+            if (!mapWrapper) return;
+
+            const size = typeof ukuranTitikKumpul !== 'undefined' ? ukuranTitikKumpul : 38;
+            const svgSize = Math.max(12, Math.round(size * 0.58));
+            const labelSize = Math.max(9, Math.round(size * 0.28));
+
+            dataTitikKumpul.forEach((tk, idx) => {
+                const marker = document.createElement('div');
+                marker.className = 'titik-kumpul-marker';
+                marker.style.left = tk.x + '%';
+                marker.style.top = tk.y + '%';
+                marker.title = tk.nama;
+
+                marker.innerHTML = `
+                    <div class="titik-kumpul-icon-box" style="width:${size}px; height:${size}px;">
+                        <svg viewBox="0 0 24 24" style="width:${svgSize}px; height:${svgSize}px;">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-3H8l4-4 4 4h-3v3h-2zM7 7h10v2H7V7z"/>
+                        </svg>
+                    </div>
+                    <div class="titik-kumpul-label" style="font-size:${labelSize}px;">TK ${idx + 1}</div>
+                `;
+
+                marker.onclick = (e) => {
+                    e.stopPropagation();
+                    if (window.tampilkanToast) {
+                        window.tampilkanToast(`🟢 ${tk.nama}`);
+                    }
+                    if (window.bicara) {
+                        window.bicara(`Ini adalah area aman ${tk.nama}. Ikuti jalur evakuasi hijau menuju titik ini.`);
+                    }
+                };
+
+                mapWrapper.appendChild(marker);
+            });
+        };
+
+        window.toggleOverlayTitikKumpul = function() {
+            tampilkanTitikKumpul = !tampilkanTitikKumpul;
+            const btn = document.getElementById('btn-toggle-titik-kumpul');
+            if (btn) {
+                if (tampilkanTitikKumpul) {
+                    btn.style.background = '#107C41';
+                    btn.style.borderColor = '#2ecc71';
+                    btn.title = "Sembunyikan Overlay Titik Kumpul";
+                    if (window.tampilkanToast) window.tampilkanToast("🟢 Overlay Titik Kumpul Aktif");
+                } else {
+                    btn.style.background = '#333333';
+                    btn.style.borderColor = '#666666';
+                    btn.title = "Tampilkan Overlay Titik Kumpul";
+                    if (window.tampilkanToast) window.tampilkanToast("⚪ Overlay Titik Kumpul Dinonaktifkan");
+                }
+            }
+            window.renderOverlayTitikKumpul();
+        };
+
+        // ==========================================
+        // AUTO FULLSCREEN & KONTROL KELUAR APLIKASI
+        // ==========================================
+        let isForcedFullscreen = false;
+
+        window.mintaFullscreen = function() {
+            const docEl = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (docEl.requestFullscreen) {
+                    docEl.requestFullscreen().catch(err => {
+                        console.warn("Fullscreen request:", err.message);
+                    });
+                } else if (docEl.webkitRequestFullscreen) {
+                    docEl.webkitRequestFullscreen();
+                }
+            }
+        };
+
+        window.toggleLayarPenuh = function() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                window.mintaFullscreen();
+                const btn = document.getElementById('btn-fullscreen-toggle');
+                if (btn) btn.innerHTML = '⛶ Keluar Layar Penuh';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                const btn = document.getElementById('btn-fullscreen-toggle');
+                if (btn) btn.innerHTML = '⛶ Layar Penuh';
+            }
+        };
+
+        window.keluarAplikasi = function() {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+            
+            if (window.catatLogAktivitas) {
+                window.catatLogAktivitas(window.currentUserName || 'Pengunjung', window.currentUserRole || 'pengunjung', "Keluar Sesi", "Mengakhiri penggunaan aplikasi");
+            }
+
+            // Reset state dan tampilkan start overlay
+            document.getElementById('start-overlay').style.display = 'flex';
+            if (document.getElementById('front-nama')) document.getElementById('front-nama').value = '';
+            if (document.getElementById('front-pin')) document.getElementById('front-pin').value = '';
+            window.currentUserName = '';
+            window.currentUserRole = 'pengunjung';
+            lokasiAsal = '';
+            lokasiTujuan = '';
+
+            const cpanel = document.getElementById('panel-cpanel');
+            if (cpanel) cpanel.classList.remove('open');
+
+            if (typeof window.resetPosisiPeta === 'function') {
+                window.resetPosisiPeta();
+            }
+            const navPopup = document.getElementById('nav-popup');
+            if (navPopup) navPopup.style.display = 'none';
+            const surveyPopup = document.getElementById('survey-popup');
+            if (surveyPopup) surveyPopup.style.display = 'none';
+
+            if (window.tampilkanToast) window.tampilkanToast("👋 Sesi telah diakhiri. Silakan masuk kembali.");
+        };
+
         window.mulaiAplikasi = function() {
-            const nama = document.getElementById('front-nama').value.trim();
-            if(!nama) {
+            const nama = (document.getElementById('front-nama')?.value || '').trim();
+            const aksesChoice = (document.getElementById('front-akses')?.value || 'pengunjung');
+            const frontPin = (document.getElementById('front-pin')?.value || '').trim();
+
+            if (!nama) {
                 alert("Mohon masukkan nama Anda terlebih dahulu.");
                 return;
             }
+
+            const currentAdminPin = localStorage.getItem('app_admin_pin_6') || '123456';
+            const currentSuperPin = localStorage.getItem('app_super_pin_6') || '999999';
+
+            if (aksesChoice === 'staf' || aksesChoice === 'admin') {
+                if (!frontPin) {
+                    alert("Mohon masukkan PIN 6 angka untuk akses " + aksesChoice.toUpperCase());
+                    return;
+                }
+                if (frontPin === currentSuperPin || frontPin === systemPIN) {
+                    window.currentUserRole = 'superadmin';
+                } else if (frontPin === currentAdminPin) {
+                    window.currentUserRole = aksesChoice;
+                } else {
+                    alert("⚠️ PIN Akses Salah! Silakan periksa kembali PIN Anda.");
+                    return;
+                }
+            } else {
+                window.currentUserRole = 'pengunjung';
+            }
+
             window.currentUserName = nama;
             document.getElementById('start-overlay').style.display = 'none';
-            if(window.bicara) {
+
+            // Auto Fullscreen Diawal
+            isForcedFullscreen = true;
+            window.mintaFullscreen();
+
+            // Default toolbar tutup pada mobile saat awal dibuka
+            if (window.innerWidth <= 950 && typeof window.collapseSidebarPanel === 'function') {
+                window.collapseSidebarPanel();
+            }
+
+            // Render overlay titik kumpul
+            window.renderOverlayTitikKumpul();
+
+            if (window.catatLogAktivitas) {
+                window.catatLogAktivitas(nama, window.currentUserRole, "Masuk Aplikasi", "Akses role: " + window.currentUserRole.toUpperCase());
+            }
+
+            if (window.tampilkanToast) {
+                window.tampilkanToast("Selamat Datang, " + nama + " [" + window.currentUserRole.toUpperCase() + "]");
+            }
+
+            if (window.bicara) {
                 window.bicara("Selamat datang di RS Atma Husada Mahakam, " + nama + ". Silakan pilih lokasi tujuan Anda.");
             }
         };
@@ -2783,14 +3274,63 @@
             });
         }
 
-        window.tampilkanInfoHotspot = function(nama, target) {
+        window.tampilkanInfoHotspot = function(nama, target, hs = null) {
             const popup = document.getElementById('hotspot-info-popup');
             if(!popup) return;
-            document.getElementById('hs-info-nama').innerText = nama || target || "Area Gedung";
+            
+            let foundHs = hs;
+            if (!foundHs && dataHotspots && dataHotspots.length > 0) {
+                const searchKey = (nama || target || '').toLowerCase().trim();
+                foundHs = dataHotspots.find(h => {
+                    const hn = (h.nama_bangunan || '').toLowerCase().trim();
+                    const ht = (h.target_lokasi || '').toLowerCase().trim();
+                    return hn === searchKey || ht === searchKey || (hn && searchKey.includes(hn)) || (ht && searchKey.includes(ht));
+                });
+            }
+
+            const buildingName = (foundHs && foundHs.nama_bangunan) ? foundHs.nama_bangunan : (nama || target || "Area Gedung");
+            const nomorGedung = foundHs && foundHs.nomor ? foundHs.nomor : "";
+            document.getElementById('hs-info-nama').innerText = (nomorGedung ? `Gedung ${nomorGedung}. ` : '') + buildingName;
+
+            // K3 Detail Data
+            const rute = dataRute[target || buildingName] || {};
+            const detailRisiko = window.dapatkanDetailRisiko(rute, target || buildingName, foundHs);
+            const aksesRaw = (foundHs && foundHs.akses) || rute.akses || (detailRisiko.warna === 'Merah' ? 'Khusus Staf & Petugas' : 'Pengunjung, Pasien & Staf');
+            const isKhususStaff = aksesRaw.toLowerCase().includes('staff') || aksesRaw.toLowerCase().includes('petugas') || aksesRaw.toLowerCase().includes('karyawan') || aksesRaw.toLowerCase().includes('khusus');
+
+            const elAkses = document.getElementById('hs-info-akses-badge');
+            if (elAkses) {
+                if (isKhususStaff) {
+                    elAkses.innerHTML = `🔒 Akses: Khusus Staf & Petugas`;
+                    elAkses.style.background = 'rgba(231, 76, 60, 0.15)';
+                    elAkses.style.color = '#c0392b';
+                    elAkses.style.borderColor = '#e74c3c';
+                } else {
+                    elAkses.innerHTML = `👥 Akses: Pengunjung & Pasien`;
+                    elAkses.style.background = 'rgba(39, 174, 96, 0.15)';
+                    elAkses.style.color = '#1e824c';
+                    elAkses.style.borderColor = '#27ae60';
+                }
+            }
+
+            const elWarna = document.getElementById('hs-info-warna-badge');
+            if (elWarna) {
+                elWarna.innerHTML = `🎨 Area ${detailRisiko.warna}`;
+                elWarna.style.background = detailRisiko.kode_hex === '#ffffff' ? '#f0f0f0' : `${detailRisiko.kode_hex}33`;
+                elWarna.style.color = detailRisiko.textColor === '#fff' ? '#8B0000' : '#111';
+                elWarna.style.borderColor = detailRisiko.kode_hex;
+            }
+
+            const elResiko = document.getElementById('hs-info-resiko-teks');
+            if (elResiko) {
+                elResiko.innerText = detailRisiko.keterangan;
+            }
+
             const actDiv = document.getElementById('hs-info-action');
             if(actDiv) {
-                if(target && (typeof window.pilihTujuan === 'function')) {
-                    actDiv.innerHTML = `<button class="btn-primary" style="background:#D4AF37; color:#111; font-weight:bold; width:100%; margin-bottom:8px;" onclick="tutupModal('hotspot-info-popup'); pilihTujuan('${target.replace(/'/g, "\\'")}')">🧭 Panduan Rute ke Lokasi Ini</button>`;
+                const targetFinal = target || (foundHs && foundHs.target_lokasi) || buildingName;
+                if(targetFinal && (typeof window.pilihTujuan === 'function')) {
+                    actDiv.innerHTML = `<button class="btn-primary" style="background:#D4AF37; color:#111; font-weight:bold; width:100%; margin-bottom:8px;" onclick="tutupModal('hotspot-info-popup'); pilihTujuan('${targetFinal.replace(/'/g, "\\'")}', true, true, true)">🧭 Panduan Rute ke Lokasi Ini</button>`;
                 } else {
                     actDiv.innerHTML = `<p style="font-size:14px; color:#666;">Titik lokasi rumah sakit terpilih.</p>`;
                 }
@@ -2938,8 +3478,295 @@
         // Jalankan pemuatan data dari Supabase saat aplikasi dibuka
         
         // ==========================================
-        // C-PANEL AUTHENTICATION & TOGGLE
+        // C-PANEL AUTHENTICATION & ROLE SYSTEM & LOGS
         // ==========================================
+        let adminPin6 = localStorage.getItem('app_admin_pin_6') || '123456';
+        let superAdminPin6 = localStorage.getItem('app_super_pin_6') || '999999';
+        let ukuranTitikKumpul = parseInt(localStorage.getItem('ukuranTitikKumpul') || '38');
+
+        // Feature permissions per role
+        const defaultRolePermissions = {
+            admin: { tujuan: true, titik_kumpul: true, asal: true, matrix: true, hotspot: true, log: true, tts: true },
+            staf: { tujuan: true, titik_kumpul: true, asal: false, matrix: false, hotspot: false, log: true, tts: false }
+        };
+
+        let rolePermissions = defaultRolePermissions;
+        try {
+            const savedPerms = localStorage.getItem('app_role_permissions');
+            if (savedPerms) rolePermissions = JSON.parse(savedPerms);
+        } catch(e) {}
+
+        // Front Form PIN Input Toggle
+        window.toggleFrontPinInput = function(role) {
+            const pinContainer = document.getElementById('container-pin-front');
+            const pinInput = document.getElementById('front-pin');
+            if (!pinContainer) return;
+            if (role === 'staf' || role === 'admin') {
+                pinContainer.style.display = 'block';
+                if (pinInput) pinInput.focus();
+            } else {
+                pinContainer.style.display = 'none';
+                if (pinInput) pinInput.value = '';
+            }
+        };
+
+        // Activity Log Engine
+        window.getStoredLogs = function() {
+            try {
+                return JSON.parse(localStorage.getItem('app_activity_logs') || '[]');
+            } catch(e) {
+                return [];
+            }
+        };
+
+        window.catatLogAktivitas = function(user, role, aksi, detail="") {
+            const logs = window.getStoredLogs();
+            const nowStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            const newEntry = {
+                id: 'log-' + Date.now(),
+                timestamp: nowStr,
+                user: user || 'Pengunjung',
+                role: (role || 'pengunjung').toLowerCase(),
+                aksi: aksi,
+                detail: detail
+            };
+            logs.unshift(newEntry);
+            if (logs.length > 300) logs.pop();
+            try {
+                localStorage.setItem('app_activity_logs', JSON.stringify(logs));
+            } catch(e){}
+            if (window.renderListLogAdmin) window.renderListLogAdmin();
+        };
+
+        window.renderListLogAdmin = function() {
+            const container = document.getElementById('list-log-admin');
+            if (!container) return;
+            const logs = window.getStoredLogs();
+            const filter = (document.getElementById('filter-log')?.value || '').toLowerCase().trim();
+            container.innerHTML = '';
+            
+            const filtered = logs.filter(l => {
+                if (!filter) return true;
+                return (l.user && l.user.toLowerCase().includes(filter)) ||
+                       (l.role && l.role.toLowerCase().includes(filter)) ||
+                       (l.aksi && l.aksi.toLowerCase().includes(filter)) ||
+                       (l.detail && l.detail.toLowerCase().includes(filter));
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="color:#888; font-style:italic; padding:6px;">Belum ada log aktifitas dicatat.</div>';
+                return;
+            }
+
+            filtered.forEach(l => {
+                const item = document.createElement('div');
+                item.style.cssText = 'background:#1a1a1a; padding:6px 8px; margin-bottom:4px; border-radius:4px; border-left:3px solid #3498db;';
+                let roleColor = '#2ecc71';
+                if (l.role === 'superadmin') roleColor = '#FFD700';
+                else if (l.role === 'admin') roleColor = '#e74c3c';
+                else if (l.role === 'staf') roleColor = '#3498db';
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; color:#aaa; font-size:10px;">
+                        <span>⏰ ${l.timestamp}</span>
+                        <span style="color:${roleColor}; font-weight:bold;">[${l.role.toUpperCase()}]</span>
+                    </div>
+                    <div style="color:#fff; font-weight:bold; margin:2px 0;">👤 ${l.user} ➔ <span style="color:#FFD700;">${l.aksi}</span></div>
+                    ${l.detail ? `<div style="color:#bbb; font-size:10px;">${l.detail}</div>` : ''}
+                `;
+                container.appendChild(item);
+            });
+        };
+
+        window.downloadLogPDF = function() {
+            const logs = window.getStoredLogs();
+            if (!logs || logs.length === 0) {
+                alert("Tidak ada data log aktifitas untuk diunduh.");
+                return;
+            }
+            try {
+                if (window.jspdf && window.jspdf.jsPDF) {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFontSize(15);
+                    doc.setTextColor(139, 0, 0);
+                    doc.text("RS ATMA HUSADA MAHAKAM", 14, 15);
+                    doc.setFontSize(11);
+                    doc.setTextColor(60, 60, 60);
+                    doc.text("Laporan Log Aktifitas Sistem Smart Navigasi", 14, 22);
+                    doc.setFontSize(9);
+                    doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 28);
+                    
+                    const tableData = logs.map(l => [
+                        l.timestamp || '-',
+                        l.user || 'Pengunjung',
+                        (l.role || 'pengunjung').toUpperCase(),
+                        l.aksi || '-',
+                        l.detail || '-'
+                    ]);
+                    
+                    doc.autoTable({
+                        startY: 32,
+                        head: [['Waktu', 'Pengguna', 'Role', 'Aktivitas', 'Detail']],
+                        body: tableData,
+                        headStyles: { fillColor: [139, 0, 0], textColor: [255, 255, 255], fontStyle: 'bold' },
+                        alternateRowStyles: { fillColor: [245, 245, 245] },
+                        styles: { fontSize: 8, cellPadding: 3 }
+                    });
+                    
+                    doc.save("Log_Aktivitas_SmartNav_RS.pdf");
+                    if (window.tampilkanToast) window.tampilkanToast("📄 File PDF Log berhasil diunduh!");
+                    window.catatLogAktivitas(window.currentUserName, window.currentUserRole, "Download Log PDF", "Mencetak dokumen log aktifitas PDF");
+                } else {
+                    let win = window.open('', '_blank');
+                    let html = `<html><head><title>Log Aktifitas</title><style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:6px;font-size:12px;}th{background:#8B0000;color:#fff;}</style></head><body><h2>LOG AKTIFITAS RS ATMA HUSADA MAHAKAM</h2><table><thead><tr><th>Waktu</th><th>Pengguna</th><th>Role</th><th>Aktivitas</th><th>Detail</th></tr></thead><tbody>`;
+                    logs.forEach(l => {
+                        html += `<tr><td>${l.timestamp}</td><td>${l.user}</td><td>${l.role}</td><td>${l.aksi}</td><td>${l.detail}</td></tr>`;
+                    });
+                    html += `</tbody></table></body></html>`;
+                    win.document.write(html);
+                    win.document.close();
+                    win.print();
+                }
+            } catch (e) {
+                alert("Gagal mengunduh PDF: " + e.message);
+            }
+        };
+
+        window.hapusSemuaLog = function() {
+            if (!confirm("Apakah Anda yakin ingin membersihkan seluruh log aktifitas?")) return;
+            localStorage.removeItem('app_activity_logs');
+            window.renderListLogAdmin();
+            if (window.tampilkanToast) window.tampilkanToast("🗑️ Seluruh log aktifitas telah dibersihkan.");
+        };
+
+        // Size slider for Titik Kumpul Marker
+        window.ubahUkuranMarkerTK = function(val) {
+            ukuranTitikKumpul = parseInt(val) || 38;
+            try {
+                localStorage.setItem('ukuranTitikKumpul', ukuranTitikKumpul);
+            } catch(e) {}
+            const valEl = document.getElementById('val-size-tk');
+            if (valEl) valEl.innerText = ukuranTitikKumpul + 'px';
+            window.renderOverlayTitikKumpul();
+        };
+
+        // Role Permissions Checklist Management
+        const featureLabels = {
+            tujuan: '🗺️ Direktori Tujuan & Rute',
+            titik_kumpul: '🟢 Marker Titik Kumpul (TK)',
+            asal: '📍 Lokasi Kiosk Titik Awal',
+            matrix: '🔀 Matriks Rute Navigasi',
+            hotspot: '🏢 Pemetaan Area & Risiko K3',
+            log: '📜 Lihat Log Aktifitas',
+            tts: '🎛️ Pengaturan Suara (TTS)'
+        };
+
+        window.renderRolePermissionsAdmin = function() {
+            const tbody = document.getElementById('tbody-role-permissions');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            const currentAdmin = localStorage.getItem('app_admin_pin_6') || '123456';
+            const currentSuper = localStorage.getItem('app_super_pin_6') || '999999';
+
+            const inpAdmin = document.getElementById('input-pin-admin-6');
+            if (inpAdmin) inpAdmin.value = currentAdmin;
+            const inpSuper = document.getElementById('input-pin-super-6');
+            if (inpSuper) inpSuper.value = currentSuper;
+
+            Object.keys(featureLabels).forEach(featKey => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #222';
+                const isAdminChecked = rolePermissions.admin[featKey] !== false;
+                const isStafChecked = rolePermissions.staf[featKey] !== false;
+
+                tr.innerHTML = `
+                    <td style="padding:6px 4px; color:#EEE;">${featureLabels[featKey]}</td>
+                    <td style="padding:6px 4px; text-align:center;">
+                        <input type="checkbox" id="perm-admin-${featKey}" ${isAdminChecked ? 'checked' : ''} style="cursor:pointer;">
+                    </td>
+                    <td style="padding:6px 4px; text-align:center;">
+                        <input type="checkbox" id="perm-staf-${featKey}" ${isStafChecked ? 'checked' : ''} style="cursor:pointer;">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.simpanPinRole = function() {
+            const newAdmin = (document.getElementById('input-pin-admin-6')?.value || '').trim();
+            const newSuper = (document.getElementById('input-pin-super-6')?.value || '').trim();
+
+            if (newAdmin.length !== 6 || isNaN(newAdmin)) {
+                alert("PIN Admin harus berupa 6 angka!");
+                return;
+            }
+            if (newSuper.length !== 6 || isNaN(newSuper)) {
+                alert("PIN SuperAdmin harus berupa 6 angka!");
+                return;
+            }
+
+            adminPin6 = newAdmin;
+            superAdminPin6 = newSuper;
+            localStorage.setItem('app_admin_pin_6', adminPin6);
+            localStorage.setItem('app_super_pin_6', superAdminPin6);
+
+            alert("✅ PIN Admin (" + adminPin6 + ") dan PIN SuperAdmin (" + superAdminPin6 + ") berhasil diperbarui!");
+            window.catatLogAktivitas(window.currentUserName, window.currentUserRole, "Ubah PIN Akses", "Memperbarui PIN Admin/SuperAdmin");
+        };
+
+        window.simpanHakAksesRole = function() {
+            Object.keys(featureLabels).forEach(featKey => {
+                const chkAdmin = document.getElementById('perm-admin-' + featKey);
+                const chkStaf = document.getElementById('perm-staf-' + featKey);
+                if (chkAdmin) rolePermissions.admin[featKey] = chkAdmin.checked;
+                if (chkStaf) rolePermissions.staf[featKey] = chkStaf.checked;
+            });
+
+            try {
+                localStorage.setItem('app_role_permissions', JSON.stringify(rolePermissions));
+            } catch(e) {}
+
+            alert("✅ Hak Akses Matriks Ceklist Role berhasil disimpan!");
+            window.catatLogAktivitas(window.currentUserName, window.currentUserRole, "Ubah Hak Akses Role", "Memperbarui ceklist izin fitur");
+            window.terapkanAksesAplikasi();
+        };
+
+        window.terapkanAksesAplikasi = function() {
+            const role = (window.currentUserRole || 'pengunjung').toLowerCase();
+            const secRole = document.getElementById('section-role-permissions');
+            if (secRole) secRole.style.display = (role === 'superadmin') ? 'block' : 'none';
+
+            if (role === 'superadmin') {
+                ['section-tujuan', 'section-titik-kumpul', 'section-asal', 'section-matrix', 'section-hotspot', 'section-log-aktivitas', 'section-tts'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'block';
+                });
+            } else if (role === 'admin' || role === 'staf') {
+                const perms = rolePermissions[role] || defaultRolePermissions.admin;
+                const mapFeatToSection = {
+                    tujuan: 'section-tujuan',
+                    titik_kumpul: 'section-titik-kumpul',
+                    asal: 'section-asal',
+                    matrix: 'section-matrix',
+                    hotspot: 'section-hotspot',
+                    log: 'section-log-aktivitas',
+                    tts: 'section-tts'
+                };
+                Object.keys(mapFeatToSection).forEach(fKey => {
+                    const sec = document.getElementById(mapFeatToSection[fKey]);
+                    if (sec) {
+                        sec.style.display = (perms[fKey] !== false) ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (window.renderRolePermissionsAdmin) window.renderRolePermissionsAdmin();
+            if (window.renderListLogAdmin) window.renderListLogAdmin();
+        };
+
         window.bukaModalLogin = function() {
             const pinEl = document.getElementById('login-pin');
             if (pinEl) pinEl.value = '';
@@ -2949,44 +3776,30 @@
 
         window.prosesLogin = function() {
             const pin = (document.getElementById('login-pin').value || '').trim();
-            if (pin === systemPIN) {
-                window.tutupModal('login-modal');
-                document.getElementById('panel-cpanel').classList.add('open');
-                
-                const rolePanel = document.getElementById('login-role').value;
-                window.currentUserRole = rolePanel;
-                
-                if (rolePanel === 'administrator') {
-                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'none';
-                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'none';
-                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'none';
-                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'none';
-                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'none';
-                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'none';
-                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'none';
-                    
-                    setTimeout(() => {
-                        const deleteBtns = document.querySelectorAll('.action-btn[title="Hapus"]');
-                        deleteBtns.forEach(btn => btn.style.display = 'none');
-                    }, 300);
-                } else {
-                    if(document.getElementById('section-logo')) document.getElementById('section-logo').style.display = 'flex';
-                    if(document.getElementById('section-peta')) document.getElementById('section-peta').style.display = 'flex';
-                    if(document.getElementById('section-hotspot')) document.getElementById('section-hotspot').style.display = 'flex';
-                    if(document.getElementById('section-matrix')) document.getElementById('section-matrix').style.display = 'flex';
-                    if(document.getElementById('section-asal')) document.getElementById('section-asal').style.display = 'flex';
-                    if(document.getElementById('section-tts')) document.getElementById('section-tts').style.display = 'flex';
-                    if(document.getElementById('section-pin')) document.getElementById('section-pin').parentElement.style.display = 'flex';
-                }
+            const rolePanel = document.getElementById('login-role').value;
+            const currentAdminPin = localStorage.getItem('app_admin_pin_6') || '123456';
+            const currentSuperPin = localStorage.getItem('app_super_pin_6') || '999999';
 
-                document.getElementById('tts-volume').value = settingTTS.volume;
-                document.getElementById('val-vol').innerText = settingTTS.volume;
-                document.getElementById('tts-rate').value = settingTTS.rate;
-                document.getElementById('val-rate').innerText = settingTTS.rate;
-                renderAllAdminLists();
+            if (pin === currentSuperPin || pin === systemPIN) {
+                window.currentUserRole = 'superadmin';
+            } else if (pin === currentAdminPin) {
+                window.currentUserRole = (rolePanel === 'superadmin') ? 'admin' : rolePanel;
             } else {
-                alert("PIN Akses Salah!");
+                alert("⚠️ PIN C-Panel Salah! Masukkan PIN 6 Digit (Admin / SuperAdmin) yang benar.");
+                return;
             }
+
+            window.tutupModal('login-modal');
+            document.getElementById('panel-cpanel').classList.add('open');
+            window.terapkanAksesAplikasi();
+
+            if (window.tampilkanToast) {
+                window.tampilkanToast("🔑 Login C-Panel Berhasil [" + window.currentUserRole.toUpperCase() + "]");
+            }
+
+            window.catatLogAktivitas(window.currentUserName || 'User C-Panel', window.currentUserRole, "Login C-Panel Admin", "Masuk ke C-Panel sebagai " + window.currentUserRole.toUpperCase());
+
+            if (typeof renderAllAdminLists === 'function') renderAllAdminLists();
         };
 
         window.tutupCPanel = function() {
@@ -3487,6 +4300,19 @@
         loadLogoSupabase();
         if (typeof window.renderDropdownAsal === 'function') window.renderDropdownAsal();
         fetchAllDataSupabase();
+        if (typeof window.renderOverlayTitikKumpul === 'function') window.renderOverlayTitikKumpul();
+
+        // Update teks tombol Layar Penuh saat status fullscreen berubah
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('btn-fullscreen-toggle');
+            if (btn) {
+                if (document.fullscreenElement) {
+                    btn.innerHTML = '⛶ Keluar Layar Penuh';
+                } else {
+                    btn.innerHTML = '⛶ Layar Penuh';
+                }
+            }
+        });
     </script>
 
     <!-- Running Text Pengembang (Hanya 1 teks aktif, mengalir utuh dari kanan ke kiri, berulang setelah keluar penuh) -->
