@@ -1242,19 +1242,33 @@
 
         <!-- Section Titik Kumpul (Assembly Points) -->
         <div class="admin-section" id="section-titik-kumpul" style="border-color: #107C41;">
-            <h3 style="color: #2ecc71;">🟢 Marker Titik Kumpul (Assembly Point)</h3>
-            <div class="data-list" id="list-titik-kumpul"></div>
-            <hr style="border-color:#333; margin:10px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
+                <h3 style="color: #2ecc71; margin:0;">🟢 Marker Titik Kumpul & Evakuasi</h3>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <button type="button" class="btn-mini-action" style="background:#2ecc71; color:#000; font-weight:bold; padding:5px 12px; border-radius:4px; border:none; cursor:pointer;" onclick="resetFormTitikKumpul()">➕ Tambah Baru</button>
+                    <button type="button" class="btn-mini-action" style="background:#107C41; color:#fff; font-weight:bold; padding:5px 12px; border-radius:4px; border:1px solid #2ecc71; cursor:pointer;" onclick="singkronkanSemuaTitikKumpulKeSupabase()" title="Sinkronkan seluruh data ke database Supabase">⚡ Sync Supabase</button>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; margin-bottom: 12px; border-radius: 6px; border: 1px solid #333;" id="container-tabel-tk">
+                <div class="data-list" id="list-titik-kumpul"></div>
+            </div>
+            <hr style="border-color:#333; margin:12px 0;">
             
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="color:#D4AF37; font-weight:bold;" id="label-mode-tk">Mode: [ Tambah Baru ]</label>
-                <button class="btn-cancel-admin" style="padding: 4px 8px; margin:0; font-size:12px;" onclick="resetFormTitikKumpul()">Batal</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="color:#D4AF37; font-weight:bold; font-size:13px;" id="label-mode-tk">Mode: [ Tambah Baru ]</label>
+                <button class="btn-cancel-admin" style="padding: 4px 10px; margin:0; font-size:11px;" onclick="resetFormTitikKumpul()">Reset / Batal</button>
             </div>
             
-            <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Nama Titik Kumpul:</label>
-            <input type="text" id="tk-nama" placeholder="Misal: Titik Kumpul 1 (Depan Poliklinik & IGD)">
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px; display:block;">Nama Titik Kumpul:</label>
+            <input type="text" id="tk-nama" placeholder="Contoh: Titik Kumpul 4 (Halaman Depan)">
 
-            <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Posisi Label (Penyesuaian Agar Tidak Menutupi Bangunan):</label>
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px; display:block;">Hotspot / Gedung Terkait:</label>
+            <select id="tk-hotspot-select" style="width:100%; padding:6px 8px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:12px; margin-bottom:8px;">
+                <option value="">🎯 Otomatis Deteksi Gedung Terdekat</option>
+            </select>
+
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px; display:block;">Posisi Label:</label>
             <select id="tk-label-pos" style="width:100%; padding:6px 8px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:12px; margin-bottom:8px;">
                 <option value="bawah">👇 Posisi Label: Di Bawah Marker (Default)</option>
                 <option value="atas">👆 Posisi Label: Di Atas Marker</option>
@@ -1263,18 +1277,18 @@
                 <option value="sembunyi">👁️ Sembunyikan Label (Tampil Saat Hover/Sentuh)</option>
             </select>
 
-            <button type="button" class="btn-save-admin" style="background: #107C41; color: #FFF; width: 100%; margin: 8px 0 5px 0; border-color: #2ecc71;" onclick="mulaiPilihKoordinatTK()">🖱️ Klik Lokasi di Peta untuk Set Koordinat</button>
+            <button type="button" class="btn-save-admin" style="background: #107C41; color: #FFF; width: 100%; margin: 8px 0 6px 0; border-color: #2ecc71; font-weight:bold;" onclick="mulaiPilihKoordinatTK()">🖱️ Klik Lokasi di Peta untuk Set Koordinat</button>
 
-            <label style="font-size:12px; color:#C0C0C0;">Koordinat Posisi Persentase (%):</label>
+            <label style="font-size:12px; color:#C0C0C0; display:block;">Koordinat Posisi Persentase (%):</label>
             <div class="flex-row">
                 <div><input type="number" id="tk-x" placeholder="X (%)" step="0.1"></div>
                 <div><input type="number" id="tk-y" placeholder="Y (%)" step="0.1"></div>
             </div>
 
-            <button class="btn-save-admin" style="width: 100%; margin-top: 8px;" id="btn-save-tk" onclick="simpanTitikKumpul()">💾 Simpan Titik Kumpul</button>
+            <button class="btn-save-admin" style="width: 100%; margin-top: 10px; font-weight:bold; font-size:13px; background:#2ecc71; color:#000;" id="btn-save-tk" onclick="simpanTitikKumpul()">💾 Simpan Titik Kumpul Baru</button>
 
             <!-- Slider Ukuran Marker Titik Kumpul -->
-            <div style="margin-top: 12px; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #333;">
+            <div style="margin-top: 14px; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #333;">
                 <label style="font-size:12px; color:#D4AF37; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
                     <span>📐 Ukuran Marker Titik Kumpul:</span>
                     <span id="val-size-tk" style="color:#2ecc71; font-weight:900;">38px</span>
@@ -2023,11 +2037,15 @@
                     const y = ((e.clientY - rect.top) / rect.height) * 100;
                     const elX = document.getElementById('tk-x');
                     const elY = document.getElementById('tk-y');
+                    const elNama = document.getElementById('tk-nama');
                     if (elX) elX.value = x.toFixed(1);
                     if (elY) elY.value = y.toFixed(1);
+                    if (elNama && !elNama.value.trim()) {
+                        elNama.value = `Titik Kumpul ${dataTitikKumpul.length + 1}`;
+                    }
                     isPickingTKCoord = false;
                     if (window.tampilkanToast) {
-                        window.tampilkanToast(`📍 Koordinat TK di-set: X ${x.toFixed(1)}%, Y ${y.toFixed(1)}%`);
+                        window.tampilkanToast(`📍 Posisi dipilih (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%). Klik 'Simpan Titik Kumpul'!`);
                     }
                 }
             });
@@ -2054,6 +2072,7 @@
                     if(set.pin) systemPIN = set.pin; 
                     if(set.tts_volume) settingTTS.volume = parseFloat(set.tts_volume); 
                     if(set.tts_rate) settingTTS.rate = parseFloat(set.tts_rate); 
+                    if(set.ukuran_titik_kumpul) ukuranTitikKumpul = parseInt(set.ukuran_titik_kumpul) || 38;
                 }
 
                 // Peta Utama (map_image)
@@ -2157,6 +2176,64 @@
                 if (totalUlasan > 0) {
                     document.getElementById('landing-rating-val').innerText = "5.0";
                     document.getElementById('landing-rating-count').innerText = totalUlasan;
+                }
+
+                // Ambil Marker Titik Kumpul (titik_kumpul) dari Supabase Database (Dual Mode: Dedicated Table & app_settings Fallback)
+                let tkLoaded = false;
+                try {
+                    const { data: tkArr, error: tkErr } = await supabase.from('titik_kumpul').select('*');
+                    if (!tkErr && tkArr && tkArr.length > 0) {
+                        dataTitikKumpul = tkArr.map(row => ({
+                            id: String(row.id),
+                            nama: row.nama || row.nama_titik || row.nama_lokasi,
+                            x: parseFloat(row.x || row.x_pos || row.pos_left) || 0,
+                            y: parseFloat(row.y || row.y_pos || row.pos_top) || 0,
+                            pos: row.pos || row.posisi_label || 'bawah',
+                            hotspot_terkait: row.hotspot_terkait || row.hotspot_nama || ''
+                        }));
+                        tkLoaded = true;
+                    }
+                } catch(errTK) {
+                    console.warn("Tabel 'titik_kumpul' belum dibuat di Supabase, mencoba membaca dari app_settings...", errTK);
+                }
+
+                if (!tkLoaded) {
+                    if (setArr && setArr.length > 0 && setArr[0].data_titik_kumpul) {
+                        try {
+                            const parsed = JSON.parse(setArr[0].data_titik_kumpul);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                dataTitikKumpul = parsed;
+                                tkLoaded = true;
+                            }
+                        } catch(e) {}
+                    }
+                }
+
+                if (!tkLoaded) {
+                    // Seed data default ke Supabase jika belum terisi sama sekali
+                    dataTitikKumpul = [
+                        { id: 'tk-1', nama: 'Titik Kumpul 1 (Depan Poliklinik & IGD)', x: 18, y: 32, pos: 'bawah', hotspot_terkait: '' },
+                        { id: 'tk-2', nama: 'Titik Kumpul 2 (Area Parkir & Lapangan)', x: 82, y: 72, pos: 'bawah', hotspot_terkait: '' },
+                        { id: 'tk-3', nama: 'Titik Kumpul 3 (Halaman Tengah)', x: 50, y: 48, pos: 'atas', hotspot_terkait: '' }
+                    ];
+                }
+
+                // Otomatis sinkronkan data ke tabel 'titik_kumpul' dan 'app_settings' di Supabase
+                try {
+                    await supabase.from('app_settings').update({ data_titik_kumpul: JSON.stringify(dataTitikKumpul) }).eq('id', 1);
+                    if (dataTitikKumpul && dataTitikKumpul.length > 0) {
+                        const payloadBatch = dataTitikKumpul.map(tk => ({
+                            id: String(tk.id),
+                            nama: String(tk.nama || ''),
+                            x: parseFloat(tk.x) || 0,
+                            y: parseFloat(tk.y) || 0,
+                            pos: String(tk.pos || 'bawah'),
+                            hotspot_terkait: String(tk.hotspot_terkait || '')
+                        }));
+                        await supabase.from('titik_kumpul').upsert(payloadBatch);
+                    }
+                } catch(eSync) {
+                    console.warn("Auto-sync titik_kumpul error:", eSync);
                 }
 
                 clearTimeout(timeoutHint);
@@ -2835,80 +2912,215 @@
 
         
         // ==========================================
-        // TITIK KUMPUL (ASSEMBLY POINT) OVERLAY & CRUD
+        // TITIK KUMPUL (ASSEMBLY POINT) OVERLAY & CRUD (100% DATABASE DRIVEN)
         // ==========================================
         let tampilkanTitikKumpul = true;
         let idEditTK = null;
         let isPickingTKCoord = false;
 
-        let dataTitikKumpul = [];
-        try {
-            const savedTK = localStorage.getItem('dataTitikKumpul');
-            if (savedTK) dataTitikKumpul = JSON.parse(savedTK);
-        } catch(e) {}
+        // Clean up legacy localStorage if present
+        try { localStorage.removeItem('dataTitikKumpul'); } catch(e) {}
 
-        if (!dataTitikKumpul || dataTitikKumpul.length === 0) {
-            dataTitikKumpul = [
-                { id: 'tk-1', nama: 'Titik Kumpul 1 (Depan Poliklinik & IGD)', x: 18, y: 32, pos: 'bawah' },
-                { id: 'tk-2', nama: 'Titik Kumpul 2 (Area Parkir & Lapangan)', x: 82, y: 72, pos: 'bawah' },
-                { id: 'tk-3', nama: 'Titik Kumpul 3 (Halaman Tengah)', x: 50, y: 48, pos: 'atas' }
-            ];
-        }
+        let dataTitikKumpul = [];
+
+        window.getHotspotTerdekat = function(x, y, hotspotExplicit) {
+            if (hotspotExplicit && hotspotExplicit.trim() !== '') return hotspotExplicit;
+            if (typeof dataHotspots === 'undefined' || !dataHotspots || dataHotspots.length === 0) return '-';
+            let minDist = Infinity;
+            let closest = null;
+            dataHotspots.forEach(h => {
+                const hX = parseFloat(h.pos_left || h.x_pos || 0);
+                const hY = parseFloat(h.pos_top || h.y_pos || 0);
+                const dist = Math.hypot(hX - x, hY - y);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = h.nama_bangunan || h.target_lokasi || (h.nomor ? `Gedung #${h.nomor}` : 'Hotspot');
+                }
+            });
+            return closest ? closest : '-';
+        };
+
+        window.populateHotspotOptionsTK = function() {
+            const selectEl = document.getElementById('tk-hotspot-select');
+            if (!selectEl) return;
+            const currentVal = selectEl.value;
+            selectEl.innerHTML = '<option value="">🎯 Otomatis Deteksi Gedung Terdekat</option>';
+            if (typeof dataHotspots !== 'undefined' && dataHotspots && dataHotspots.length > 0) {
+                dataHotspots.forEach(h => {
+                    const name = h.nama_bangunan || h.target_lokasi;
+                    if (name) {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = `🏢 ${name} (X:${h.pos_left || h.x_pos || 0}%, Y:${h.pos_top || h.y_pos || 0}%)`;
+                        selectEl.appendChild(opt);
+                    }
+                });
+            }
+            if (currentVal) selectEl.value = currentVal;
+        };
+
+        window.updateSqlTextArea = function() {};
 
         window.renderListTitikKumpulAdmin = function() {
             const listEl = document.getElementById('list-titik-kumpul');
             if (!listEl) return;
-            listEl.innerHTML = '';
+            window.populateHotspotOptionsTK();
+
             if (dataTitikKumpul.length === 0) {
-                listEl.innerHTML = '<div style="color:#888; font-size:12px; font-style:italic;">Belum ada marker titik kumpul.</div>';
+                listEl.innerHTML = '<div style="color:#888; font-size:12px; font-style:italic; padding:10px;">Belum ada marker titik kumpul tersimpan di database. Klik "➕ Tambah Baru" untuk menambah.</div>';
                 return;
             }
-            dataTitikKumpul.forEach((tk, idx) => {
-                const div = document.createElement('div');
-                div.className = 'data-item';
-                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:#222; margin-bottom:5px; border-radius:4px; border:1px solid #333;';
-                const posLabelMap = { bawah: '👇 Bawah', atas: '👆 Atas', kiri: '👈 Kiri', kanan: '👉 Kanan', sembunyi: '👁️ Sembunyi' };
-                div.innerHTML = `
-                    <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:8px;">
-                        <strong style="color:#2ecc71;">TK ${idx + 1}: ${tk.nama}</strong>
-                        <div style="font-size:11px; color:#aaa;">X: ${tk.x}%, Y: ${tk.y}% | Label: ${posLabelMap[tk.pos || 'bawah']}</div>
-                    </div>
-                    <div style="display:flex; gap:4px; flex-shrink:0;">
-                        <button type="button" class="btn-mini-action" onclick="editTitikKumpul('${tk.id}')">✏️ Edit</button>
-                        <button type="button" class="btn-delete-admin" style="padding:2px 6px; font-size:11px; margin:0;" onclick="hapusTitikKumpul('${tk.id}')">🗑️ Hapus</button>
-                    </div>
+
+            const posLabelMap = { bawah: '👇 Bawah', atas: '👆 Atas', kiri: '👈 Kiri', kanan: '👉 Kanan', sembunyi: '👁️ Sembunyi' };
+
+            let rowsHtml = dataTitikKumpul.map((tk, idx) => {
+                const hsName = window.getHotspotTerdekat(tk.x, tk.y, tk.hotspot_terkait);
+                return `
+                    <tr style="border-bottom: 1px solid #333; transition: background 0.2s;" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 6px 8px; font-weight: bold; color: #2ecc71;">TK ${idx + 1}</td>
+                        <td style="padding: 6px 8px; color: #FFF; font-weight: 600;">${tk.nama}</td>
+                        <td style="padding: 6px 8px; color: #D4AF37; font-family: monospace;">(${tk.x}%, ${tk.y}%)</td>
+                        <td style="padding: 6px 8px; color: #BBB;">${posLabelMap[tk.pos || 'bawah']}</td>
+                        <td style="padding: 6px 8px; color: #3498db; font-style: italic;">🏢 ${hsName}</td>
+                        <td style="padding: 6px 8px; text-align: center; white-space: nowrap;">
+                            <button type="button" class="btn-mini-action" onclick="editTitikKumpul('${tk.id}')" title="Edit">✏️ Edit</button>
+                            <button type="button" class="btn-delete-admin" style="padding:2px 6px; font-size:11px; margin:0; display:inline-block;" onclick="hapusTitikKumpul('${tk.id}')" title="Hapus">🗑️</button>
+                        </td>
+                    </tr>
                 `;
-                listEl.appendChild(div);
-            });
+            }).join('');
+
+            listEl.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; background: #1a1a1a; color: #eee;">
+                    <thead>
+                        <tr style="background: #107C41; color: #fff; font-weight: bold; border-bottom: 2px solid #2ecc71;">
+                            <th style="padding: 6px 8px;">No</th>
+                            <th style="padding: 6px 8px;">Nama Titik Kumpul</th>
+                            <th style="padding: 6px 8px;">Koordinat (%)</th>
+                            <th style="padding: 6px 8px;">Label</th>
+                            <th style="padding: 6px 8px;">Hotspot / Gedung Terkait</th>
+                            <th style="padding: 6px 8px; text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            `;
         };
 
-        window.simpanTitikKumpul = function() {
-            const nama = document.getElementById('tk-nama').value.trim();
-            const x = parseFloat(document.getElementById('tk-x').value);
-            const y = parseFloat(document.getElementById('tk-y').value);
-            const posEl = document.getElementById('tk-label-pos');
-            const pos = posEl ? posEl.value : 'bawah';
-
-            if (!nama || isNaN(x) || isNaN(y)) {
-                alert("Mohon lengkapi Nama, Koordinat X, dan Koordinat Y.");
+        window.singkronkanSemuaTitikKumpulKeSupabase = async function() {
+            if (!window.supabase) {
+                alert("Client Supabase belum siap.");
+                return;
+            }
+            
+            if (!dataTitikKumpul || dataTitikKumpul.length === 0) {
+                if (window.tampilkanToast) window.tampilkanToast("⚠️ Belum ada data Titik Kumpul untuk disinkronkan.");
                 return;
             }
 
-            if (idEditTK) {
-                const index = dataTitikKumpul.findIndex(t => t.id === idEditTK);
-                if (index !== -1) {
-                    dataTitikKumpul[index] = { id: idEditTK, nama, x, y, pos };
+            const payloadBatch = dataTitikKumpul.map(tk => ({
+                id: String(tk.id),
+                nama: String(tk.nama || ''),
+                x: parseFloat(tk.x) || 0,
+                y: parseFloat(tk.y) || 0,
+                pos: String(tk.pos || 'bawah'),
+                hotspot_terkait: String(tk.hotspot_terkait || '')
+            }));
+
+            let successTable = false;
+            let errMsg = '';
+
+            try {
+                const { error } = await supabase.from('titik_kumpul').upsert(payloadBatch);
+                if (!error) {
+                    successTable = true;
+                } else {
+                    errMsg = error.message;
+                    console.warn("Sinkronkan ke tabel titik_kumpul error:", error);
                 }
-            } else {
-                const newId = 'tk-' + Date.now();
-                dataTitikKumpul.push({ id: newId, nama, x, y, pos });
+            } catch(err) {
+                errMsg = err.message || String(err);
+                console.warn("Exception sinkronkan ke titik_kumpul:", err);
             }
 
             try {
-                localStorage.setItem('dataTitikKumpul', JSON.stringify(dataTitikKumpul));
+                await supabase.from('app_settings').update({ data_titik_kumpul: JSON.stringify(dataTitikKumpul) }).eq('id', 1);
             } catch(e) {}
 
-            if (window.tampilkanToast) window.tampilkanToast("💾 Titik Kumpul berhasil disimpan!");
+            if (successTable) {
+                if (window.tampilkanToast) window.tampilkanToast(`✅ Berhasil menyinkronkan ${payloadBatch.length} titik kumpul ke tabel 'titik_kumpul'!`);
+            } else {
+                if (window.tampilkanToast) {
+                    window.tampilkanToast(`⚠️ RLS Supabase Aktif: Data tersimpan di cadangan app_settings.\nError: ${errMsg}`);
+                }
+            }
+
+            window.renderListTitikKumpulAdmin();
+            window.renderOverlayTitikKumpul();
+        };
+
+        window.simpanTitikKumpul = async function() {
+            let nama = document.getElementById('tk-nama').value.trim();
+            let xVal = document.getElementById('tk-x').value;
+            let yVal = document.getElementById('tk-y').value;
+            let x = parseFloat(xVal);
+            let y = parseFloat(yVal);
+            const posEl = document.getElementById('tk-label-pos');
+            const pos = posEl ? posEl.value : 'bawah';
+            const hsSelectEl = document.getElementById('tk-hotspot-select');
+            const hotspot_terkait = hsSelectEl ? hsSelectEl.value : '';
+
+            // Auto-fill jika kosong agar proses tambah data sangat cepat dan tanpa hambatan
+            if (isNaN(x) || isNaN(y)) {
+                x = 50.0;
+                y = 50.0;
+                document.getElementById('tk-x').value = '50';
+                document.getElementById('tk-y').value = '50';
+            }
+
+            if (!nama) {
+                nama = `Titik Kumpul ${dataTitikKumpul.length + 1}`;
+                document.getElementById('tk-nama').value = nama;
+            }
+
+            let targetId = idEditTK ? idEditTK : 'tk-' + Date.now();
+            let payload = {
+                id: targetId,
+                nama: nama,
+                x: x,
+                y: y,
+                pos: pos,
+                hotspot_terkait: hotspot_terkait || ''
+            };
+
+            // Update local memory state first
+            if (idEditTK) {
+                const idx = dataTitikKumpul.findIndex(t => t.id === idEditTK);
+                if (idx !== -1) dataTitikKumpul[idx] = payload;
+                else dataTitikKumpul.push(payload);
+            } else {
+                dataTitikKumpul.push(payload);
+            }
+
+            // Save to Supabase (Dual Strategy: Dedicated table 'titik_kumpul' or fallback to 'app_settings')
+            if (window.supabase) {
+                try {
+                    const { error } = await supabase.from('titik_kumpul').upsert(payload);
+                    if (error) console.warn("Tabel 'titik_kumpul' fallback ke app_settings:", error.message);
+                } catch(errDb) {
+                    console.warn("Error upserting to titik_kumpul table:", errDb);
+                }
+
+                try {
+                    await supabase.from('app_settings').update({ data_titik_kumpul: JSON.stringify(dataTitikKumpul) }).eq('id', 1);
+                } catch(errSet) {
+                    console.warn("Error updating app_settings fallback:", errSet);
+                }
+            }
+
+            if (window.tampilkanToast) window.tampilkanToast(`✅ '${nama}' berhasil disimpan!`);
             window.resetFormTitikKumpul();
             window.renderListTitikKumpulAdmin();
             window.renderOverlayTitikKumpul();
@@ -2924,18 +3136,30 @@
             if (document.getElementById('tk-label-pos')) {
                 document.getElementById('tk-label-pos').value = item.pos || 'bawah';
             }
+            if (document.getElementById('tk-hotspot-select')) {
+                document.getElementById('tk-hotspot-select').value = item.hotspot_terkait || '';
+            }
             document.getElementById('label-mode-tk').innerText = `Mode: [ Edit TK ${item.nama} ]`;
         };
 
-        window.hapusTitikKumpul = function(id) {
-            if (!confirm("Yakin ingin menghapus titik kumpul ini?")) return;
+        window.hapusTitikKumpul = async function(id) {
+            if (!confirm("Yakin ingin menghapus titik kumpul ini dari Supabase Database?")) return;
+
             dataTitikKumpul = dataTitikKumpul.filter(t => t.id !== id);
-            try {
-                localStorage.setItem('dataTitikKumpul', JSON.stringify(dataTitikKumpul));
-            } catch(e) {}
+
+            if (window.supabase) {
+                try {
+                    await supabase.from('titik_kumpul').delete().eq('id', id);
+                } catch(errDb) {}
+
+                try {
+                    await supabase.from('app_settings').update({ data_titik_kumpul: JSON.stringify(dataTitikKumpul) }).eq('id', 1);
+                } catch(errSet) {}
+            }
+
+            if (window.tampilkanToast) window.tampilkanToast("🗑️ Titik Kumpul dihapus dari Database!");
             window.renderListTitikKumpulAdmin();
             window.renderOverlayTitikKumpul();
-            if (window.tampilkanToast) window.tampilkanToast("🗑️ Titik Kumpul dihapus!");
         };
 
         window.resetFormTitikKumpul = function() {
@@ -2945,6 +3169,9 @@
             document.getElementById('tk-y').value = '';
             if (document.getElementById('tk-label-pos')) {
                 document.getElementById('tk-label-pos').value = 'bawah';
+            }
+            if (document.getElementById('tk-hotspot-select')) {
+                document.getElementById('tk-hotspot-select').value = '';
             }
             document.getElementById('label-mode-tk').innerText = 'Mode: [ Tambah Baru ]';
             isPickingTKCoord = false;
@@ -2962,15 +3189,20 @@
             const mapWrapper = document.getElementById('interactive-map');
             if (!mapWrapper) return;
 
-            const size = typeof ukuranTitikKumpul !== 'undefined' ? (parseInt(ukuranTitikKumpul) || 38) : 38;
-            const svgSize = Math.max(12, Math.round(size * 0.58));
-            const labelSize = Math.max(9, Math.round(size * 0.28));
+            // Ukuran adaptif proporsional terhadap lebar layar / container peta
+            const containerWidth = mapWrapper.clientWidth || window.innerWidth;
+            const scaleRatio = Math.min(1.2, Math.max(0.60, containerWidth / 900));
 
-            // Sync UI slider jika elemen tersedia
+            const baseSize = typeof ukuranTitikKumpul !== 'undefined' ? (parseInt(ukuranTitikKumpul) || 38) : 38;
+            const size = Math.round(baseSize * scaleRatio);
+            const svgSize = Math.max(10, Math.round(size * 0.58));
+            const labelSize = Math.max(8, Math.round(size * 0.28));
+
+            // Sync UI slider
             const slider = document.getElementById('slider-size-tk');
             const labelVal = document.getElementById('val-size-tk');
-            if (slider && parseInt(slider.value) !== size) slider.value = size;
-            if (labelVal) labelVal.innerText = size + 'px';
+            if (slider && parseInt(slider.value) !== baseSize) slider.value = baseSize;
+            if (labelVal) labelVal.innerText = baseSize + 'px';
 
             dataTitikKumpul.forEach((tk, idx) => {
                 const marker = document.createElement('div');
@@ -2985,7 +3217,9 @@
                 marker.style.maxWidth = size + 'px';
                 marker.style.maxHeight = size + 'px';
                 marker.style.flexShrink = '0';
-                marker.title = tk.nama;
+
+                const hsName = window.getHotspotTerdekat(tk.x, tk.y, tk.hotspot_terkait);
+                marker.title = `${tk.nama} (Dekat: ${hsName})`;
 
                 marker.innerHTML = `
                     <div class="titik-kumpul-icon-box">
@@ -2999,10 +3233,10 @@
                 marker.onclick = (e) => {
                     e.stopPropagation();
                     if (window.tampilkanToast) {
-                        window.tampilkanToast(`🟢 ${tk.nama}`);
+                        window.tampilkanToast(`🟢 ${tk.nama}\n🏢 Dekat: ${hsName}`);
                     }
                     if (window.bicara) {
-                        window.bicara(`Ini adalah area aman ${tk.nama}. Ikuti jalur evakuasi hijau menuju titik ini.`);
+                        window.bicara(`Ini adalah area aman ${tk.nama}, berlokasi dekat ${hsName}. Ikuti jalur evakuasi hijau menuju titik ini.`);
                     }
                 };
 
@@ -3751,6 +3985,14 @@
             const valEl = document.getElementById('val-size-tk');
             if (valEl) valEl.innerText = ukuranTitikKumpul + 'px';
             window.renderOverlayTitikKumpul();
+
+            if (window.supabase) {
+                try {
+                    supabase.from('app_settings').update({ ukuran_titik_kumpul: ukuranTitikKumpul.toString() }).eq('id', 1);
+                } catch(errDb) {
+                    console.warn("Error updating ukuran_titik_kumpul in Supabase app_settings:", errDb);
+                }
+            }
         };
 
         // Role Permissions Checklist Management
@@ -4402,6 +4644,24 @@
         if (typeof window.renderDropdownAsal === 'function') window.renderDropdownAsal();
         fetchAllDataSupabase();
         if (typeof window.renderOverlayTitikKumpul === 'function') window.renderOverlayTitikKumpul();
+
+        // Auto re-render Titik Kumpul markers adaptively on screen/container resize
+        if (window.ResizeObserver) {
+            const mapContainer = document.getElementById('interactive-map');
+            if (mapContainer) {
+                const resizeObs = new ResizeObserver(() => {
+                    if (typeof window.renderOverlayTitikKumpul === 'function') {
+                        window.renderOverlayTitikKumpul();
+                    }
+                });
+                resizeObs.observe(mapContainer);
+            }
+        }
+        window.addEventListener('resize', () => {
+            if (typeof window.renderOverlayTitikKumpul === 'function') {
+                window.renderOverlayTitikKumpul();
+            }
+        });
 
         // Update teks tombol Layar Penuh saat status fullscreen berubah
         document.addEventListener('fullscreenchange', () => {
