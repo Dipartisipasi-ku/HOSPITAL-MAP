@@ -1509,6 +1509,22 @@
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
         import { ENV } from "./env.js";
 
+        // Auto unregister service workers & clear browser cache storage on startup to prevent stale UI across devices
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            }).catch(e => {});
+        }
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                names.forEach(name => {
+                    caches.delete(name);
+                });
+            }).catch(e => {});
+        }
+
         const supabase = createClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY);
         window.supabase = supabase;
 
