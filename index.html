@@ -175,17 +175,17 @@
             line-height: normal; 
         }
         .hotspot:hover { 
-            background: rgba(255, 255, 255, 0.15); 
-            border: 2px solid #FFD700; 
-            transform: scale(1.02); 
-            z-index: 80; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+            background: rgba(255, 255, 255, 0.22) !important; 
+            border: 2px solid #FFD700 !important; 
+            transform: scale(1.02) !important; 
+            z-index: 120 !important; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7) !important; 
         }
         .hotspot.hotspot-active-cinematic {
             background: rgba(255, 255, 255, 0.18) !important;
             border: 2.5px solid #FFD700 !important;
             box-shadow: 0 0 20px #FFD700, inset 0 0 8px rgba(255, 215, 0, 0.4) !important;
-            z-index: 95 !important;
+            z-index: 115 !important;
             animation: pulseHotspotCinematic 1.2s infinite alternate ease-in-out !important;
         }
         @keyframes pulseHotspotCinematic {
@@ -206,10 +206,10 @@
             position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); 
             background: #111111; color: #E0E0E0; padding: 6px 10px; border-radius: 6px; 
             font-size: 13px; font-weight: bold; white-space: nowrap; pointer-events: none; 
-            opacity: 0; visibility: hidden; transition: 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #8B0000; z-index: 90;
+            opacity: 0; visibility: hidden; transition: 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #8B0000; z-index: 125;
         }
         .hotspot-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #8B0000 transparent transparent transparent; }
-        .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; }
+        .hotspot:hover .hotspot-tooltip { opacity: 1; visibility: visible; bottom: 120%; z-index: 130 !important; }
 
         /* Titik Kumpul (Assembly Point) Overlay Markers */
         .titik-kumpul-marker {
@@ -219,49 +219,101 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 92;
+            z-index: 88;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            opacity: 0.88;
+            backdrop-filter: blur(2px);
         }
         .titik-kumpul-marker:hover {
-            transform: translate(-50%, -50%) scale(1.15);
-            z-index: 105;
+            transform: translate(-50%, -50%) scale(1.15) !important;
+            z-index: 115 !important;
+            opacity: 1.0 !important;
         }
+
+        /* Posisi Label Fleksibel agar tidak menutupi hotspot/bangunan */
+        .titik-kumpul-marker.pos-atas {
+            flex-direction: column;
+        }
+        .titik-kumpul-marker.pos-atas .titik-kumpul-label {
+            order: -1;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+        .titik-kumpul-marker.pos-kiri {
+            flex-direction: row;
+            align-items: center;
+        }
+        .titik-kumpul-marker.pos-kiri .titik-kumpul-label {
+            order: -1;
+            margin-top: 0;
+            margin-right: 6px;
+        }
+        .titik-kumpul-marker.pos-kanan {
+            flex-direction: row;
+            align-items: center;
+        }
+        .titik-kumpul-marker.pos-kanan .titik-kumpul-label {
+            margin-top: 0;
+            margin-left: 6px;
+        }
+        .titik-kumpul-marker.pos-sembunyi .titik-kumpul-label {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease;
+        }
+        .titik-kumpul-marker.pos-sembunyi:hover .titik-kumpul-label {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Meredupkan otomatis saat rute navigasi aktif agar rute/bangunan menonjol */
+        .interactive-map-route-active .titik-kumpul-marker {
+            opacity: 0.40;
+        }
+        .interactive-map-route-active .titik-kumpul-marker:hover {
+            opacity: 1.0 !important;
+        }
+
         .titik-kumpul-icon-box {
-            width: 38px;
-            height: 38px;
-            background: #107C41;
-            border: 2.5px solid #FFFFFF;
+            background: rgba(16, 124, 65, 0.88);
+            border: 2px solid #FFFFFF;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6), 0 0 12px rgba(16, 124, 65, 0.85);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 10px rgba(16, 124, 65, 0.7);
             animation: pulseAssemblyPoint 1.8s infinite alternate ease-in-out;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
         .titik-kumpul-icon-box svg {
-            width: 22px;
-            height: 22px;
             fill: #FFFFFF;
+            flex-shrink: 0;
         }
         .titik-kumpul-label {
             margin-top: 4px;
-            background: rgba(16, 124, 65, 0.95);
+            background: rgba(16, 124, 65, 0.90);
             color: #FFFFFF;
             font-size: 11px;
             font-weight: 800;
             padding: 2px 7px;
             border-radius: 12px;
-            border: 1px solid #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.9);
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            pointer-events: none; /* Clicks pass through label to hotspot underneath if overlapped */
         }
         @keyframes pulseAssemblyPoint {
-            0% { box-shadow: 0 0 8px rgba(16, 124, 65, 0.6); transform: scale(1); }
-            100% { box-shadow: 0 0 20px rgba(46, 204, 113, 0.95), 0 0 30px rgba(46, 204, 113, 0.6); transform: scale(1.08); }
+            0% { box-shadow: 0 0 6px rgba(16, 124, 65, 0.5); transform: scale(1); }
+            100% { box-shadow: 0 0 18px rgba(46, 204, 113, 0.9), 0 0 25px rgba(46, 204, 113, 0.5); transform: scale(1.06); }
         }
 
         /* ------------------------------------------- */
@@ -620,6 +672,12 @@
         /* RESPONSIVE DESIGN (HP & TABLET)             */
         /* ------------------------------------------- */
         @media (max-width: 950px) {
+            .titik-kumpul-marker {
+                transform: translate(-50%, -50%) scale(0.85);
+            }
+            .titik-kumpul-marker:hover {
+                transform: translate(-50%, -50%) scale(1.05) !important;
+            }
             .app-container { 
                 flex-direction: column; 
                 width: 100%;
@@ -1185,6 +1243,15 @@
             
             <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Nama Titik Kumpul:</label>
             <input type="text" id="tk-nama" placeholder="Misal: Titik Kumpul 1 (Depan Poliklinik & IGD)">
+
+            <label style="font-size:12px; color:#C0C0C0; margin-top:6px;">Posisi Label (Penyesuaian Agar Tidak Menutupi Bangunan):</label>
+            <select id="tk-label-pos" style="width:100%; padding:6px 8px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:12px; margin-bottom:8px;">
+                <option value="bawah">👇 Posisi Label: Di Bawah Marker (Default)</option>
+                <option value="atas">👆 Posisi Label: Di Atas Marker</option>
+                <option value="kiri">👈 Posisi Label: Di Samping Kiri</option>
+                <option value="kanan">👉 Posisi Label: Di Samping Kanan</option>
+                <option value="sembunyi">👁️ Sembunyikan Label (Tampil Saat Hover/Sentuh)</option>
+            </select>
 
             <button type="button" class="btn-save-admin" style="background: #107C41; color: #FFF; width: 100%; margin: 8px 0 5px 0; border-color: #2ecc71;" onclick="mulaiPilihKoordinatTK()">🖱️ Klik Lokasi di Peta untuk Set Koordinat</button>
 
@@ -2772,9 +2839,9 @@
 
         if (!dataTitikKumpul || dataTitikKumpul.length === 0) {
             dataTitikKumpul = [
-                { id: 'tk-1', nama: 'Titik Kumpul 1 (Depan Poliklinik & IGD)', x: 18, y: 32 },
-                { id: 'tk-2', nama: 'Titik Kumpul 2 (Area Parkir & Lapangan)', x: 82, y: 72 },
-                { id: 'tk-3', nama: 'Titik Kumpul 3 (Halaman Tengah)', x: 50, y: 48 }
+                { id: 'tk-1', nama: 'Titik Kumpul 1 (Depan Poliklinik & IGD)', x: 18, y: 32, pos: 'bawah' },
+                { id: 'tk-2', nama: 'Titik Kumpul 2 (Area Parkir & Lapangan)', x: 82, y: 72, pos: 'bawah' },
+                { id: 'tk-3', nama: 'Titik Kumpul 3 (Halaman Tengah)', x: 50, y: 48, pos: 'atas' }
             ];
         }
 
@@ -2790,10 +2857,11 @@
                 const div = document.createElement('div');
                 div.className = 'data-item';
                 div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:#222; margin-bottom:5px; border-radius:4px; border:1px solid #333;';
+                const posLabelMap = { bawah: '👇 Bawah', atas: '👆 Atas', kiri: '👈 Kiri', kanan: '👉 Kanan', sembunyi: '👁️ Sembunyi' };
                 div.innerHTML = `
                     <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:8px;">
                         <strong style="color:#2ecc71;">TK ${idx + 1}: ${tk.nama}</strong>
-                        <div style="font-size:11px; color:#aaa;">X: ${tk.x}%, Y: ${tk.y}%</div>
+                        <div style="font-size:11px; color:#aaa;">X: ${tk.x}%, Y: ${tk.y}% | Label: ${posLabelMap[tk.pos || 'bawah']}</div>
                     </div>
                     <div style="display:flex; gap:4px; flex-shrink:0;">
                         <button type="button" class="btn-mini-action" onclick="editTitikKumpul('${tk.id}')">✏️ Edit</button>
@@ -2808,6 +2876,8 @@
             const nama = document.getElementById('tk-nama').value.trim();
             const x = parseFloat(document.getElementById('tk-x').value);
             const y = parseFloat(document.getElementById('tk-y').value);
+            const posEl = document.getElementById('tk-label-pos');
+            const pos = posEl ? posEl.value : 'bawah';
 
             if (!nama || isNaN(x) || isNaN(y)) {
                 alert("Mohon lengkapi Nama, Koordinat X, dan Koordinat Y.");
@@ -2817,11 +2887,11 @@
             if (idEditTK) {
                 const index = dataTitikKumpul.findIndex(t => t.id === idEditTK);
                 if (index !== -1) {
-                    dataTitikKumpul[index] = { id: idEditTK, nama, x, y };
+                    dataTitikKumpul[index] = { id: idEditTK, nama, x, y, pos };
                 }
             } else {
                 const newId = 'tk-' + Date.now();
-                dataTitikKumpul.push({ id: newId, nama, x, y });
+                dataTitikKumpul.push({ id: newId, nama, x, y, pos });
             }
 
             try {
@@ -2841,6 +2911,9 @@
             document.getElementById('tk-nama').value = item.nama;
             document.getElementById('tk-x').value = item.x;
             document.getElementById('tk-y').value = item.y;
+            if (document.getElementById('tk-label-pos')) {
+                document.getElementById('tk-label-pos').value = item.pos || 'bawah';
+            }
             document.getElementById('label-mode-tk').innerText = `Mode: [ Edit TK ${item.nama} ]`;
         };
 
@@ -2860,6 +2933,9 @@
             document.getElementById('tk-nama').value = '';
             document.getElementById('tk-x').value = '';
             document.getElementById('tk-y').value = '';
+            if (document.getElementById('tk-label-pos')) {
+                document.getElementById('tk-label-pos').value = 'bawah';
+            }
             document.getElementById('label-mode-tk').innerText = 'Mode: [ Tambah Baru ]';
             isPickingTKCoord = false;
         };
@@ -2876,24 +2952,35 @@
             const mapWrapper = document.getElementById('interactive-map');
             if (!mapWrapper) return;
 
-            const size = typeof ukuranTitikKumpul !== 'undefined' ? ukuranTitikKumpul : 38;
+            const size = typeof ukuranTitikKumpul !== 'undefined' ? (parseInt(ukuranTitikKumpul) || 38) : 38;
             const svgSize = Math.max(12, Math.round(size * 0.58));
             const labelSize = Math.max(9, Math.round(size * 0.28));
 
+            // Sync UI slider jika elemen tersedia
+            const slider = document.getElementById('slider-size-tk');
+            const labelVal = document.getElementById('val-size-tk');
+            if (slider && parseInt(slider.value) !== size) slider.value = size;
+            if (labelVal) labelVal.innerText = size + 'px';
+
             dataTitikKumpul.forEach((tk, idx) => {
                 const marker = document.createElement('div');
-                marker.className = 'titik-kumpul-marker';
+                const pos = tk.pos || 'bawah';
+                marker.className = `titik-kumpul-marker pos-${pos}`;
                 marker.style.left = tk.x + '%';
                 marker.style.top = tk.y + '%';
+                marker.style.width = size + 'px';
+                marker.style.minWidth = size + 'px';
+                marker.style.maxWidth = size + 'px';
+                marker.style.flexShrink = '0';
                 marker.title = tk.nama;
 
                 marker.innerHTML = `
-                    <div class="titik-kumpul-icon-box" style="width:${size}px; height:${size}px;">
-                        <svg viewBox="0 0 24 24" style="width:${svgSize}px; height:${svgSize}px;">
+                    <div class="titik-kumpul-icon-box" style="width:${size}px; height:${size}px; min-width:${size}px; min-height:${size}px; max-width:${size}px; max-height:${size}px; flex-shrink:0;">
+                        <svg viewBox="0 0 24 24" style="width:${svgSize}px; height:${svgSize}px; min-width:${svgSize}px; min-height:${svgSize}px; flex-shrink:0;">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-3H8l4-4 4 4h-3v3h-2zM7 7h10v2H7V7z"/>
                         </svg>
                     </div>
-                    <div class="titik-kumpul-label" style="font-size:${labelSize}px;">TK ${idx + 1}</div>
+                    <div class="titik-kumpul-label" style="font-size:${labelSize}px; white-space:nowrap; flex-shrink:0;">TK ${idx + 1}</div>
                 `;
 
                 marker.onclick = (e) => {
@@ -3482,7 +3569,7 @@
         // ==========================================
         let adminPin6 = localStorage.getItem('app_admin_pin_6') || '123456';
         let superAdminPin6 = localStorage.getItem('app_super_pin_6') || '999999';
-        let ukuranTitikKumpul = parseInt(localStorage.getItem('ukuranTitikKumpul') || '38');
+        let ukuranTitikKumpul = parseInt(localStorage.getItem('ukuranTitikKumpul') || localStorage.getItem('app_ukuran_titik_kumpul') || '38');
 
         // Feature permissions per role
         const defaultRolePermissions = {
@@ -3645,7 +3732,8 @@
         window.ubahUkuranMarkerTK = function(val) {
             ukuranTitikKumpul = parseInt(val) || 38;
             try {
-                localStorage.setItem('ukuranTitikKumpul', ukuranTitikKumpul);
+                localStorage.setItem('ukuranTitikKumpul', ukuranTitikKumpul.toString());
+                localStorage.setItem('app_ukuran_titik_kumpul', ukuranTitikKumpul.toString());
             } catch(e) {}
             const valEl = document.getElementById('val-size-tk');
             if (valEl) valEl.innerText = ukuranTitikKumpul + 'px';
