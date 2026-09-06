@@ -155,8 +155,12 @@
             border-radius: 10px; pointer-events: none; border: 2px solid #D4AF37; background: #fff;
         }
         
-        /* Animasi SVG Jalur Rute */
+        /* Animasi SVG Jalur Rute & Ukuran Titik Node Adaptif Bening */
         #route-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 65; display: none; pointer-events: none; }
+        #route-svg circle, #route-svg path { pointer-events: none; }
+        #route-svg .wpt-handle-group { pointer-events: all !important; }
+        .wpt-node-handle { transition: r 0.15s ease, fill-opacity 0.15s ease, stroke-width 0.15s ease; }
+        .wpt-handle-group:hover .wpt-node-handle { r: 1.6 !important; fill-opacity: 1 !important; }
         .path-anim { animation: moveDash 1.2s linear infinite; filter: drop-shadow(0px 0px 5px rgba(0, 168, 255, 0.9)); }
         @keyframes moveDash { to { stroke-dashoffset: -24; } }
 
@@ -992,7 +996,8 @@
                 </div>
                 <div class="toolbar-divider-v"></div>
                 <div class="map-aux-controls" id="map-aux-toolbar">
-                    <!-- Toggle Overlay Titik Kumpul Sejajar dengan Zoom -->
+                    <!-- Toggle Overlay Garis Rute & Titik Kumpul -->
+                    <button type="button" class="btn-quick-ctrl" id="btn-toggle-garis-rute" onclick="window.toggleGarisRuteVisibilitas()" title="Tampilkan / Sembunyikan Garis Rute Navigasi" style="background:#00a8ff; color:#000; border-color:#00ffff;">🛣️</button>
                     <button type="button" class="btn-quick-ctrl" id="btn-toggle-titik-kumpul" onclick="toggleOverlayTitikKumpul()" title="Tampilkan / Sembunyikan Overlay Titik Kumpul (Assembly Point)" style="background:#107C41; color:#FFF; border-color:#2ecc71;">🟢</button>
                     <button type="button" class="btn-quick-ctrl" id="btn-quick-view-mode" onclick="toggleModePetaQuick()" title="Ubah Mode 2D / 3D">🧊</button>
                     <button type="button" class="btn-quick-ctrl" onclick="resetPosisiPeta()" title="Reset Posisi Peta">🔄</button>
@@ -1023,7 +1028,14 @@
                         <button class="btn-map-control" onclick="putarPeta(-45)">↩️ Kiri</button>
                         <button class="btn-map-control" onclick="putarPeta(45)">Kanan ↪️</button>
                     </div>
-                    <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:4px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset Denah</button>
+
+                    <h4 style="margin-top: 6px;">Visibilitas Layer</h4>
+                    <div class="control-row">
+                        <button class="btn-map-control active" id="btn-hud-toggle-rute" style="background:#00a8ff; color:#000;" onclick="window.toggleGarisRuteVisibilitas()" title="Toggle Garis Rute">🛣️ Rute: Aktif</button>
+                        <button class="btn-map-control" id="btn-hud-toggle-all-routes" onclick="window.toggleSemuaJalurMatrixOverlay()" title="Toggle Semua Rute Matriks">🌐 Semua Rute</button>
+                    </div>
+
+                    <button class="btn-map-control" style="background:#111; color:#D4AF37; margin-top:6px; border:1px solid #D4AF37;" onclick="resetPosisiPeta()">🔄 Reset Denah</button>
                 </div>
             </div>
 
@@ -1031,11 +1043,28 @@
             <div class="map-wrapper" id="interactive-map">
                 <img id="main-map-image" src="" alt="Denah Rumah Sakit">
                 
-                <!-- Animasi Garis Navigasi SVG -->
-                <svg id="route-svg">
-                    <line id="route-line" x1="50%" y1="95%" x2="50%" y2="50%" stroke="#00a8ff" stroke-width="6" stroke-dasharray="14,10" stroke-linecap="round" class="path-anim"/>
-                    <circle id="route-start" cx="50%" cy="95%" r="7" fill="#D4AF37" stroke="#8B0000" stroke-width="3"/>
-                    <circle id="route-end" cx="50%" cy="50%" r="7" fill="#4cd137" stroke="#fff" stroke-width="3"/>
+                <!-- Animasi Garis Navigasi SVG dengan ViewBox Responsif -->
+                <svg id="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 65; display: none; pointer-events: none;">
+                    <!-- Group Overlay Semua Rute Matriks -->
+                    <g id="route-all-paths-group"></g>
+
+                    <!-- Path Utama Rute Berbelok (Waypoints Polyline) -->
+                    <path id="route-path" d="M 50 95 L 50 50" stroke="#00a8ff" stroke-width="1.8" stroke-dasharray="2.5,1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" class="path-anim" vector-effect="non-scaling-stroke"/>
+                    
+                    <!-- Line Fallback Standar -->
+                    <line id="route-line" x1="50" y1="95" x2="50" y2="50" stroke="#00a8ff" stroke-width="1.8" stroke-dasharray="2.5,1.5" stroke-linecap="round" class="path-anim" vector-effect="non-scaling-stroke" style="display:none;"/>
+                    
+                    <!-- Titik Awal (Gold) & Titik Tujuan (Green) - Compact Adaptif Transparan -->
+                    <circle id="route-start" cx="50" cy="95" r="1.1" fill="#D4AF37" fill-opacity="0.9" stroke="#8B0000" stroke-width="0.5" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>
+                    <circle id="route-end" cx="50" cy="50" r="1.1" fill="#4cd137" fill-opacity="0.9" stroke="#ffffff" stroke-width="0.5" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>
+                    
+                    <!-- Animated Glowing Traveling Dot (Cahaya Bergerak Menyusuri Jalur) -->
+                    <circle id="route-glow-dot" r="0.9" fill="#00ffff" style="display:none; filter: drop-shadow(0 0 3px #00ffff); pointer-events:none;" vector-effect="non-scaling-stroke">
+                        <animateMotion id="route-dot-anim" dur="3s" repeatCount="indefinite" path="M 50 95 L 50 50" />
+                    </circle>
+
+                    <!-- Group Node Handles untuk Editor Rute C-Panel -->
+                    <g id="route-waypoints-handles"></g>
                 </svg>
 
                 <div id="draw-overlay"><div id="draw-box"></div></div>
@@ -1237,6 +1266,132 @@
             <div style="display:flex; gap:8px; margin-top:4px;">
                 <button class="btn-save-admin" id="btn-save-matrix" onclick="simpanDataMatrix()">💾 Simpan ke Matriks</button>
                 <button type="button" class="btn-save-admin" style="background:#2c3e50; color:#ecf0f1; border-color:#34495e; flex:0.6;" onclick="ujiMatrixRute()">🧪 Tes Suara</button>
+            </div>
+        </div>
+
+        <!-- Section Editor Jalur Rute (Visual / Animasi Line Editor) -->
+        <div class="admin-section" id="section-rute-editor" style="border-color: #00a8ff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                <h3 style="color: #00a8ff; margin:0;">✏️ Editor Jalur & Animasi Rute Visual</h3>
+                <span style="font-size:11px; background:#00a8ff22; color:#00a8ff; padding:3px 8px; border-radius:12px; border:1px solid #00a8ff;">Interactive Waypoints</span>
+            </div>
+            <p style="font-size:12px; color:#bbb; margin:0 0 10px 0; line-height:1.4;">
+                Buat animasi garis rute berbelok mengikuti koridor gedung dari <b>Titik Awal</b> ke <b>Lokasi Tujuan</b> dengan mengklik titik-titik (waypoints) langsung di peta.
+            </p>
+
+            <!-- Control Toggle Visibilitas Garis Rute & Mode Edit Lock -->
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px; background:#111; padding:8px; border-radius:6px; border:1px solid #333;">
+                <label style="font-size:11px; color:#D4AF37; font-weight:bold;">⚙️ Kontrol Status Mode Edit & Visibilitas Peta:</label>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="btn-save-admin" id="btn-toggle-route-edit-lock" style="flex:1.2; background:#27ae60; color:#fff; font-weight:bold; font-size:11px; padding:6px;" onclick="window.toggleRouteEditMode()">🔓 Status Peta: [ BISA DIGESER ] (Klik utk Lock Edit)</button>
+                    <button type="button" class="btn-save-admin" id="btn-toggle-route-vis-cpanel" style="flex:1; background:#00a8ff; color:#000; font-weight:bold; font-size:11px; padding:6px;" onclick="window.toggleGarisRuteVisibilitas()">👁️ Status Garis: [ TAMPIL ]</button>
+                    <button type="button" class="btn-save-admin" id="btn-toggle-all-routes-cpanel" style="flex:1; background:#2c3e50; color:#ecf0f1; font-weight:bold; font-size:11px; padding:6px; border-color:#34495e;" onclick="window.toggleSemuaJalurMatrixOverlay()">🌐 Semua Rute</button>
+                </div>
+            </div>
+
+            <label style="font-size:12px; color:#C0C0C0;">📍 Pilih Titik Awal:</label>
+            <select id="editor-route-asal" style="width:100%; padding:6px 8px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:12px; margin-bottom:8px;" onchange="window.muatJalurRuteEditor()"></select>
+
+            <label style="font-size:12px; color:#C0C0C0;">🎯 Pilih Lokasi Tujuan:</label>
+            <select id="editor-route-tujuan" style="width:100%; padding:6px 8px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:12px; margin-bottom:8px;" onchange="window.muatJalurRuteEditor()"></select>
+
+            <!-- Aksi Tombol Editor Waypoints -->
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 8px 0;">
+                <button type="button" class="btn-save-admin" id="btn-toggle-route-pick" style="flex:1; background:#00a8ff; color:#000; font-weight:bold; font-size:12px;" onclick="window.toggleModePickWaypoints()">🖱️ Klik Peta untuk Tambah Belokan / Point</button>
+                <button type="button" class="btn-cancel-admin" style="padding:6px 10px; font-size:11px;" onclick="window.hapusWaypointTerakhir()" title="Hapus Point Terakhir">↩️ Hapus Point</button>
+                <button type="button" class="btn-cancel-admin" style="padding:6px 10px; font-size:11px; background:#8B0000; color:#fff; border-color:#5c0000;" onclick="window.resetWaypointsEditor()" title="Reset Semua Point">🗑️ Reset</button>
+            </div>
+
+            <!-- Panel Daftar Point & Adjustment Presisi X/Y -->
+            <div style="background:#111; padding:8px; border-radius:6px; border:1px solid #333; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:11px; color:#D4AF37; font-weight:bold;">📍 Waypoints & Adjust Presisi X/Y:</span>
+                    <span id="editor-waypoint-count" style="font-size:11px; color:#00a8ff; font-weight:bold;">0 Points</span>
+                </div>
+
+                <!-- Adjustment Box untuk Point yang Dipilih -->
+                <div id="waypoint-fine-adjust-panel" style="background:#1a1a1a; padding:8px; border-radius:6px; border:1px solid #00a8ff; margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+                        <span style="font-size:11px; color:#00ffff; font-weight:bold;">🎯 Target Point Aktif:</span>
+                        <select id="select-active-waypoint-idx" style="background:#222; color:#fff; border:1px solid #00a8ff; border-radius:4px; font-size:11px; padding:3px 6px; flex:1; max-width:200px;" onchange="window.selectWaypointIndex(parseInt(this.value))">
+                            <option value="0">🏁 START (Awal)</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between;">
+                        <!-- X Adjust -->
+                        <div style="display:flex; align-items:center; gap:4px; flex:1; min-width:130px; background:#111; padding:4px 6px; border-radius:4px; border:1px solid #333;">
+                            <span style="font-size:11px; color:#aaa; font-weight:bold;">X:</span>
+                            <button type="button" class="btn-cancel-admin" style="padding:2px 6px; font-size:11px; background:#222;" onclick="window.adjustWaypointPos(-0.1, 0)" title="Geser Kiri -0.1%">◀️</button>
+                            <input type="number" id="input-wpt-x" step="0.1" min="0" max="100" value="50.0" style="width:52px; background:#000; color:#00ffff; border:1px solid #444; border-radius:4px; font-size:11px; text-align:center; padding:2px;" onchange="window.setWaypointPosFromInput()">
+                            <button type="button" class="btn-cancel-admin" style="padding:2px 6px; font-size:11px; background:#222;" onclick="window.adjustWaypointPos(0.1, 0)" title="Geser Kanan +0.1%">▶️</button>
+                        </div>
+
+                        <!-- Y Adjust -->
+                        <div style="display:flex; align-items:center; gap:4px; flex:1; min-width:130px; background:#111; padding:4px 6px; border-radius:4px; border:1px solid #333;">
+                            <span style="font-size:11px; color:#aaa; font-weight:bold;">Y:</span>
+                            <button type="button" class="btn-cancel-admin" style="padding:2px 6px; font-size:11px; background:#222;" onclick="window.adjustWaypointPos(0, -0.1)" title="Geser Naik -0.1%">🔼</button>
+                            <input type="number" id="input-wpt-y" step="0.1" min="0" max="100" value="50.0" style="width:52px; background:#000; color:#00ffff; border:1px solid #444; border-radius:4px; font-size:11px; text-align:center; padding:2px;" onchange="window.setWaypointPosFromInput()">
+                            <button type="button" class="btn-cancel-admin" style="padding:2px 6px; font-size:11px; background:#222;" onclick="window.adjustWaypointPos(0, 0.1)" title="Geser Turun +0.1%">🔽</button>
+                        </div>
+                    </div>
+                    <div style="font-size:10px; color:#888; margin-top:4px;">
+                        💡 Geser langsung dengan klik-tahan titik di peta, atau tekan ◀️ ▶️ 🔼 🔽 untuk atur presisi.
+                    </div>
+                </div>
+
+                <div id="editor-waypoint-list" style="font-size:11px; color:#aaa; font-family:monospace; max-height:90px; overflow-y:auto; line-height:1.4;">
+                    (Belum ada titik belokan tambahan. Garis rute menggunakan garis lurus standar)
+                </div>
+            </div>
+
+            <!-- Custom Opsi Garis, Ketebalan, Warna & Ukuran Dot -->
+            <div style="display:flex; flex-direction:column; gap:8px; background:#111; padding:8px; border-radius:6px; border:1px solid #333; margin-bottom:10px;">
+                <div class="flex-row" style="gap:8px;">
+                    <div style="flex:1;">
+                        <label style="font-size:11px; color:#C0C0C0;">🎨 Warna Garis Rute:</label>
+                        <select id="editor-route-color" style="width:100%; padding:5px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:11px;" onchange="window.previewJalurEditor()">
+                            <option value="#00a8ff">🟦 Cyan Neon (Default)</option>
+                            <option value="#2ecc71">🟩 Hijau Evakuasi</option>
+                            <option value="#f1c40f">🟨 Kuning Emas</option>
+                            <option value="#e74c3c">🟥 Merah Bahaya</option>
+                            <option value="#9b59b6">🟪 Ungu Elegan</option>
+                            <option value="#000000">⬛ Hitam</option>
+                            <option value="#000080">🟦 Navy</option>
+                            <option value="#800000">🟥 Maroon</option>
+                            <option value="#4a2c11">🟫 Coklat Tua</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:11px; color:#C0C0C0;">✨ Efek Animasi:</label>
+                        <select id="editor-route-style" style="width:100%; padding:5px; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:4px; font-size:11px;" onchange="window.previewJalurEditor()">
+                            <option value="dash">✨ Garis Putus-Putus Bergerak</option>
+                            <option value="glow">🌟 Garis Glowing Pulse</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex-row" style="gap:8px;">
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="font-size:11px; color:#C0C0C0;">📏 Ketebalan Garis:</label>
+                            <span id="val-route-width" style="font-size:11px; color:#00a8ff; font-weight:bold;">1.8px</span>
+                        </div>
+                        <input type="range" id="editor-route-width" min="0.5" max="6.0" step="0.1" value="1.8" style="width:100%; cursor:pointer;" oninput="document.getElementById('val-route-width').innerText = this.value + 'px'; window.previewJalurEditor();">
+                    </div>
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="font-size:11px; color:#C0C0C0;">⚪ Ukuran Point (Dot):</label>
+                            <span id="val-route-dotsize" style="font-size:11px; color:#00a8ff; font-weight:bold;">1.2px</span>
+                        </div>
+                        <input type="range" id="editor-route-dotsize" min="0.4" max="5.0" step="0.1" value="1.2" style="width:100%; cursor:pointer;" oninput="document.getElementById('val-route-dotsize').innerText = this.value + 'px'; window.previewJalurEditor();">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="btn-save-admin" style="flex:1; background:#107C41; color:#FFF; font-weight:bold; border-color:#2ecc71;" onclick="window.simpanJalurRuteEditor()">💾 Simpan Jalur Rute</button>
+                <button type="button" class="btn-save-admin" style="flex:0.6; background:#00a8ff; color:#000; font-weight:bold;" onclick="window.ujiAnimasiRuteEditor()">🧪 Uji Animasi</button>
             </div>
         </div>
 
@@ -1857,6 +2012,32 @@
             const quickModeBtn = document.getElementById('btn-quick-view-mode');
             if (quickModeBtn) quickModeBtn.innerText = (mode === '3D') ? '🟦' : '🧊';
             terapkanTransformasiPeta(true);
+
+            // Default: Jalur rute otomatis ditampilkan/diperbarui saat transisi kembali ke Mode Flat (2D)
+            if (mode === 'FLAT' && window.tampilkanGarisRute) {
+                const routeSvg = document.getElementById('route-svg');
+                if (routeSvg) {
+                    const edAsal = document.getElementById('editor-route-asal')?.value;
+                    const edTujuan = document.getElementById('editor-route-tujuan')?.value;
+                    if (edAsal && edTujuan && typeof window.previewJalurEditor === 'function' && window.editorWaypoints && window.editorWaypoints.length >= 2) {
+                        window.previewJalurEditor();
+                    } else if (lokasiAsal && lokasiTujuan) {
+                        const coordAsal = window.getCoordinatesForLokasi(lokasiAsal);
+                        const coordTujuan = window.getCoordinatesForLokasi(lokasiTujuan);
+                        let matchMatrix = typeof dataMatrixRute !== 'undefined' ? dataMatrixRute.find(m => 
+                            ((m.lokasi_asal || m.nama_asal) === lokasiAsal || (m.lokasi_asal || m.nama_asal)?.trim().toLowerCase() === lokasiAsal?.trim().toLowerCase()) &&
+                            ((m.lokasi_tujuan || m.nama_tujuan) === lokasiTujuan || (m.lokasi_tujuan || m.nama_tujuan)?.trim().toLowerCase() === lokasiTujuan?.trim().toLowerCase())
+                        ) : null;
+                        if (typeof window.renderGarisRuteSVG === 'function') {
+                            window.renderGarisRuteSVG(coordAsal, coordTujuan, matchMatrix);
+                        } else {
+                            routeSvg.style.display = 'block';
+                        }
+                    } else if (window.tampilkanSemuaJalurMatrix && typeof window.renderSemuaJalurMatrixOverlay === 'function') {
+                        window.renderSemuaJalurMatrixOverlay();
+                    }
+                }
+            }
         };
 
         window.putarPeta = function(derajat) { 
@@ -1937,7 +2118,7 @@
 
         // MOUSE PANNING & TRACKING (Window-level agar tidak tersendat)
         function startMousePan(e) {
-            if (isDrawingArea) return;
+            if (isDrawingArea || window.isRouteEditMode || window.isPickingRouteWaypoint || window.isDraggingWaypoint) return;
             if (e.button !== 0) return; // Hanya klik kiri
             if (e.target.closest('.map-controls-hud') || e.target.closest('.map-top-toolbar') || 
                 e.target.closest('.map-zoom-controls') || e.target.closest('.map-aux-controls') ||
@@ -1981,7 +2162,7 @@
         // TOUCH GESTURE (Pinch-to-zoom dan 1-finger pan terkoordinasi rapi tanpa jeda)
         if (mapView) {
             mapView.addEventListener('touchstart', (e) => {
-                if (isDrawingArea) return;
+                if (isDrawingArea || window.isRouteEditMode || window.isPickingRouteWaypoint || window.isDraggingWaypoint) return;
                 if (e.target.closest('.map-controls-hud') || e.target.closest('.map-top-toolbar') || 
                     e.target.closest('.map-zoom-controls') || e.target.closest('.map-aux-controls') || 
                     e.target.closest('.map-quick-toolbar') || e.target.closest('.credit-dev-badge')) return;
@@ -2005,7 +2186,7 @@
             }, { passive: true });
 
             mapView.addEventListener('touchmove', (e) => {
-                if (isDrawingArea) return;
+                if (isDrawingArea || window.isRouteEditMode || window.isPickingRouteWaypoint || window.isDraggingWaypoint) return;
                 if (e.touches.length === 1 && isPanning) {
                     if (e.cancelable) e.preventDefault();
                     panX = e.touches[0].clientX - startPanX;
@@ -2046,11 +2227,41 @@
 
         if (mapWrapper) {
             mapWrapper.addEventListener('click', (e) => {
+                if (window.isDraggingWaypoint) {
+                    window.isDraggingWaypoint = false;
+                    return;
+                }
+
+                const rect = mapWrapper.getBoundingClientRect();
+                const x = parseFloat((((e.clientX - rect.left) / rect.width) * 100).toFixed(1));
+                const y = parseFloat((((e.clientY - rect.top) / rect.height) * 100).toFixed(1));
+
+                if (typeof window.isPickingRouteWaypoint !== 'undefined' && window.isPickingRouteWaypoint) {
+                    e.stopPropagation();
+                    if (!window.editorWaypoints || window.editorWaypoints.length < 2) {
+                        const asal = document.getElementById('editor-route-asal')?.value;
+                        const tujuan = document.getElementById('editor-route-tujuan')?.value;
+                        const coordAsal = window.getCoordinatesForLokasi(asal) || { x: x, y: y };
+                        const coordTujuan = window.getCoordinatesForLokasi(tujuan) || { x: x, y: y };
+                        window.editorWaypoints = [
+                            { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
+                            { x: x, y: y },
+                            { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
+                        ];
+                    } else {
+                        // Insert point right before the destination point (end point)
+                        window.editorWaypoints.splice(window.editorWaypoints.length - 1, 0, { x: x, y: y });
+                    }
+                    window.updateUIWaypointsList();
+                    window.previewJalurEditor();
+                    if (window.tampilkanToast) {
+                        window.tampilkanToast(`📍 Belokan #${window.editorWaypoints.length - 2} ditambahkan: (${x}%, ${y}%)`);
+                    }
+                    return;
+                }
+
                 if (typeof isPickingTKCoord !== 'undefined' && isPickingTKCoord) {
                     e.stopPropagation();
-                    const rect = mapWrapper.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
                     const elX = document.getElementById('tk-x');
                     const elY = document.getElementById('tk-y');
                     const elNama = document.getElementById('tk-nama');
@@ -2066,6 +2277,852 @@
                 }
             });
         }
+
+        // ==========================================
+        // RENDER SVG GARIS RUTE NAVIGASI & EDITOR & TOGGLES
+        // ==========================================
+        window.tampilkanGarisRute = true;
+        window.tampilkanSemuaJalurMatrix = false;
+
+        window.toggleGarisRuteVisibilitas = function(state = null) {
+            if (state !== null) {
+                window.tampilkanGarisRute = !!state;
+            } else {
+                window.tampilkanGarisRute = !window.tampilkanGarisRute;
+            }
+
+            const isAktif = window.tampilkanGarisRute;
+            const routeSvg = document.getElementById('route-svg');
+
+            // Update Quick Toolbar button
+            const btnQuick = document.getElementById('btn-toggle-garis-rute');
+            if (btnQuick) {
+                if (isAktif) {
+                    btnQuick.style.background = '#00a8ff';
+                    btnQuick.style.color = '#000';
+                    btnQuick.style.borderColor = '#00ffff';
+                    btnQuick.title = "Matikan / Sembunyikan Garis Rute Navigasi";
+                } else {
+                    btnQuick.style.background = '#333';
+                    btnQuick.style.color = '#888';
+                    btnQuick.style.borderColor = '#555';
+                    btnQuick.title = "Aktifkan / Tampilkan Garis Rute Navigasi";
+                }
+            }
+
+            // Update C-Panel Editor Toggle Button
+            const btnCpanel = document.getElementById('btn-toggle-route-vis-cpanel');
+            if (btnCpanel) {
+                if (isAktif) {
+                    btnCpanel.style.background = '#00a8ff';
+                    btnCpanel.style.color = '#000';
+                    btnCpanel.innerText = '👁️ Status Garis Rute: [ AKTIF / TAMPIL ]';
+                } else {
+                    btnCpanel.style.background = '#444';
+                    btnCpanel.style.color = '#ccc';
+                    btnCpanel.innerText = '🙈 Status Garis Rute: [ NONAKTIF / SEMBUNYI ]';
+                }
+            }
+
+            // Update HUD Button
+            const btnHud = document.getElementById('btn-hud-toggle-rute');
+            if (btnHud) {
+                if (isAktif) {
+                    btnHud.classList.add('active');
+                    btnHud.style.background = '#00a8ff';
+                    btnHud.style.color = '#000';
+                    btnHud.innerText = 'GM Rute: Aktif';
+                } else {
+                    btnHud.classList.remove('active');
+                    btnHud.style.background = '#333';
+                    btnHud.style.color = '#888';
+                    btnHud.innerText = 'GM Rute: Off';
+                }
+            }
+
+            if (!isAktif) {
+                if (routeSvg) routeSvg.style.display = 'none';
+                if (window.tampilkanToast) window.tampilkanToast("🙈 Tampilan Garis Rute Navigasi Dinonaktifkan.");
+            } else {
+                if (window.tampilkanSemuaJalurMatrix && typeof window.renderSemuaJalurMatrixOverlay === 'function') {
+                    window.renderSemuaJalurMatrixOverlay();
+                } else if (document.getElementById('editor-route-asal')?.value && document.getElementById('editor-route-tujuan')?.value) {
+                    if (typeof window.previewJalurEditor === 'function') window.previewJalurEditor();
+                } else if (typeof lokasiAsal !== 'undefined' && lokasiAsal && typeof lokasiTujuan !== 'undefined' && lokasiTujuan) {
+                    if (typeof window.pilihTujuan === 'function') window.pilihTujuan(lokasiTujuan, false, false);
+                } else {
+                    if (routeSvg) routeSvg.style.display = 'block';
+                }
+                if (window.tampilkanToast) window.tampilkanToast("👁️ Tampilan Garis Rute Navigasi Diaktifkan.");
+            }
+        };
+
+        window.toggleSemuaJalurMatrixOverlay = function() {
+            window.tampilkanSemuaJalurMatrix = !window.tampilkanSemuaJalurMatrix;
+            const btnAll = document.getElementById('btn-toggle-all-routes-cpanel');
+            const btnHudAll = document.getElementById('btn-hud-toggle-all-routes');
+
+            if (window.tampilkanSemuaJalurMatrix) {
+                if (!window.tampilkanGarisRute) window.toggleGarisRuteVisibilitas(true);
+                if (btnAll) {
+                    btnAll.style.background = '#2ecc71';
+                    btnAll.style.color = '#000';
+                    btnAll.innerText = '🌐 Tampil Semua Rute: [ AKTIF ]';
+                }
+                if (btnHudAll) {
+                    btnHudAll.style.background = '#2ecc71';
+                    btnHudAll.style.color = '#000';
+                    btnHudAll.innerText = '🌐 Semua Rute: ON';
+                }
+                window.renderSemuaJalurMatrixOverlay();
+                if (window.tampilkanToast) window.tampilkanToast(`🌐 Menampilkan seluruh ${typeof dataMatrixRute !== 'undefined' ? dataMatrixRute.length : 0} rute matriks pada denah.`);
+            } else {
+                if (btnAll) {
+                    btnAll.style.background = '#2c3e50';
+                    btnAll.style.color = '#ecf0f1';
+                    btnAll.innerText = '🌐 Tampilkan Semua Rute Matriks';
+                }
+                if (btnHudAll) {
+                    btnHudAll.style.background = '#333';
+                    btnHudAll.style.color = '#888';
+                    btnHudAll.innerText = '🌐 Semua Rute: Off';
+                }
+                const group = document.getElementById('route-all-paths-group');
+                if (group) group.innerHTML = '';
+                if (document.getElementById('editor-route-asal')?.value && document.getElementById('editor-route-tujuan')?.value) {
+                    if (typeof window.previewJalurEditor === 'function') window.previewJalurEditor();
+                } else {
+                    const routeSvg = document.getElementById('route-svg');
+                    if (routeSvg) routeSvg.style.display = 'none';
+                }
+                if (window.tampilkanToast) window.tampilkanToast("Overlay semua rute disembunyikan.");
+            }
+        };
+
+        window.renderSemuaJalurMatrixOverlay = function() {
+            const routeSvg = document.getElementById('route-svg');
+            const group = document.getElementById('route-all-paths-group');
+            if (!routeSvg || !group) return;
+
+            if (!window.tampilkanGarisRute || !window.tampilkanSemuaJalurMatrix) {
+                group.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            if (typeof dataMatrixRute !== 'undefined' && dataMatrixRute) {
+                dataMatrixRute.forEach((m) => {
+                    const asal = m.nama_asal || m.lokasi_asal;
+                    const tujuan = m.nama_tujuan || m.lokasi_tujuan;
+                    const coordAsal = window.getCoordinatesForLokasi(asal);
+                    const coordTujuan = window.getCoordinatesForLokasi(tujuan);
+                    if (!coordAsal || !coordTujuan) return;
+
+                    let pts = [];
+                    if (m.waypoints) {
+                        try {
+                            let parsed = typeof m.waypoints === 'string' ? JSON.parse(m.waypoints) : m.waypoints;
+                            if (Array.isArray(parsed) && parsed.length >= 2) pts = parsed;
+                        } catch(e){}
+                    }
+                    if (pts.length < 2) {
+                        pts = [
+                            { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
+                            { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
+                        ];
+                    } else {
+                        pts[0] = { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) };
+                        pts[pts.length - 1] = { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) };
+                    }
+
+                    const pathD = pts.map((p, pIdx) => `${pIdx === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+                    const color = m.warna_jalur || '#00a8ff';
+                    const styleClass = (m.gaya_animasi === 'glow') ? 'path-glow' : 'path-anim';
+
+                    html += `<path d="${pathD}" stroke="${color}" stroke-width="1.5" stroke-dasharray="2.5,1.5" stroke-linecap="round" fill="none" class="${styleClass}" vector-effect="non-scaling-stroke"/>`;
+                    html += `<circle cx="${pts[0].x}" cy="${pts[0].y}" r="0.8" fill="#D4AF37" fill-opacity="0.85" stroke="#8B0000" stroke-width="0.4" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>`;
+                    html += `<circle cx="${pts[pts.length - 1].x}" cy="${pts[pts.length - 1].y}" r="0.8" fill="#2ecc71" fill-opacity="0.85" stroke="#fff" stroke-width="0.4" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>`;
+                });
+            }
+
+            group.innerHTML = html;
+            routeSvg.style.display = 'block';
+        };
+
+        window.renderGarisRuteSVG = function(coordAsal, coordTujuan, matchMatrix = null) {
+            const routeSvg = document.getElementById('route-svg');
+            const routePath = document.getElementById('route-path');
+            const routeLine = document.getElementById('route-line');
+            const routeStart = document.getElementById('route-start');
+            const routeEnd = document.getElementById('route-end');
+            const routeGlowDot = document.getElementById('route-glow-dot');
+            const routeDotAnim = document.getElementById('route-dot-anim');
+            const handlesGroup = document.getElementById('route-waypoints-handles');
+
+            if (!window.tampilkanGarisRute) {
+                if (routeSvg) routeSvg.style.display = 'none';
+                return;
+            }
+
+            if (!coordAsal || !coordTujuan || !routeSvg) {
+                if (routeSvg && !window.tampilkanSemuaJalurMatrix) routeSvg.style.display = 'none';
+                return;
+            }
+
+            let pts = [];
+            // Check if matchMatrix has saved waypoints
+            if (matchMatrix && matchMatrix.waypoints) {
+                try {
+                    let parsed = typeof matchMatrix.waypoints === 'string' ? JSON.parse(matchMatrix.waypoints) : matchMatrix.waypoints;
+                    if (Array.isArray(parsed) && parsed.length >= 2) {
+                        pts = parsed;
+                    }
+                } catch(e){}
+            }
+
+            // Fallback to start -> destination
+            if (pts.length < 2) {
+                pts = [
+                    { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
+                    { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
+                ];
+            } else {
+                // Ensure start and end match current locations
+                pts[0] = { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) };
+                pts[pts.length - 1] = { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) };
+            }
+
+            // Build SVG Path 'd' attribute
+            const pathD = pts.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+            const color = (matchMatrix && matchMatrix.warna_jalur) ? matchMatrix.warna_jalur : '#00a8ff';
+            const styleType = (matchMatrix && matchMatrix.gaya_animasi) ? matchMatrix.gaya_animasi : 'dash';
+            const lineWidth = (matchMatrix && matchMatrix.ketebalan_garis) ? matchMatrix.ketebalan_garis : 1.8;
+            const dotSize = (matchMatrix && matchMatrix.ukuran_point) ? matchMatrix.ukuran_point : 1.2;
+
+            if (routePath) {
+                routePath.setAttribute('d', pathD);
+                routePath.setAttribute('stroke', color);
+                routePath.setAttribute('stroke-width', lineWidth);
+                routePath.setAttribute('class', styleType === 'glow' ? 'path-glow' : 'path-anim');
+                routePath.style.display = 'block';
+            }
+
+            if (routeLine) routeLine.style.display = 'none';
+
+            if (routeStart) {
+                routeStart.setAttribute('cx', pts[0].x);
+                routeStart.setAttribute('cy', pts[0].y);
+                routeStart.setAttribute('r', dotSize);
+            }
+
+            if (routeEnd) {
+                routeEnd.setAttribute('cx', pts[pts.length - 1].x);
+                routeEnd.setAttribute('cy', pts[pts.length - 1].y);
+                routeEnd.setAttribute('r', dotSize);
+            }
+
+            // Animated traveling dot
+            if (routeGlowDot && routeDotAnim) {
+                routeGlowDot.setAttribute('fill', color === '#00a8ff' ? '#00ffff' : color);
+                routeGlowDot.setAttribute('r', Math.max(0.8, dotSize * 0.8));
+                routeDotAnim.setAttribute('path', pathD);
+                routeGlowDot.style.display = 'block';
+            }
+
+            if (handlesGroup && !window.isPickingRouteWaypoint) {
+                if (pts.length > 2) {
+                    let turnHtml = pts.slice(1, pts.length - 1).map((p) => {
+                        return `<circle cx="${p.x}" cy="${p.y}" r="0.7" fill="${color}" fill-opacity="0.8" stroke="#ffffff" stroke-width="0.3" vector-effect="non-scaling-stroke" style="pointer-events:none;"/>`;
+                    }).join('');
+                    handlesGroup.innerHTML = turnHtml;
+                } else {
+                    handlesGroup.innerHTML = '';
+                }
+            }
+
+            routeSvg.style.display = 'block';
+        };
+
+        // ==========================================
+        // JS LOGIC EDITOR JALUR RUTE VISUAL (WAYPOINTS)
+        // ==========================================
+        window.isPickingRouteWaypoint = false;
+        window.isRouteEditMode = false;
+        window.selectedWaypointIdx = 0;
+        window.editorWaypoints = [];
+
+        window.toggleRouteEditMode = function(statusExplicit) {
+            if (typeof statusExplicit === 'boolean') {
+                window.isRouteEditMode = statusExplicit;
+            } else {
+                window.isRouteEditMode = !window.isRouteEditMode;
+            }
+            const btn = document.getElementById('btn-toggle-route-edit-lock');
+            const mapView = document.getElementById('map-container-view');
+
+            if (window.isRouteEditMode) {
+                if (btn) {
+                    btn.style.background = '#e74c3c';
+                    btn.style.color = '#fff';
+                    btn.innerText = '🔒 Status Peta: [ TERKUNCI / MODUS EDIT ] (Klik utk Unlock)';
+                }
+                if (mapView) mapView.style.cursor = 'crosshair';
+                if (window.tampilkanToast) window.tampilkanToast("🔒 Mode Edit Aktif: Peta dikunci agar titik point mudah digeser.");
+            } else {
+                if (btn) {
+                    btn.style.background = '#27ae60';
+                    btn.style.color = '#fff';
+                    btn.innerText = '🔓 Status Peta: [ BISA DIGESER ] (Klik utk Lock Edit)';
+                }
+                if (mapView) mapView.style.cursor = 'grab';
+                if (window.tampilkanToast) window.tampilkanToast("🔓 Peta dapat digeser kembali.");
+            }
+        };
+
+        window.selectWaypointIndex = function(idx) {
+            if (isNaN(idx) || !window.editorWaypoints || !window.editorWaypoints[idx]) return;
+            window.selectedWaypointIdx = idx;
+            const pt = window.editorWaypoints[idx];
+            
+            const inpX = document.getElementById('input-wpt-x');
+            const inpY = document.getElementById('input-wpt-y');
+            if (inpX) inpX.value = parseFloat(pt.x).toFixed(1);
+            if (inpY) inpY.value = parseFloat(pt.y).toFixed(1);
+
+            if (typeof window.previewJalurEditor === 'function') {
+                window.previewJalurEditor();
+            }
+        };
+
+        window.adjustWaypointPos = function(dx, dy) {
+            if (!window.editorWaypoints || window.editorWaypoints.length === 0) return;
+            let idx = window.selectedWaypointIdx || 0;
+            if (idx < 0 || idx >= window.editorWaypoints.length) idx = 0;
+
+            let pt = window.editorWaypoints[idx];
+            pt.x = parseFloat(Math.max(0, Math.min(100, pt.x + dx)).toFixed(1));
+            pt.y = parseFloat(Math.max(0, Math.min(100, pt.y + dy)).toFixed(1));
+
+            const inpX = document.getElementById('input-wpt-x');
+            const inpY = document.getElementById('input-wpt-y');
+            if (inpX) inpX.value = pt.x.toFixed(1);
+            if (inpY) inpY.value = pt.y.toFixed(1);
+
+            if (typeof window.updateUIWaypointsList === 'function') window.updateUIWaypointsList();
+            if (typeof window.previewJalurEditor === 'function') window.previewJalurEditor();
+        };
+
+        window.setWaypointPosFromInput = function() {
+            if (!window.editorWaypoints || window.editorWaypoints.length === 0) return;
+            let idx = window.selectedWaypointIdx || 0;
+            if (idx < 0 || idx >= window.editorWaypoints.length) idx = 0;
+
+            const valX = parseFloat(document.getElementById('input-wpt-x')?.value || 50);
+            const valY = parseFloat(document.getElementById('input-wpt-y')?.value || 50);
+
+            window.editorWaypoints[idx] = {
+                x: parseFloat(Math.max(0, Math.min(100, valX)).toFixed(1)),
+                y: parseFloat(Math.max(0, Math.min(100, valY)).toFixed(1))
+            };
+
+            if (typeof window.updateUIWaypointsList === 'function') window.updateUIWaypointsList();
+            if (typeof window.previewJalurEditor === 'function') window.previewJalurEditor();
+        };
+
+        window.populateOptionsRuteEditor = function() {
+            const selectAsal = document.getElementById('editor-route-asal');
+            const selectTujuan = document.getElementById('editor-route-tujuan');
+            if (!selectAsal || !selectTujuan) return;
+
+            const currAsal = selectAsal.value;
+            const currTujuan = selectTujuan.value;
+
+            // Populate Titik Awal (asal)
+            selectAsal.innerHTML = '<option value="">-- Pilih Titik Awal --</option>';
+            const listAsal = (typeof dataLokasiAsal !== 'undefined' && dataLokasiAsal && dataLokasiAsal.length > 0) 
+                ? dataLokasiAsal 
+                : (typeof fallbackLokasiAsal !== 'undefined' ? fallbackLokasiAsal : []);
+
+            listAsal.forEach(a => {
+                const nama = typeof a === 'object' ? (a.nama_lokasi || a.nama || '') : String(a || '').trim();
+                if (!nama || nama === 'undefined') return;
+                const opt = document.createElement('option');
+                opt.value = nama;
+                opt.innerText = `📍 ${nama}`;
+                selectAsal.appendChild(opt);
+            });
+
+            // Populate Lokasi Tujuan
+            selectTujuan.innerHTML = '<option value="">-- Pilih Lokasi Tujuan --</option>';
+            if (typeof dataRute !== 'undefined' && dataRute) {
+                Object.keys(dataRute).sort().forEach(tName => {
+                    if (!tName || tName === 'undefined') return;
+                    const opt = document.createElement('option');
+                    opt.value = tName;
+                    opt.innerText = `🎯 ${tName}`;
+                    selectTujuan.appendChild(opt);
+                });
+            }
+
+            if (currAsal && currAsal !== 'undefined') selectAsal.value = currAsal;
+            if (currTujuan && currTujuan !== 'undefined') selectTujuan.value = currTujuan;
+        };
+
+        window.muatJalurRuteEditor = function() {
+            const asal = document.getElementById('editor-route-asal').value;
+            const tujuan = document.getElementById('editor-route-tujuan').value;
+            
+            if (!asal || !tujuan) {
+                window.editorWaypoints = [];
+                window.updateUIWaypointsList();
+                if (document.getElementById('route-svg')) document.getElementById('route-svg').style.display = 'none';
+                return;
+            }
+
+            const coordAsal = window.getCoordinatesForLokasi(asal) || { x: 50, y: 90 };
+            const coordTujuan = window.getCoordinatesForLokasi(tujuan) || { x: 50, y: 50 };
+
+            let matchMatrix = dataMatrixRute.find(m => 
+                (m.lokasi_asal === asal || m.nama_asal === asal) && 
+                (m.lokasi_tujuan === tujuan || m.nama_tujuan === tujuan)
+            );
+
+            if (matchMatrix && matchMatrix.waypoints) {
+                try {
+                    let parsed = typeof matchMatrix.waypoints === 'string' ? JSON.parse(matchMatrix.waypoints) : matchMatrix.waypoints;
+                    if (Array.isArray(parsed) && parsed.length >= 2) {
+                        window.editorWaypoints = parsed;
+                    } else {
+                        window.editorWaypoints = [coordAsal, coordTujuan];
+                    }
+                } catch(e) {
+                    window.editorWaypoints = [coordAsal, coordTujuan];
+                }
+            } else {
+                window.editorWaypoints = [coordAsal, coordTujuan];
+            }
+
+            if (matchMatrix) {
+                if (matchMatrix.warna_jalur && document.getElementById('editor-route-color')) {
+                    document.getElementById('editor-route-color').value = matchMatrix.warna_jalur;
+                }
+                if (matchMatrix.gaya_animasi && document.getElementById('editor-route-style')) {
+                    document.getElementById('editor-route-style').value = matchMatrix.gaya_animasi;
+                }
+                if (matchMatrix.ketebalan_garis && document.getElementById('editor-route-width')) {
+                    document.getElementById('editor-route-width').value = matchMatrix.ketebalan_garis;
+                    const lblW = document.getElementById('val-route-width');
+                    if (lblW) lblW.innerText = matchMatrix.ketebalan_garis + 'px';
+                }
+                if (matchMatrix.ukuran_point && document.getElementById('editor-route-dotsize')) {
+                    document.getElementById('editor-route-dotsize').value = matchMatrix.ukuran_point;
+                    const lblD = document.getElementById('val-route-dotsize');
+                    if (lblD) lblD.innerText = matchMatrix.ukuran_point + 'px';
+                }
+            }
+
+            // Lock map panning automatically when loading route in editor
+            window.toggleRouteEditMode(true);
+            window.selectedWaypointIdx = 0;
+            window.updateUIWaypointsList();
+            window.previewJalurEditor();
+        };
+
+        window.toggleModePickWaypoints = function() {
+            const asal = document.getElementById('editor-route-asal').value;
+            const tujuan = document.getElementById('editor-route-tujuan').value;
+
+            if (!asal || !tujuan) {
+                alert("Harap pilih Titik Awal dan Lokasi Tujuan terlebih dahulu!");
+                return;
+            }
+
+            window.isPickingRouteWaypoint = !window.isPickingRouteWaypoint;
+            const btn = document.getElementById('btn-toggle-route-pick');
+
+            if (window.isPickingRouteWaypoint) {
+                window.toggleRouteEditMode(true);
+                if (btn) {
+                    btn.style.background = '#e74c3c';
+                    btn.style.color = '#fff';
+                    btn.innerText = '🛑 Selesai Menambah Point (Klik di Peta AKTIF)';
+                }
+                if (window.tampilkanToast) window.tampilkanToast("👇 Klik lokasi di peta untuk menambah titik belokan baru.");
+            } else {
+                if (btn) {
+                    btn.style.background = '#00a8ff';
+                    btn.style.color = '#000';
+                    btn.innerText = '🖱️ Klik Peta untuk Tambah Belokan / Point';
+                }
+                if (window.tampilkanToast) window.tampilkanToast("Mode tambah point dinonaktifkan.");
+            }
+        };
+
+        window.hapusWaypointTerakhir = function() {
+            if (window.editorWaypoints.length <= 2) {
+                if (window.tampilkanToast) window.tampilkanToast("Hanya tersisa titik awal dan titik tujuan standar.");
+                return;
+            }
+            window.editorWaypoints.splice(window.editorWaypoints.length - 2, 1);
+            window.selectedWaypointIdx = Math.max(0, window.editorWaypoints.length - 2);
+            window.updateUIWaypointsList();
+            window.previewJalurEditor();
+            if (window.tampilkanToast) window.tampilkanToast("↩️ Point belokan terakhir dihapus.");
+        };
+
+        window.resetWaypointsEditor = function() {
+            const asal = document.getElementById('editor-route-asal').value;
+            const tujuan = document.getElementById('editor-route-tujuan').value;
+            const coordAsal = window.getCoordinatesForLokasi(asal) || { x: 50, y: 90 };
+            const coordTujuan = window.getCoordinatesForLokasi(tujuan) || { x: 50, y: 50 };
+
+            window.editorWaypoints = [
+                { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
+                { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
+            ];
+
+            window.selectedWaypointIdx = 0;
+            window.updateUIWaypointsList();
+            window.previewJalurEditor();
+            if (window.tampilkanToast) window.tampilkanToast("🗑️ Jalur rute di-reset ke garis lurus.");
+        };
+
+        let draggingWaypointIdx = null;
+        window.isDraggingWaypoint = false;
+
+        window.attachWaypointDragEvents = function() {
+            const group = document.getElementById('route-waypoints-handles');
+            if (!group) return;
+
+            const handles = group.querySelectorAll('.wpt-handle-group');
+            handles.forEach(handle => {
+                const startDrag = (e) => {
+                    e.stopPropagation();
+                    if (e.type === 'touchstart' && e.touches.length > 1) return;
+                    const targetIdx = parseInt(handle.getAttribute('data-idx'));
+                    if (isNaN(targetIdx) || !window.editorWaypoints || !window.editorWaypoints[targetIdx]) return;
+
+                    draggingWaypointIdx = targetIdx;
+                    window.selectedWaypointIdx = targetIdx;
+                    window.isDraggingWaypoint = false;
+
+                    // Automatically lock map during point drag
+                    if (!window.isRouteEditMode) {
+                        window.toggleRouteEditMode(true);
+                    }
+
+                    const onMove = (moveEvt) => {
+                        moveEvt.preventDefault();
+                        moveEvt.stopPropagation();
+                        window.isDraggingWaypoint = true;
+
+                        const mapWrapper = document.getElementById('interactive-map');
+                        if (!mapWrapper) return;
+                        const rect = mapWrapper.getBoundingClientRect();
+
+                        const clientX = moveEvt.touches ? moveEvt.touches[0].clientX : moveEvt.clientX;
+                        const clientY = moveEvt.touches ? moveEvt.touches[0].clientY : moveEvt.clientY;
+
+                        let px = parseFloat((((clientX - rect.left) / rect.width) * 100).toFixed(1));
+                        let py = parseFloat((((clientY - rect.top) / rect.height) * 100).toFixed(1));
+
+                        px = Math.max(0, Math.min(100, px));
+                        py = Math.max(0, Math.min(100, py));
+
+                        window.editorWaypoints[draggingWaypointIdx] = { x: px, y: py };
+                        if (typeof window.updateUIWaypointsList === 'function') window.updateUIWaypointsList();
+                        if (typeof window.previewJalurEditor === 'function') window.previewJalurEditor();
+                    };
+
+                    const onEnd = (endEvt) => {
+                        window.removeEventListener('mousemove', onMove, { capture: true });
+                        window.removeEventListener('touchmove', onMove, { capture: true });
+                        window.removeEventListener('mouseup', onEnd, { capture: true });
+                        window.removeEventListener('touchend', onEnd, { capture: true });
+
+                        if (window.isDraggingWaypoint && window.editorWaypoints[draggingWaypointIdx]) {
+                            const pt = window.editorWaypoints[draggingWaypointIdx];
+                            let labelName = draggingWaypointIdx === 0 ? "Titik Awal" : (draggingWaypointIdx === window.editorWaypoints.length - 1 ? "Titik Akhir" : `Belokan #${draggingWaypointIdx}`);
+                            if (window.tampilkanToast) {
+                                window.tampilkanToast(`📍 ${labelName} digeser ke (${pt.x}%, ${pt.y}%)`);
+                            }
+                        }
+                        setTimeout(() => {
+                            draggingWaypointIdx = null;
+                            window.isDraggingWaypoint = false;
+                        }, 100);
+                    };
+
+                    window.addEventListener('mousemove', onMove, { passive: false, capture: true });
+                    window.addEventListener('touchmove', onMove, { passive: false, capture: true });
+                    window.addEventListener('mouseup', onEnd, { capture: true });
+                    window.addEventListener('touchend', onEnd, { capture: true });
+                };
+
+                handle.removeEventListener('mousedown', handle._startDrag);
+                handle.removeEventListener('touchstart', handle._startDrag);
+                handle._startDrag = startDrag;
+                handle.addEventListener('mousedown', startDrag);
+                handle.addEventListener('touchstart', startDrag, { passive: false });
+            });
+        };
+
+        window.updateUIWaypointsList = function() {
+            const countEl = document.getElementById('editor-waypoint-count');
+            const listEl = document.getElementById('editor-waypoint-list');
+            const selectEl = document.getElementById('select-active-waypoint-idx');
+            if (!countEl || !listEl) return;
+
+            const total = window.editorWaypoints.length;
+            countEl.innerText = `${total} Points (${Math.max(0, total - 2)} Belokan)`;
+
+            if (total === 0) {
+                listEl.innerHTML = '(Belum ada titik belokan)';
+                if (selectEl) selectEl.innerHTML = '<option value="0">-- Belum Ada Point --</option>';
+                return;
+            }
+
+            if (window.selectedWaypointIdx >= total) window.selectedWaypointIdx = 0;
+            let selIdx = window.selectedWaypointIdx || 0;
+
+            // Populate active waypoint dropdown
+            if (selectEl) {
+                selectEl.innerHTML = window.editorWaypoints.map((p, idx) => {
+                    let label = idx === 0 ? '🏁 START' : (idx === total - 1 ? '🎯 END' : `📍 Turn #${idx}`);
+                    return `<option value="${idx}" ${idx === selIdx ? 'selected' : ''}>${label} (${p.x}%, ${p.y}%)</option>`;
+                }).join('');
+            }
+
+            // Sync current input X & Y
+            const curPt = window.editorWaypoints[selIdx] || window.editorWaypoints[0];
+            const inpX = document.getElementById('input-wpt-x');
+            const inpY = document.getElementById('input-wpt-y');
+            if (inpX) inpX.value = parseFloat(curPt.x).toFixed(1);
+            if (inpY) inpY.value = parseFloat(curPt.y).toFixed(1);
+
+            let html = window.editorWaypoints.map((p, idx) => {
+                let tag = idx === 0 ? '🏁 START' : (idx === total - 1 ? '🎯 END' : `📍 Turn ${idx}`);
+                let color = idx === 0 ? '#D4AF37' : (idx === total - 1 ? '#2ecc71' : '#00a8ff');
+                let isSelected = idx === selIdx;
+                let bgStyle = isSelected ? 'background:#00a8ff22; border-left:3px solid #00a8ff; padding-left:4px;' : '';
+
+                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:3px 4px; border-bottom:1px solid #222; cursor:pointer; ${bgStyle}" onclick="window.selectWaypointIndex(${idx})">
+                    <span style="color:${color}; font-weight:bold;">${tag} ${isSelected ? '🎯' : ''}</span>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <span style="font-family:monospace; color:${isSelected ? '#00ffff' : '#aaa'};">(${p.x}%, ${p.y}%)</span>
+                        ${(idx > 0 && idx < total - 1) ? `<button type="button" style="background:#8B0000; color:#fff; border:none; border-radius:3px; padding:1px 5px; font-size:10px; cursor:pointer;" onclick="event.stopPropagation(); window.editorWaypoints.splice(${idx}, 1); window.updateUIWaypointsList(); window.previewJalurEditor();" title="Hapus Point Ini">✕</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+
+            listEl.innerHTML = html;
+        };
+
+        window.previewJalurEditor = function() {
+            const routeSvg = document.getElementById('route-svg');
+            if (!window.tampilkanGarisRute) {
+                if (routeSvg && !window.tampilkanSemuaJalurMatrix) routeSvg.style.display = 'none';
+                return;
+            }
+
+            const asal = document.getElementById('editor-route-asal')?.value;
+            const tujuan = document.getElementById('editor-route-tujuan')?.value;
+            if (!asal || !tujuan) return;
+
+            const coordAsal = window.getCoordinatesForLokasi(asal) || { x: 50, y: 90 };
+            const coordTujuan = window.getCoordinatesForLokasi(tujuan) || { x: 50, y: 50 };
+            const color = document.getElementById('editor-route-color')?.value || '#00a8ff';
+            const styleType = document.getElementById('editor-route-style')?.value || 'dash';
+            const lineWidth = parseFloat(document.getElementById('editor-route-width')?.value || 1.8);
+            const dotSize = parseFloat(document.getElementById('editor-route-dotsize')?.value || 1.2);
+
+            if (window.editorWaypoints.length < 2) {
+                window.editorWaypoints = [
+                    { x: parseFloat(coordAsal.x), y: parseFloat(coordAsal.y) },
+                    { x: parseFloat(coordTujuan.x), y: parseFloat(coordTujuan.y) }
+                ];
+            }
+
+            const pathD = window.editorWaypoints.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+            const routePath = document.getElementById('route-path');
+            const routeStart = document.getElementById('route-start');
+            const routeEnd = document.getElementById('route-end');
+            const routeGlowDot = document.getElementById('route-glow-dot');
+            const routeDotAnim = document.getElementById('route-dot-anim');
+            const handlesGroup = document.getElementById('route-waypoints-handles');
+
+            if (routePath) {
+                routePath.setAttribute('d', pathD);
+                routePath.setAttribute('stroke', color);
+                routePath.setAttribute('stroke-width', lineWidth);
+                routePath.setAttribute('class', styleType === 'glow' ? 'path-glow' : 'path-anim');
+            }
+
+            if (routeStart) {
+                routeStart.setAttribute('cx', window.editorWaypoints[0].x);
+                routeStart.setAttribute('cy', window.editorWaypoints[0].y);
+                routeStart.setAttribute('r', dotSize);
+            }
+
+            if (routeEnd) {
+                routeEnd.setAttribute('cx', window.editorWaypoints[window.editorWaypoints.length - 1].x);
+                routeEnd.setAttribute('cy', window.editorWaypoints[window.editorWaypoints.length - 1].y);
+                routeEnd.setAttribute('r', dotSize);
+            }
+
+            if (routeGlowDot && routeDotAnim) {
+                routeGlowDot.setAttribute('fill', color === '#00a8ff' ? '#00ffff' : color);
+                routeGlowDot.setAttribute('r', Math.max(0.8, dotSize * 0.8));
+                routeDotAnim.setAttribute('path', pathD);
+                routeGlowDot.style.display = 'block';
+            }
+
+            // Render interactive draggable handles in editor mode for ALL points (Start, Belokan, and End)
+            if (handlesGroup) {
+                let selIdx = window.selectedWaypointIdx || 0;
+                let handlesHtml = window.editorWaypoints.map((p, idx) => {
+                    const isStart = idx === 0;
+                    const isEnd = idx === window.editorWaypoints.length - 1;
+                    const isSelected = (idx === selIdx);
+
+                    const fillColor = isStart ? '#D4AF37' : (isEnd ? '#2ecc71' : color);
+                    const strokeColor = isStart ? '#8B0000' : (isEnd ? '#ffffff' : '#00ffff');
+                    const label = isStart ? '🏁 START' : (isEnd ? '🎯 END' : `#${idx}`);
+                    const labelColor = isStart ? '#D4AF37' : (isEnd ? '#2ecc71' : '#00ffff');
+
+                    const pulseRingR = (dotSize * 2.2).toFixed(1);
+                    const hitAreaR = Math.max(5, dotSize * 3.5).toFixed(1);
+
+                    return `<g class="wpt-handle-group ${isSelected ? 'wpt-active-selected' : ''}" data-idx="${idx}" style="pointer-events: all; cursor: grab;">
+                        <!-- Invisible large touch hit area -->
+                        <circle cx="${p.x}" cy="${p.y}" r="${hitAreaR}" fill="transparent" stroke="none" data-idx="${idx}"/>
+                        
+                        <!-- Outer Ring Highlight / Pulse when selected -->
+                        <circle cx="${p.x}" cy="${p.y}" r="${pulseRingR}" fill="none" stroke="${isSelected ? '#00ffff' : strokeColor}" stroke-width="${isSelected ? '0.8' : '0.4'}" stroke-dasharray="${isSelected ? '0.8,0.8' : 'none'}" vector-effect="non-scaling-stroke"/>
+                        
+                        <!-- Center Visible Anchor Dot -->
+                        <circle cx="${p.x}" cy="${p.y}" r="${dotSize}" fill="${fillColor}" fill-opacity="0.9" stroke="${strokeColor}" stroke-width="0.5" vector-effect="non-scaling-stroke" class="wpt-node-handle" data-idx="${idx}"/>
+                        
+                        <!-- Label Tag -->
+                        <text x="${p.x}" y="${p.y - (dotSize * 1.8 + 1.2)}" fill="${labelColor}" font-size="${isSelected ? '2.8' : '2.2'}" font-weight="bold" text-anchor="middle" vector-effect="non-scaling-stroke" style="pointer-events:none; filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.9));">${label}</text>
+                    </g>`;
+                }).join('');
+                handlesGroup.innerHTML = handlesHtml;
+
+                if (typeof window.attachWaypointDragEvents === 'function') {
+                    window.attachWaypointDragEvents();
+                }
+            }
+
+            if (routeSvg) routeSvg.style.display = 'block';
+        };
+
+        window.simpanJalurRuteEditor = async function() {
+            const asal = document.getElementById('editor-route-asal').value;
+            const tujuan = document.getElementById('editor-route-tujuan').value;
+            const color = document.getElementById('editor-route-color').value;
+            const styleType = document.getElementById('editor-route-style').value;
+            const lineWidth = parseFloat(document.getElementById('editor-route-width')?.value || 1.8);
+            const dotSize = parseFloat(document.getElementById('editor-route-dotsize')?.value || 1.2);
+
+            if (!asal || !tujuan) {
+                alert("Harap pilih Titik Awal dan Lokasi Tujuan!");
+                return;
+            }
+
+            const waypointsStr = JSON.stringify(window.editorWaypoints);
+
+            // Find existing in dataMatrixRute
+            let existing = dataMatrixRute.find(m => 
+                ((m.lokasi_asal || m.nama_asal) === asal || (m.lokasi_asal || m.nama_asal)?.trim().toLowerCase() === asal?.trim().toLowerCase()) &&
+                ((m.lokasi_tujuan || m.nama_tujuan) === tujuan || (m.lokasi_tujuan || m.nama_tujuan)?.trim().toLowerCase() === tujuan?.trim().toLowerCase())
+            );
+
+            let payloadDb = {
+                nama_asal: asal,
+                nama_tujuan: tujuan,
+                waypoints: waypointsStr,
+                warna_jalur: color,
+                gaya_animasi: styleType,
+                ketebalan_garis: lineWidth,
+                ukuran_point: dotSize
+            };
+
+            if (!existing || !existing.instruksi) {
+                payloadDb.instruksi = `Petunjuk rute dari ${asal} menuju ${tujuan}.`;
+            }
+
+            try {
+                if (window.supabase) {
+                    if (existing && existing.id) {
+                        await supabase.from('rute_matrix').update(payloadDb).eq('id', existing.id);
+                    } else {
+                        await supabase.from('rute_matrix').insert(payloadDb);
+                    }
+                }
+
+                // Update local memory state
+                if (existing) {
+                    existing.waypoints = waypointsStr;
+                    existing.warna_jalur = color;
+                    existing.gaya_animasi = styleType;
+                    existing.ketebalan_garis = lineWidth;
+                    existing.ukuran_point = dotSize;
+                } else {
+                    dataMatrixRute.push({
+                        id: 'mat-' + Date.now(),
+                        nama_asal: asal,
+                        nama_tujuan: tujuan,
+                        lokasi_asal: asal,
+                        lokasi_tujuan: tujuan,
+                        instruksi: payloadDb.instruksi,
+                        waypoints: waypointsStr,
+                        warna_jalur: color,
+                        gaya_animasi: styleType,
+                        ketebalan_garis: lineWidth,
+                        ukuran_point: dotSize
+                    });
+                }
+
+                // Save fallback in app_settings
+                if (window.supabase) {
+                    try {
+                        await supabase.from('app_settings').update({ data_matrix_rute: JSON.stringify(dataMatrixRute) }).eq('id', 1);
+                    } catch(e) {}
+                }
+
+                // Sync all data from Supabase
+                if (typeof window.fetchAllDataSupabase === 'function') {
+                    await window.fetchAllDataSupabase();
+                }
+
+                if (window.tampilkanToast) window.tampilkanToast(`✅ Jalur Rute '${asal} ➔ ${tujuan}' (${window.editorWaypoints.length} points) berhasil disimpan ke Supabase!`);
+                
+                window.isPickingRouteWaypoint = false;
+                const btn = document.getElementById('btn-toggle-route-pick');
+                if (btn) {
+                    btn.style.background = '#00a8ff';
+                    btn.style.color = '#000';
+                    btn.innerText = '🖱️ Klik Peta untuk Tambah Belokan / Point';
+                }
+
+                await fetchAllDataSupabase();
+            } catch(err) {
+                alert("Gagal menyimpan rute: " + err.message);
+            }
+        };
+
+        window.ujiAnimasiRuteEditor = function() {
+            const asal = document.getElementById('editor-route-asal').value;
+            const tujuan = document.getElementById('editor-route-tujuan').value;
+            if (!asal || !tujuan) return alert("Pilih Titik Awal dan Lokasi Tujuan!");
+
+            window.previewJalurEditor();
+            if (window.bicara) window.bicara(`Pengujian animasi jalur rute dari ${asal} menuju ${tujuan}.`);
+            if (window.tampilkanToast) window.tampilkanToast(`🧪 Pengujian visual rute ${asal} ➔ ${tujuan}`);
+        };
 
         // ==========================================
         // FETCH DATA SUPABASE
@@ -2172,7 +3229,10 @@
                         lokasi_asal: m.nama_asal || m.lokasi_asal,
                         lokasi_tujuan: m.nama_tujuan || m.lokasi_tujuan,
                         instruksi: m.instruksi || '',
-                        gambar_tanda: m.gambar_tanda || ''
+                        gambar_tanda: m.gambar_tanda || '',
+                        waypoints: m.waypoints || null,
+                        warna_jalur: m.warna_jalur || '#00a8ff',
+                        gaya_animasi: m.gaya_animasi || 'dash'
                     });
                 });
 
@@ -2262,6 +3322,7 @@
                 if(typeof window.inisialisasiDaftarTujuan === 'function') window.inisialisasiDaftarTujuan();
                 if(typeof window.renderTombolTujuan === 'function') window.renderTombolTujuan();
                 if(typeof window.kembaliPilihAsal === 'function') window.kembaliPilihAsal();
+                if(typeof window.populateOptionsRuteEditor === 'function') window.populateOptionsRuteEditor();
                 document.getElementById('sync-indicator').style.display = 'none';
             } catch (error) {
                 console.error(error);
@@ -2302,6 +3363,7 @@
 
             if(window.renderMatrixAdminList) window.renderMatrixAdminList();
             if(window.renderListTitikKumpulAdmin) window.renderListTitikKumpulAdmin();
+            if(window.populateOptionsRuteEditor) window.populateOptionsRuteEditor();
         }
 
         window.resetFormAsal = function() { editAsalName = null; document.getElementById('label-mode-asal').innerText = "Mode: [ Tambah Baru ]"; document.getElementById('btn-save-asal').innerText = "➕ Tambah Baru"; document.getElementById('admin-nama-asal').value = ""; }
@@ -2777,8 +3839,14 @@
 
         
         window.getCoordinatesForLokasi = function(nama) {
-            const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama);
-            if(hs) return {x: hs.x_pos, y: hs.y_pos};
+            if (!nama) return null;
+            const hs = dataHotspots.find(h => h.target_lokasi === nama || h.nama_bangunan === nama || h.nama === nama);
+            if (hs) return { x: parseFloat(hs.x_pos || hs.pos_left || 50), y: parseFloat(hs.y_pos || hs.pos_top || 50) };
+            
+            if (typeof dataTitikKumpul !== 'undefined' && dataTitikKumpul) {
+                const tk = dataTitikKumpul.find(t => t.nama_titik === nama || t.nama === nama);
+                if (tk) return { x: parseFloat(tk.x_pos || 50), y: parseFloat(tk.y_pos || 50) };
+            }
             return null;
         }
 
@@ -2870,15 +3938,20 @@
             const coordAsal = window.getCoordinatesForLokasi(lokasiAsal);
             const coordTujuan = window.getCoordinatesForLokasi(tujuan);
             
-            if (coordAsal && coordTujuan) {
-                document.getElementById('route-line').setAttribute('x1', coordAsal.x + '%');
-                document.getElementById('route-line').setAttribute('y1', coordAsal.y + '%');
-                document.getElementById('route-line').setAttribute('x2', coordTujuan.x + '%');
-                document.getElementById('route-line').setAttribute('y2', coordTujuan.y + '%');
-                document.getElementById('route-start').setAttribute('cx', coordAsal.x + '%');
-                document.getElementById('route-start').setAttribute('cy', coordAsal.y + '%');
-                document.getElementById('route-end').setAttribute('cx', coordTujuan.x + '%');
-                document.getElementById('route-end').setAttribute('cy', coordTujuan.y + '%');
+            if (typeof window.renderGarisRuteSVG === 'function') {
+                window.renderGarisRuteSVG(coordAsal, coordTujuan, matchMatrix);
+            } else if (coordAsal && coordTujuan) {
+                const line = document.getElementById('route-line');
+                if (line) {
+                    line.setAttribute('x1', coordAsal.x); line.setAttribute('y1', coordAsal.y);
+                    line.setAttribute('x2', coordTujuan.x); line.setAttribute('y2', coordTujuan.y);
+                }
+                const path = document.getElementById('route-path');
+                if (path) path.setAttribute('d', `M ${coordAsal.x} ${coordAsal.y} L ${coordTujuan.x} ${coordTujuan.y}`);
+                document.getElementById('route-start').setAttribute('cx', coordAsal.x);
+                document.getElementById('route-start').setAttribute('cy', coordAsal.y);
+                document.getElementById('route-end').setAttribute('cx', coordTujuan.x);
+                document.getElementById('route-end').setAttribute('cy', coordTujuan.y);
                 document.getElementById('route-svg').style.display = 'block';
             } else {
                 document.getElementById('route-svg').style.display = 'none';
@@ -4099,7 +5172,7 @@
             if (secRole) secRole.style.display = (role === 'superadmin') ? 'block' : 'none';
 
             if (role === 'superadmin') {
-                ['section-tujuan', 'section-titik-kumpul', 'section-asal', 'section-matrix', 'section-hotspot', 'section-log-aktivitas', 'section-tts'].forEach(id => {
+                ['section-tujuan', 'section-titik-kumpul', 'section-asal', 'section-matrix', 'section-rute-editor', 'section-hotspot', 'section-log-aktivitas', 'section-tts'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'block';
                 });
@@ -4120,6 +5193,8 @@
                         sec.style.display = (perms[fKey] !== false) ? 'block' : 'none';
                     }
                 });
+                const secRuteEd = document.getElementById('section-rute-editor');
+                if (secRuteEd) secRuteEd.style.display = (perms['matrix'] !== false) ? 'block' : 'none';
             }
 
             if (window.renderRolePermissionsAdmin) window.renderRolePermissionsAdmin();
